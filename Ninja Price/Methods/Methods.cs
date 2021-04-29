@@ -82,7 +82,8 @@ namespace Ninja_Price.Main
                 {"Harbinger's Shard", "Harbinger's Orb"},
                 {"Horizon Shard", "Orb of Horizons"},
                 {"Binding Shard", "Orb of Binding"},
-                {"Scroll Fragment", "Scroll of Wisdom"}
+                {"Scroll Fragment", "Scroll of Wisdom"},
+                {"Ritual Splinter", "Ritual Vessel"}
             };
             try
             {
@@ -185,7 +186,7 @@ namespace Ninja_Price.Main
                                 var shardCurrencySearch = CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == shardParent);
                                 if (shardCurrencySearch != null)
                                 {
-                                    item.PriceData.ChaosValue = item.CurrencyInfo.StackSize * (double)shardCurrencySearch.ChaosEquivalent / 20;
+                                    item.PriceData.ChaosValue = item.CurrencyInfo.StackSize * (double)shardCurrencySearch.ChaosEquivalent / (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20);
                                     item.PriceData.ChangeInLast7Days = (double)shardCurrencySearch.ReceiveSparkLine.TotalChange;
                                 }
 
