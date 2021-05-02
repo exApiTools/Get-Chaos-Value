@@ -56,6 +56,9 @@ namespace Ninja_Price.Settings
         [Menu("League", 1)]
         public ListNode LeagueList { get; set; }
 
+        [Menu("Map Variant Check ?", "Toggle Map Variant Checking", 1)]
+        public ToggleNode MapVariant { get; set; } = new ToggleNode(true);
+
         [Menu("Reload", 2)]
         public ButtonNode ReloadButton { get; set; }
 

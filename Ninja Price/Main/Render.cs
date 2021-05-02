@@ -251,6 +251,7 @@ namespace Ninja_Price.Main
                 {
                     text += $"\n\rItemType: {Hovereditem.ItemType}";
                     text += $"\n\rBaseName: {Hovereditem.BaseName}";
+                    text += $"\n\rMapType: {Hovereditem.MapInfo.MapType}";
                 }
 
                 // var textMeasure = Graphics.MeasureText(text, 15);
