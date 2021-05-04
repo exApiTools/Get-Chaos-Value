@@ -290,7 +290,7 @@ namespace Ninja_Price.Main
                             case 2:
                             case 3:
                             case 4:
-                                var uniqueArmourSearchLinks04 = CollectedData.UniqueArmours.Lines.Find(x => x.Name == item.UniqueName && x.Links <= 4 && x.Links >= 0);
+                                var uniqueArmourSearchLinks04 = CollectedData.UniqueArmours.Lines.Find(x => x.Name == item.UniqueName && (x.Links <= 4 && x.Links >= 0 || x.Links == null));
                                 if (uniqueArmourSearchLinks04 != null)
                                 {
                                     item.PriceData.ChaosValue = (double)uniqueArmourSearchLinks04.ChaosValue;
@@ -380,7 +380,7 @@ namespace Ninja_Price.Main
                             case 2:
                             case 3:
                             case 4:
-                                var uniqueWeaponSearch04 = CollectedData.UniqueWeapons.Lines.Find(x => x.Name == item.UniqueName && x.Links <= 4 && x.Links >= 0);
+                                var uniqueWeaponSearch04 = CollectedData.UniqueWeapons.Lines.Find(x => x.Name == item.UniqueName && (x.Links <= 4 && x.Links >= 0 || x.Links == null));
                                 if (uniqueWeaponSearch04 != null)
                                 {
                                     item.PriceData.ChaosValue = (double)uniqueWeaponSearch04.ChaosValue;

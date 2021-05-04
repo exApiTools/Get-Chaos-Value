@@ -24,7 +24,7 @@ namespace Ninja_Price.Main
         public bool IsHovered;
         public NormalInventoryItem Item;
         public int ItemLevel;
-        public int LargestLink;
+        public int LargestLink { get; set; } = 0;
         public string Path;
         public string ProphecyName;
         public int Quality;

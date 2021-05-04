@@ -1,4 +1,4 @@
-﻿using Ninja_Price.Enums;
+using Ninja_Price.Enums;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace Ninja_Price.Main
         public Stopwatch ValueUpdateTimer = Stopwatch.StartNew();
         public double StashTabValue { get; set; }
         public double InventoryTabValue { get; set; }
+        public double ExaltedValue { get; set; } = 0;
         public List<NormalInventoryItem> ItemList { get; set; } = new List<NormalInventoryItem>();
         public List<CustomItem> FortmattedItemList { get; set; } = new List<CustomItem>();
 
@@ -73,6 +74,7 @@ namespace Ninja_Price.Main
                 {
                     if (ShouldUpdateValues())
                     {
+                        ExaltedValue = (double)CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == "Exalted Orb").ChaosEquivalent;
                         // Format stash items
                         ItemList = new List<NormalInventoryItem>();
                         switch (tabType)
@@ -249,11 +251,12 @@ namespace Ninja_Price.Main
                 }
                 if (Settings.Debug)
                 {
-                    text += $"\n\rItemType: {Hovereditem.ItemType}";
+                    text += $"\n\rUniqueName: {Hovereditem.UniqueName}";
                     text += $"\n\rBaseName: {Hovereditem.BaseName}";
+                    text += $"\n\rItemType: {Hovereditem.ItemType}";
                     text += $"\n\rMapType: {Hovereditem.MapInfo.MapType}";
                 }
-
+                
                 // var textMeasure = Graphics.MeasureText(text, 15);
                 //Graphics.DrawBox(new RectangleF(0, 0, textMeasure.Width, textMeasure.Height), Color.Black);
                 //Graphics.DrawText(text, new Vector2(50, 50), Color.White);
@@ -316,8 +319,7 @@ namespace Ninja_Price.Main
                 if (!Settings.VisibleStashValue.Value || !StashPanel.IsVisible) return;
                 {
                     var pos = new Vector2(Settings.StashValueX.Value, Settings.StashValueY.Value);
-                    var significantDigits =
-                        Math.Round((decimal)StashTabValue, Settings.StashValueSignificantDigits.Value);
+                    var significantDigits = Math.Round((decimal)StashTabValue, Settings.StashValueSignificantDigits.Value);
                     //Graphics.DrawText(
                     //    DrawImage($"{DirectoryFullName}//images//Chaos_Orb_inventory_icon.png",
                     //        new RectangleF(Settings.StashValueX.Value - Settings.StashValueFontSize.Value,
@@ -327,7 +329,7 @@ namespace Ninja_Price.Main
                     //        : $"{significantDigits} Chaos", Settings.StashValueFontSize.Value, pos,
                     //    Settings.UniTextColor);
 
-                    Graphics.DrawText($"{significantDigits} Chaos", pos, Settings.UniTextColor, FontAlign.Center);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(StashTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -352,7 +354,7 @@ namespace Ninja_Price.Main
                     var pos = new Vector2(Settings.InventoryValueX.Value, Settings.InventoryValueY.Value);
                     var significantDigits =
                         Math.Round((decimal)InventoryTabValue, Settings.InventoryValueSignificantDigits.Value);
-                    Graphics.DrawText($"{significantDigits} Chaos", pos, Settings.UniTextColor, FontAlign.Center);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(InventoryTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -398,6 +400,11 @@ namespace Ninja_Price.Main
 
             //Graphics.DrawBox(new RectangleF(position.X - backgroundBox.Width, position.Y, backgroundBox.Width, backgroundBox.Height), Color.Black);
             Graphics.DrawText($"{chaosValueSignificanDigits}", position, Settings.UniTextColor, FontAlign.Center);
+
+            DrawImage($"{DirectoryFullName}//images//Chaos_Orb_inventory_icon.png",
+                new RectangleF(rec.TopRight.X - fontSize, rec.TopRight.Y,
+                    Settings.HighlightFontSize.Value, Settings.HighlightFontSize.Value)
+            );
             //Graphics.DrawFrame(item.Item.GetClientRect(), 2, Settings.HighlightColor.Value);
         }
 
