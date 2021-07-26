@@ -241,6 +241,7 @@ namespace Ninja_Price.Main
                     case ItemTypes.UniqueWeapon:
                     case ItemTypes.NormalMap:
                     case ItemTypes.Incubator:
+                    case ItemTypes.MavenInvitation:
                         if (Hovereditem.PriceData.ChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
                         {
                             text += $"\n\rExalt: {Hovereditem.PriceData.ChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";

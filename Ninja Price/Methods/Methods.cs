@@ -237,6 +237,15 @@ namespace Ninja_Price.Main
                         }
 
                         break;
+                    case ItemTypes.MavenInvitation:
+                        var InvitationSearch = CollectedData.Invitations.Lines.Find(x => x.Name == item.BaseName);
+                        if (InvitationSearch != null)
+                        {
+                            item.PriceData.ChaosValue = (double)InvitationSearch.ChaosValue;
+                            item.PriceData.ChangeInLast7Days = (double)InvitationSearch.Sparkline.TotalChange;
+                        }
+
+                        break;
                     case ItemTypes.DeliriumOrbs:
                         var deliriumOrbsSearch = CollectedData.DeliriumOrb.Lines.Find(x => x.Name == item.BaseName);
                         if (deliriumOrbsSearch != null)

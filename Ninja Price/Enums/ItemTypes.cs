@@ -23,5 +23,6 @@
         Catalyst,
         DeliriumOrbs,
         HarvestSeeds,
+        MavenInvitation
     }
 }

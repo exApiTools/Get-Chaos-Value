@@ -24,5 +24,6 @@ namespace Ninja_Price.Main
         public Incubators.RootObject Incubators { get; set; } = new Incubators.RootObject();
         public DeliriumOrb.RootObject DeliriumOrb { get; set; } = new DeliriumOrb.RootObject();
         public Seeds.RootObject Seeds { get; set; } = new Seeds.RootObject();
+        public Invitations.RootObject Invitations { get; set; } = new Invitations.RootObject();
     }
 }

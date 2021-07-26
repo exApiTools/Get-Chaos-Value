@@ -29,6 +29,7 @@ namespace Ninja_Price.Main
         private const string Oil_URL = "https://poe.ninja/api/data/itemoverview?type=Oil&league=";
         private const string DeliriumOrb_URL = "https://poe.ninja/api/data/itemoverview?type=DeliriumOrb&league=";
         private const string Seed_URL = "https://poe.ninja/api/data/itemoverview?type=Seed&league=";
+        private const string Invitation_URL = "https://poe.ninja/api/data/ItemOverview?type=Invitation&league=";
 
         private void GetJsonData(string league)
         {
@@ -61,6 +62,7 @@ namespace Ninja_Price.Main
                     Api.Json.SaveSettingFile(NinjaDirectory + "Incubators.json", JsonConvert.DeserializeObject<Incubators.RootObject>(Api.DownloadFromUrl(Incubators_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "Scarabs.json", JsonConvert.DeserializeObject<Scarab.RootObject>(Api.DownloadFromUrl(Scarabs_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "DeliriumOrbs.json", JsonConvert.DeserializeObject<DeliriumOrb.RootObject>(Api.DownloadFromUrl(DeliriumOrb_URL + league)));
+                    Api.Json.SaveSettingFile(NinjaDirectory + "Invitations.json", JsonConvert.DeserializeObject<Invitations.RootObject>(Api.DownloadFromUrl(Invitation_URL + league)));
 
                     // Not core, throw it at the bottom...
                     Api.Json.SaveSettingFile(NinjaDirectory + "Seeds.json", JsonConvert.DeserializeObject<Seeds.RootObject>(Api.DownloadFromUrl(Seed_URL + league)));
@@ -225,6 +227,13 @@ namespace Ninja_Price.Main
                     {
                         var json = r.ReadToEnd();
                         newData.Seeds = JsonConvert.DeserializeObject<Seeds.RootObject>(json);
+                    }
+
+                if (JsonExists("Invitations.json"))
+                    using (var r = new StreamReader(NinjaDirectory + "Invitations.json"))
+                    {
+                        var json = r.ReadToEnd();
+                        newData.Invitations = JsonConvert.DeserializeObject<Invitations.RootObject>(json);
                     }
 
                 CollectedData = newData;

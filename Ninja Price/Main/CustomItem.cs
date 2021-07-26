@@ -177,7 +177,7 @@ namespace Ninja_Price.Main
 
                 // sort items into types to use correct json data later from poe.ninja
                 // This might need tweaking since if this catches anything other than currency.
-                if (ClassName == "StackableCurrency" && !BaseName.StartsWith("Simulacrum") &&
+                if (ClassName == "StackableCurrency" && !BaseName.StartsWith("Crescent Splinter") && !BaseName.StartsWith("Simulacrum") &&
                     !BaseName.EndsWith("Delirium Orb") && !BaseName.Contains("Essence") && !BaseName.EndsWith(" Oil") &&
                     !BaseName.Contains("Remnant of") && !BaseName.Contains("Timeless ") && BaseName != "Prophecy" &&
                     ClassName != "MapFragment" && !BaseName.EndsWith(" Fossil") && !BaseName.StartsWith("Splinter of ") && ClassName != "Incubator" &&
@@ -204,7 +204,7 @@ namespace Ninja_Price.Main
                     ItemType = ItemTypes.Essence;
                 }
                 else if (((ClassName == "MapFragment" || BaseName.Contains("Timeless ") ||
-                          BaseName.StartsWith("Simulacrum")) && !BaseName.EndsWith(" Scarab")) || ClassName == "StackableCurrency" && BaseName.StartsWith("Splinter of "))
+                          BaseName.StartsWith("Simulacrum")) && !BaseName.EndsWith(" Scarab")) || ClassName == "StackableCurrency" && BaseName.StartsWith("Splinter of ") ||  BaseName.StartsWith("Crescent Splinter"))
                 {
                     ItemType = ItemTypes.Fragment;
                 }
@@ -239,6 +239,10 @@ namespace Ninja_Price.Main
                 else if (ClassName == "HarvestSeed")
                 {
                     ItemType = ItemTypes.HarvestSeeds;
+                }
+                else if (BaseName.StartsWith("Maven's Invitation: "))
+                {
+                    ItemType = ItemTypes.MavenInvitation;
                 }
                 else
                     switch (Rarity) // Unique information
