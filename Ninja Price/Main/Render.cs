@@ -388,7 +388,7 @@ namespace Ninja_Price.Main
         {
                 
 
-            var hoverUi = GameController.Game.IngameState.UIHoverTooltip.Tooltip;
+            var hoverUi = GameController.Game.IngameState.UIHoverElement.Tooltip;
             if (hoverUi != null && (item.Rarity != ItemRarity.Unique || hoverUi.GetClientRect().Intersects(item.Item.GetClientRect()) && hoverUi.IsVisibleLocal)) return;
 
             var chaosValueSignificanDigits = Math.Round((decimal) item.PriceData.MinChaosValue, Settings.HighlightSignificantDigits.Value);
