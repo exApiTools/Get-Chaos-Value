@@ -7,13 +7,13 @@ namespace Ninja_Price.API.PoeNinja.Classes
         public class Sparkline
         {
             public List<object> data { get; set; }
-            public int totalChange { get; set; }
+            public double totalChange { get; set; }
         }
 
         public class LowConfidenceSparkline
         {
             public List<object> data { get; set; }
-            public int totalChange { get; set; }
+            public double totalChange { get; set; }
         }
 
         public class Line

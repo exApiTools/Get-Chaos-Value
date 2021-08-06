@@ -9,6 +9,7 @@ using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.Elements.InventoryElements;
 using ExileCore.Shared.Enums;
+using Ninja_Price.API.PoeNinja.Classes;
 using Color = SharpDX.Color;
 using RectangleF = SharpDX.RectangleF;
 using Vector4 = System.Numerics.Vector4;
@@ -184,7 +185,7 @@ namespace Ninja_Price.Main
                                     var shardCurrencySearch = CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == shardParent);
                                     if (shardCurrencySearch != null)
                                     {
-                                        item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * (double)shardCurrencySearch.ChaosEquivalent / 20;
+                                        item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * (double)shardCurrencySearch.ChaosEquivalent / (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20);
                                         item.PriceData.ChangeInLast7Days = (double)shardCurrencySearch.ReceiveSparkLine.TotalChange;
                                     }
 
@@ -231,6 +232,15 @@ namespace Ninja_Price.Main
                             {
                                 item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * (double)fragmentSearch.ChaosEquivalent;
                                 item.PriceData.ChangeInLast7Days = (double)fragmentSearch.ReceiveSparkLine.TotalChange;
+                            }
+
+                            break;
+                        case ItemTypes.MavenInvitation:
+                            var InvitationSearch = CollectedData.Invitations.Lines.Find(x => x.Name == item.BaseName);
+                            if (InvitationSearch != null)
+                            {
+                                item.PriceData.MinChaosValue = (double)InvitationSearch.ChaosValue;
+                                item.PriceData.ChangeInLast7Days = (double)InvitationSearch.Sparkline.TotalChange;
                             }
 
                             break;
@@ -518,16 +528,28 @@ namespace Ninja_Price.Main
                             switch (item.MapInfo.MapType)
                             {
                                 case MapTypes.Blighted:
-                                    var normalBlightedMapSearch = CollectedData.WhiteMaps.Lines.Find(x => x.Name == item.BaseName && item.MapInfo.MapTier == x.MapTier);
-                                    if (normalBlightedMapSearch != null)
-                                    {
-                                        item.PriceData.MinChaosValue = (double)normalBlightedMapSearch.ChaosValue;
-                                        item.PriceData.ChangeInLast7Days = (double)normalBlightedMapSearch.Sparkline.TotalChange;
-                                    }
+                                    WhiteMaps.Line normalBlightedMapSearch;
+
+                                    if (Settings.MapVariant.Value)
+                                        normalBlightedMapSearch = CollectedData.WhiteMaps.Lines.Find(x => x.BaseType == $"Blighted {item.BaseName}" && item.MapInfo.MapTier == x.MapTier && x.Variant == Settings.LeagueList.Value);
+                                    else
+                                        normalBlightedMapSearch = CollectedData.WhiteMaps.Lines.Find(x => x.BaseType == $"Blighted {item.BaseName}" && item.MapInfo.MapTier == x.MapTier);
+
+                                        if (normalBlightedMapSearch != null)
+                                        {
+                                            item.PriceData.MinChaosValue = (double)normalBlightedMapSearch.ChaosValue;
+                                            item.PriceData.ChangeInLast7Days = (double)normalBlightedMapSearch.Sparkline.TotalChange;
+                                        }
 
                                     break;
                                 case MapTypes.None:
-                                    var normalMapSearch = CollectedData.WhiteMaps.Lines.Find(x => x.Name == item.BaseName && item.MapInfo.MapTier == x.MapTier);
+                                    WhiteMaps.Line normalMapSearch;
+
+                                    if (Settings.MapVariant.Value)
+                                        normalMapSearch = CollectedData.WhiteMaps.Lines.Find(x => x.BaseType == item.BaseName && item.MapInfo.MapTier == x.MapTier && x.Variant == Settings.LeagueList.Value);
+                                    else
+                                        normalMapSearch = CollectedData.WhiteMaps.Lines.Find(x => x.BaseType == item.BaseName && item.MapInfo.MapTier == x.MapTier);
+
                                     if (normalMapSearch != null)
                                     {
                                         item.PriceData.MinChaosValue = (double)normalMapSearch.ChaosValue;
@@ -626,5 +648,97 @@ namespace Ninja_Price.Main
             if (Settings.Debug) LogMessage($"{GetCurrentMethod()}.ShouldUpdateValues() == True", 5, Color.LimeGreen);
             return true;
         }
+
+
+        private double? GetProphecyValues(string ProphName)
+        {
+            var item = CollectedData.Prophecies.Lines.Find(x => x.Name == ProphName);
+            if (item == null) return NotFound;
+            var value = item.ChaosValue;
+            return value;
+        }
+        
+        private CustomItem GetHelmetEnchantValue(string EnchantName)
+        {
+            if (string.IsNullOrWhiteSpace(EnchantName))
+                return null;
+
+            var enchantSearch = CollectedData.HelmetEnchants.lines.Find(x => x.name.ToLower().Contains(EnchantName.ToLower()));
+            return enchantSearch == null
+                ? null
+                : new CustomItem
+                {
+                    PriceData = new ReleventPriceData
+                    {
+                        MinChaosValue = enchantSearch.chaosValue, ExaltedPrice = enchantSearch.exaltedValue,
+                        ItemType = ItemTypes.None, ChangeInLast7Days = enchantSearch.sparkline.totalChange
+                    },
+                    BaseName = enchantSearch.name
+                };
+        }
+
+        private Vector4 ToImVector4(SharpDX.Vector4 vector)
+        {
+            return new Vector4(vector.X, vector.Y, vector.Z, vector.W);
+        }
+
+        /*
+         * format is as follows
+         * To change color of the string surround hex codes with {} Example: "Uncolored {#AARRGGBB}Colored"
+         * having a blank {} will make it go back to default imgui text color, Example: "Uncolored {#AARRGGBB}Colored {}Back to orig color"
+         */
+        //public void Coloredtext(string TextIn)
+        //{
+        //    try
+        //    {
+        //        var accumulatedText = "";
+        //        var startColor = ImGui.GetStyle().GetColor(ColorTarget.Text);
+        //        var hexCode = "";
+        //        var sameLine = false;
+        //        var nextColor = startColor;
+        //        for (var i = 0; i < TextIn.Length; i++)
+        //        {
+        //            if (TextIn[i] == '{')
+        //            {
+        //                var foundBracketStart = TextIn.Substring(i + 1);
+        //                for (var j = 0; j < foundBracketStart.Length; j++)
+        //                {
+        //                    i++;
+        //                    if (foundBracketStart[j] == '}')
+        //                        break;
+        //                    hexCode += foundBracketStart[j];
+        //                }
+
+        //                if (sameLine)
+        //                    ImGui.SameLine(0f, 0f);
+        //                ImGui.Text(accumulatedText);
+        //                if (TextIn[i - 1] == '{')
+        //                    nextColor = startColor;
+        //                accumulatedText = "";
+        //                sameLine = true;
+        //                if (hexCode != "")
+        //                {
+        //                    var tempColor = ColorTranslator.FromHtml(hexCode);
+        //                    var tempColor2 = new Color(tempColor.R, tempColor.G, tempColor.B, tempColor.A).ToVector4();
+        //                    nextColor = new Vector4(tempColor2.X, tempColor2.Y, tempColor2.Z, tempColor2.W);
+        //                }
+
+        //                i++;
+        //                hexCode = "";
+        //            }
+
+        //            accumulatedText += TextIn[i];
+        //        }
+
+        //        if (sameLine)
+        //            ImGui.SameLine(0f, 0f);
+        //        ImGui.Text(accumulatedText);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        // This spams all the time even tho nothing seems broken so it can fuck riiiiiiiight off
+        //        //LogError("ColorText: Incorrect hex format \n" + e, 15);
+        //    }
+        //}
     }
 }

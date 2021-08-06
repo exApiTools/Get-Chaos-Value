@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -29,6 +29,8 @@ namespace Ninja_Price.Main
         private const string Oil_URL = "https://poe.ninja/api/data/itemoverview?type=Oil&league=";
         private const string DeliriumOrb_URL = "https://poe.ninja/api/data/itemoverview?type=DeliriumOrb&league=";
         private const string Vial_URL = "https://poe.ninja/api/data/itemoverview?type=Vial&league=";
+        private const string Invitation_URL = "https://poe.ninja/api/data/ItemOverview?type=Invitation&league=";
+        private const string HelmetEnchants_URL = "https://poe.ninja/api/data/ItemOverview?type=HelmetEnchant&league=";
 
         private void GetJsonData(string league)
         {
@@ -62,8 +64,9 @@ namespace Ninja_Price.Main
                     Api.Json.SaveSettingFile(NinjaDirectory + "Scarabs.json", JsonConvert.DeserializeObject<Scarab.RootObject>(Api.DownloadFromUrl(Scarabs_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "DeliriumOrbs.json", JsonConvert.DeserializeObject<DeliriumOrb.RootObject>(Api.DownloadFromUrl(DeliriumOrb_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "Vials.json", JsonConvert.DeserializeObject<Vials.RootObject>(Api.DownloadFromUrl(Vial_URL + league)));
+                    Api.Json.SaveSettingFile(NinjaDirectory + "Invitations.json", JsonConvert.DeserializeObject<Invitations.RootObject>(Api.DownloadFromUrl(Invitation_URL + league)));
+                    Api.Json.SaveSettingFile(NinjaDirectory + "HelmetEnchants.json", JsonConvert.DeserializeObject<HelmetEnchants.RootObject>(Api.DownloadFromUrl(HelmetEnchants_URL + league)));
 
-                    // Not core, throw it at the bottom...
                     LogMessage("Finished Gathering Data from Poe.Ninja.", 5);
                     UpdatingFromAPI = false;
                     UpdatePoeNinjaData();
@@ -225,6 +228,20 @@ namespace Ninja_Price.Main
                     {
                         var json = r.ReadToEnd();
                         newData.Vials = JsonConvert.DeserializeObject<Vials.RootObject>(json);
+                    }
+
+                if (JsonExists("Invitations.json"))
+                    using (var r = new StreamReader(NinjaDirectory + "Invitations.json"))
+                    {
+                        var json = r.ReadToEnd();
+                        newData.Invitations = JsonConvert.DeserializeObject<Invitations.RootObject>(json);
+                    }
+
+                if (JsonExists("HelmetEnchants.json"))
+                    using (var r = new StreamReader(NinjaDirectory + "HelmetEnchants.json"))
+                    {
+                        var json = r.ReadToEnd();
+                        newData.HelmetEnchants = JsonConvert.DeserializeObject<HelmetEnchants.RootObject>(json);
                     }
 
                 CollectedData = newData;

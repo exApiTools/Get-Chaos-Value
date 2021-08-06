@@ -1,4 +1,4 @@
-﻿using Ninja_Price.API.PoeNinja.Classes;
+using Ninja_Price.API.PoeNinja.Classes;
 
 namespace Ninja_Price.Main
 {
@@ -24,5 +24,6 @@ namespace Ninja_Price.Main
         public Incubators.RootObject Incubators { get; set; } = new Incubators.RootObject();
         public DeliriumOrb.RootObject DeliriumOrb { get; set; } = new DeliriumOrb.RootObject();
         public Vials.RootObject Vials { get; set; } = new Vials.RootObject();
+        public Invitations.RootObject Invitations { get; set; } = new Invitations.RootObject();
     }
 }

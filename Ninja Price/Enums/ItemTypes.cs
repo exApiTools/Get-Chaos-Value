@@ -1,4 +1,4 @@
-﻿namespace Ninja_Price.Enums
+namespace Ninja_Price.Enums
 {
     public enum ItemTypes
     {
@@ -23,5 +23,6 @@
         Catalyst,
         DeliriumOrbs,
         Vials,
+        MavenInvitation
     }
 }

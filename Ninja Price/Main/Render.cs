@@ -22,6 +22,7 @@ namespace Ninja_Price.Main
         public Stopwatch ValueUpdateTimer = Stopwatch.StartNew();
         public double StashTabValue { get; set; }
         public double InventoryTabValue { get; set; }
+        public double ExaltedValue { get; set; } = 0;
         public List<NormalInventoryItem> ItemList { get; set; } = new List<NormalInventoryItem>();
         public List<CustomItem> FortmattedItemList { get; set; } = new List<CustomItem>();
 
@@ -73,6 +74,7 @@ namespace Ninja_Price.Main
                 {
                     if (ShouldUpdateValues())
                     {
+                        ExaltedValue = (double)CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == "Exalted Orb").ChaosEquivalent;
                         // Format stash items
                         ItemList = new List<NormalInventoryItem>();
                         switch (tabType)
@@ -199,7 +201,7 @@ namespace Ninja_Price.Main
         public void DrawGraphics()
         {
             // Hovered Item
-            if (Hovereditem != null && Hovereditem.ItemType != ItemTypes.None)
+            if (Hovereditem != null && Hovereditem.ItemType != ItemTypes.None && Settings.HoveredItem.Value)
             {
                 var text = $"Change in last 7 Days: {Hovereditem.PriceData.ChangeInLast7Days}%%";
                 var changeTextLength = text.Length-1;
@@ -242,6 +244,7 @@ namespace Ninja_Price.Main
                     case ItemTypes.Prophecy:
                     case ItemTypes.Map:
                     case ItemTypes.Incubator:
+                    case ItemTypes.MavenInvitation:
                         if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
                         {
                             text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
@@ -252,8 +255,10 @@ namespace Ninja_Price.Main
                 }
                 if (Settings.Debug)
                 {
-                    text += $"\n\rItemType: {Hovereditem.ItemType}";
+                    text += $"\n\rUniqueName: {Hovereditem.UniqueName}";
                     text += $"\n\rBaseName: {Hovereditem.BaseName}";
+                    text += $"\n\rItemType: {Hovereditem.ItemType}";
+                    text += $"\n\rMapType: {Hovereditem.MapInfo.MapType}";
                 }
 
                 // var textMeasure = Graphics.MeasureText(text, 15);
@@ -267,6 +272,9 @@ namespace Ninja_Price.Main
 
             // Inventory Value
             VisibleInventoryValue();
+
+            if (Settings.HelmetEnchantPrices)
+                ShowHelmetEnchantPrices();
 
             if (!StashPanel.IsVisible)
                 return;
@@ -318,8 +326,7 @@ namespace Ninja_Price.Main
                 if (!Settings.VisibleStashValue.Value || !StashPanel.IsVisible) return;
                 {
                     var pos = new Vector2(Settings.StashValueX.Value, Settings.StashValueY.Value);
-                    var significantDigits =
-                        Math.Round((decimal)StashTabValue, Settings.StashValueSignificantDigits.Value);
+                    var significantDigits = Math.Round((decimal)StashTabValue, Settings.StashValueSignificantDigits.Value);
                     //Graphics.DrawText(
                     //    DrawImage($"{DirectoryFullName}//images//Chaos_Orb_inventory_icon.png",
                     //        new RectangleF(Settings.StashValueX.Value - Settings.StashValueFontSize.Value,
@@ -329,7 +336,7 @@ namespace Ninja_Price.Main
                     //        : $"{significantDigits} Chaos", Settings.StashValueFontSize.Value, pos,
                     //    Settings.UniTextColor);
 
-                    Graphics.DrawText($"{significantDigits} Chaos", pos, Settings.UniTextColor, FontAlign.Center);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(StashTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -354,7 +361,7 @@ namespace Ninja_Price.Main
                     var pos = new Vector2(Settings.InventoryValueX.Value, Settings.InventoryValueY.Value);
                     var significantDigits =
                         Math.Round((decimal)InventoryTabValue, Settings.InventoryValueSignificantDigits.Value);
-                    Graphics.DrawText($"{significantDigits} Chaos", pos, Settings.UniTextColor, FontAlign.Center);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(InventoryTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -401,6 +408,43 @@ namespace Ninja_Price.Main
             //Graphics.DrawBox(new RectangleF(position.X - backgroundBox.Width, position.Y, backgroundBox.Width, backgroundBox.Height), Color.Black);
             Graphics.DrawText($"{chaosValueSignificanDigits}", position, Settings.UniTextColor, FontAlign.Center);
             //Graphics.DrawFrame(item.Item.GetClientRect(), 2, Settings.HighlightColor.Value);
+        }
+
+
+        private void ShowHelmetEnchantPrices()
+        {
+            ExileCore.PoEMemory.Element GetElementByString(ExileCore.PoEMemory.Element element, string str)
+            {
+                if (string.IsNullOrWhiteSpace(str))
+                    return null;
+
+                if (element.Text != null && element.Text.Contains(str))
+                    return element;
+
+                return element.Children.Select(c => GetElementByString(c, str)).FirstOrDefault(e => e != null);
+            }
+            
+            var igui = GameController.Game.IngameState.IngameUi;
+            if (!igui.LabyrinthDivineFontPanel.IsVisible) return;
+            var triggerEnchantment = GetElementByString(igui.LabyrinthDivineFontPanel, "lvl ");
+            var enchantmentContainer = triggerEnchantment?.Parent?.Parent;
+            if(enchantmentContainer == null) return;
+            var enchants = enchantmentContainer.Children.Select(c => new {Name = c.Children[1].Text, ContainerElement = c}).AsEnumerable();
+            if (!enchants.Any()) return;
+            foreach (var enchant in enchants)
+            {
+                var data = GetHelmetEnchantValue(enchant.Name);
+                if (data == null) continue;
+                var box = enchant.ContainerElement.GetClientRect();
+                var drawBox = new RectangleF(box.X + box.Width, box.Y - 2, 65, box.Height);
+                var position = new Vector2(drawBox.Center.X, drawBox.Center.Y - 7);
+
+                var textColor = data.PriceData.ExaltedPrice >= 1 ? Color.Black : Color.White;
+                var bgColor = data.PriceData.ExaltedPrice >= 1 ? Color.Goldenrod : Color.Black;
+                Graphics.DrawText(Math.Round((decimal) data.PriceData.MinChaosValue, 2).ToString() + "c", position, textColor, FontAlign.Center);
+                Graphics.DrawBox(drawBox, bgColor);
+                Graphics.DrawFrame(drawBox, Color.Black, 1);
+            }
         }
     }
 }
