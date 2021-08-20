@@ -1,4 +1,4 @@
-﻿using Ninja_Price.Enums;
+using Ninja_Price.Enums;
 using SharpDX;
 using System;
 using System.Collections.Generic;
@@ -19,9 +19,6 @@ namespace Ninja_Price.Main
     public partial class Main
     {
         // TODO: Clean this shit up later
-        private static Vector2 lastProphWindowPos = new Vector2(0, 0);
-
-        private static Vector2 lastProphWindowSize = new Vector2(0, 0);
         public Stopwatch ValueUpdateTimer = Stopwatch.StartNew();
         public double StashTabValue { get; set; }
         public double InventoryTabValue { get; set; }
@@ -123,7 +120,7 @@ namespace Ninja_Price.Main
                         if (!item.Item.IsVisible && item.ItemType != ItemTypes.None)
                             continue; // Disregard non visable items as that usually means they arnt part of what we want to look at
 
-                        StashTabValue += item.PriceData.ChaosValue;
+                        StashTabValue += item.PriceData.MinChaosValue;
                         ItemsToDrawList.Add(item);
                     }
 
@@ -135,7 +132,7 @@ namespace Ninja_Price.Main
                         if (!item.Item.IsVisible && item.ItemType != ItemTypes.None)
                             continue; // Disregard non visable items as that usually means they arnt part of what we want to look at
 
-                        InventoryTabValue += item.PriceData.ChaosValue;
+                        InventoryTabValue += item.PriceData.MinChaosValue;
                         InventoryItemsToDrawList.Add(item);
                     }
                 }
@@ -166,7 +163,7 @@ namespace Ninja_Price.Main
                         if (!item.Item.IsVisible && item.ItemType != ItemTypes.None)
                             continue; // Disregard non visable items as that usually means they arnt part of what we want to look at
 
-                        InventoryTabValue += item.PriceData.ChaosValue;
+                        InventoryTabValue += item.PriceData.MinChaosValue;
                         InventoryItemsToDrawList.Add(item);
                     }
                 }
@@ -221,32 +218,40 @@ namespace Ninja_Price.Main
                     case ItemTypes.Oil:
                     case ItemTypes.Artifact:
                     case ItemTypes.Catalyst:
-                    case ItemTypes.DeliriumOrbs:    
+                    case ItemTypes.DeliriumOrbs:
+                    case ItemTypes.Vials:
                     case ItemTypes.DivinationCard:
-                        if (Hovereditem.PriceData.ChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
+                        if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
                         {
-                            text += $"\n\rExalt: {Hovereditem.PriceData.ChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
+                            text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
                             text += $"\n\r{String.Concat(Enumerable.Repeat('-', changeTextLength))}";
                         }
-                        text += $"\n\rChaos: {Hovereditem.PriceData.ChaosValue / Hovereditem.CurrencyInfo.StackSize}c";
-                        text += $"\n\rTotal: {Hovereditem.PriceData.ChaosValue}c";
+                        text += $"\n\rChaos: {Hovereditem.PriceData.MinChaosValue / Hovereditem.CurrencyInfo.StackSize}c";
+                        text += $"\n\rTotal: {Hovereditem.PriceData.MinChaosValue}c";
                         break;
-                    case ItemTypes.Prophecy:
                     case ItemTypes.UniqueAccessory:
                     case ItemTypes.UniqueArmour:
                     case ItemTypes.UniqueFlask:
                     case ItemTypes.UniqueJewel:
                     case ItemTypes.UniqueMap:
                     case ItemTypes.UniqueWeapon:
-                    case ItemTypes.NormalMap:
-                    case ItemTypes.Incubator:
-                    case ItemTypes.MavenInvitation:
-                        if (Hovereditem.PriceData.ChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
+                        if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
                         {
-                            text += $"\n\rExalt: {Hovereditem.PriceData.ChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
+                            text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex - {Hovereditem.PriceData.MaxChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
                             text += $"\n\r{String.Concat(Enumerable.Repeat('-', changeTextLength))}";
                         }
-                        text += $"\n\rChaos: {Hovereditem.PriceData.ChaosValue}c";
+                        text += $"\n\rChaos: {Hovereditem.PriceData.MinChaosValue}c - {Hovereditem.PriceData.MaxChaosValue}c";
+                        break;
+                    case ItemTypes.Prophecy:
+                    case ItemTypes.Map:
+                    case ItemTypes.Incubator:
+                    case ItemTypes.MavenInvitation:
+                        if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
+                        {
+                            text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
+                            text += $"\n\r{String.Concat(Enumerable.Repeat('-', changeTextLength))}";
+                        }
+                        text += $"\n\rChaos: {Hovereditem.PriceData.MinChaosValue}c";
                         break;
                 }
                 if (Settings.Debug)
@@ -256,9 +261,8 @@ namespace Ninja_Price.Main
                     text += $"\n\rItemType: {Hovereditem.ItemType}";
                     text += $"\n\rMapType: {Hovereditem.MapInfo.MapType}";
                 }
-                
 
-               var textMeasure = Graphics.MeasureText(text, 15);
+                // var textMeasure = Graphics.MeasureText(text, 15);
                 //Graphics.DrawBox(new RectangleF(0, 0, textMeasure.Width, textMeasure.Height), Color.Black);
                 //Graphics.DrawText(text, new Vector2(50, 50), Color.White);
 
@@ -284,7 +288,8 @@ namespace Ninja_Price.Main
             {
                 if (customItem.ItemType == ItemTypes.None) continue;
 
-                if (Settings.CurrencyTabSpecifcToggle)
+                if (Settings.CurrencyTabSpecifcToggle &&
+                    (!Settings.DoNotDrawCurrencyTabSpecifcWhileItemHovered || GameController.Game.IngameState.UIHover.Address == 0))
                 {
                     switch (tabType)
                     {
@@ -378,8 +383,8 @@ namespace Ninja_Price.Main
             var box = item.Item.GetClientRect();
             var drawBox = new RectangleF(box.X, box.Y - 2, box.Width, -Settings.CurrencyTabBoxHeight);
             var position = new Vector2(drawBox.Center.X, drawBox.Center.Y - Settings.CurrencyTabFontSize.Value / 2);
-
-            Graphics.DrawText(Math.Round((decimal) item.PriceData.ChaosValue, Settings.CurrenctTabSigDigits.Value).ToString(), position, Settings.CurrencyTabFontColor, FontAlign.Center);
+           
+            Graphics.DrawText(Math.Round((decimal) item.PriceData.MinChaosValue, Settings.CurrenctTabSigDigits.Value).ToString(), position, Settings.CurrencyTabFontColor, FontAlign.Center);
             Graphics.DrawBox(drawBox, Settings.CurrencyTabBackgroundColor);
             //Graphics.DrawFrame(drawBox, 1, Settings.CurrencyTabBorderColor);
         }
@@ -395,20 +400,15 @@ namespace Ninja_Price.Main
             var hoverUi = GameController.Game.IngameState.UIHoverTooltip.Tooltip;
             if (hoverUi != null && (item.Rarity != ItemRarity.Unique || hoverUi.GetClientRect().Intersects(item.Item.GetClientRect()) && hoverUi.IsVisibleLocal)) return;
 
-            var chaosValueSignificanDigits = Math.Round((decimal) item.PriceData.ChaosValue, Settings.HighlightSignificantDigits.Value);
+            var chaosValueSignificanDigits = Math.Round((decimal) item.PriceData.MinChaosValue, Settings.HighlightSignificantDigits.Value);
             if (chaosValueSignificanDigits >= Settings.InventoryValueCutOff.Value) return;
             var rec = item.Item.GetClientRect();
             var fontSize = Settings.HighlightFontSize.Value;
-            var backgroundBox = Graphics.MeasureText($"{chaosValueSignificanDigits}", fontSize);
+            // var backgroundBox = Graphics.MeasureText($"{chaosValueSignificanDigits}", fontSize);
             var position = new Vector2(rec.TopRight.X - fontSize, rec.TopRight.Y);
 
             //Graphics.DrawBox(new RectangleF(position.X - backgroundBox.Width, position.Y, backgroundBox.Width, backgroundBox.Height), Color.Black);
             Graphics.DrawText($"{chaosValueSignificanDigits}", position, Settings.UniTextColor, FontAlign.Center);
-
-            DrawImage($"{DirectoryFullName}//images//Chaos_Orb_inventory_icon.png",
-                new RectangleF(rec.TopRight.X - fontSize, rec.TopRight.Y,
-                    Settings.HighlightFontSize.Value, Settings.HighlightFontSize.Value)
-            );
             //Graphics.DrawFrame(item.Item.GetClientRect(), 2, Settings.HighlightColor.Value);
         }
 
@@ -443,65 +443,10 @@ namespace Ninja_Price.Main
 
                 var textColor = data.PriceData.ExaltedPrice >= 1 ? Color.Black : Color.White;
                 var bgColor = data.PriceData.ExaltedPrice >= 1 ? Color.Goldenrod : Color.Black;
-                Graphics.DrawText(Math.Round((decimal) data.PriceData.ChaosValue, 2).ToString() + "c", position, textColor, FontAlign.Center);
+                Graphics.DrawText(Math.Round((decimal) data.PriceData.MinChaosValue, 2).ToString() + "c", position, textColor, FontAlign.Center);
                 Graphics.DrawBox(drawBox, bgColor);
                 Graphics.DrawFrame(drawBox, Color.Black, 1);
             }
         }
-
-        //private void PropheccyDisplay()
-        //{
-        //    if (!Settings.ProphecyPrices)
-        //        return;
-
-        //    try
-        //    {
-        //        var UIHover = GameController.Game.IngameState.UIHover;
-        //        var newBox = new RectangleF(lastProphWindowPos.X, lastProphWindowPos.Y, lastProphWindowSize.X, lastProphWindowSize.Y);
-
-        //        if (!StashPanel.IsVisible) return;
-        //        var refBool = true;
-
-        //        if (!UIHover.Tooltip.GetClientRect().Intersects(newBox))
-        //        {
-        //            var menuOpacity = ImGui.GetStyle().GetColor(ColorTarget.WindowBg).W;
-        //            if (Settings.ProphecyOverrideColors)
-        //            {
-        //                var tempColor = new SharpDX.Vector4(Settings.ProphecyBackground.Value.R / 255.0f, Settings.ProphecyBackground.Value.G / 255.0f,
-        //                    Settings.ProphecyBackground.Value.B / 255.0f, Settings.ProphecyBackground.Value.A / 255.0f);
-        //                ImGui.PushStyleColor(ColorTarget.WindowBg, ToImVector4(tempColor));
-        //                menuOpacity = ImGui.GetStyle().GetColor(ColorTarget.WindowBg).W;
-        //            }
-
-        //            ImGui.BeginWindow("Poe.NinjaProphs", ref refBool, new System.Numerics.Vector2(200, 150), menuOpacity, Settings.ProphecyLocked ? WindowFlags.NoCollapse | WindowFlags.NoScrollbar | WindowFlags.NoMove | WindowFlags.NoResize | WindowFlags.NoInputs | WindowFlags.NoBringToFrontOnFocus | WindowFlags.NoTitleBar | WindowFlags.NoFocusOnAppearing : WindowFlags.Default | WindowFlags.NoTitleBar | WindowFlags.ResizeFromAnySide);
-
-        //            if (Settings.ProphecyOverrideColors)
-        //                ImGui.PopStyleColor();
-
-
-        //            var prophystringlist = new List<string>();
-        //            var propicies = GameController.Player.GetComponent<Player>().Prophecies;
-        //            foreach (var prophecyDat in propicies)
-        //            {
-        //                //var text = $"{GetProphecyValues(prophecyDat.Name)}c - {prophecyDat.Name}({prophecyDat.SealCost})";
-        //                var text = $"{{{HexConverter(Settings.ProphecyChaosValue)}}}{GetProphecyValues(prophecyDat.Name)}c {{}}- {{{HexConverter(Settings.ProphecyProecyName)}}}{prophecyDat.Name} {{{HexConverter(Settings.ProphecyProecySealColor)}}}({prophecyDat.SealCost}){{}}";
-        //                if (prophystringlist.Any(x => Equals(x, text))) continue;
-        //                prophystringlist.Add(text);
-        //            }
-
-        //            foreach (var proph in prophystringlist)
-        //                //ImGui.Text(VARIABLE);
-        //                Coloredtext(proph);
-
-        //            lastProphWindowSize = new Vector2(ImGui.GetWindowSize().X, ImGui.GetWindowSize().Y);
-        //            lastProphWindowPos = new Vector2(ImGui.GetWindowPosition().X, ImGui.GetWindowPosition().Y);
-        //            ImGui.EndWindow();
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        ImGui.EndWindow();
-        //    }
-        //}
     }
 }

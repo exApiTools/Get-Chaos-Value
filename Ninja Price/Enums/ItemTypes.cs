@@ -1,4 +1,4 @@
-﻿namespace Ninja_Price.Enums
+namespace Ninja_Price.Enums
 {
     public enum ItemTypes
     {
@@ -14,7 +14,7 @@
         UniqueJewel,
         UniqueMap,
         UniqueWeapon,
-        NormalMap,
+        Map,
         Resonator,
         Fossil,
         Scarab,
@@ -22,6 +22,7 @@
         Oil,
         Catalyst,
         DeliriumOrbs,
+        Vials,
         MavenInvitation,
         Artifact
     }

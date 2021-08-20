@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExileCore;
@@ -144,17 +144,17 @@ namespace Ninja_Price.Main
 
                     foreach (var itemList in item.Item.GetComponent<Mods>().ItemMods)
                     {
-                        if (itemList.RawName.Contains("MapShaped"))
+                        if (itemList.RawName.Contains("Shaped "))
                         {
-                            MapInfo.MapType = MapTypes.None;
+                            MapInfo.MapType = MapTypes.Shaped;
                             break;
                         }
-                        else if (itemList.RawName.Contains("MapElder"))
+                        else if (itemList.RawName.Contains("Elder "))
                         {
-                            MapInfo.MapType = MapTypes.None;
+                            MapInfo.MapType = MapTypes.Elder;
                             break;
                         }
-                        else if (itemList.RawName.Contains("InfectedMap"))
+                        else if (itemList.RawName.Contains("Blighted "))
                         {
                             MapInfo.MapType = MapTypes.Blighted;
                             break;
@@ -180,7 +180,7 @@ namespace Ninja_Price.Main
                 if (ClassName == "StackableCurrency" && !BaseName.StartsWith("Crescent Splinter") && !BaseName.StartsWith("Simulacrum") &&
                     !BaseName.EndsWith("Delirium Orb") && !BaseName.Contains("Essence") && !BaseName.EndsWith(" Oil") && !BaseName.EndsWith("Artifact") &&
                     !BaseName.Contains("Astragali") && !BaseName.Contains("Burial Medallion") && !BaseName.Contains("Scrap Metal") && !BaseName.Contains("Exotic Coinage") &&
-                    !BaseName.Contains("Remnant of") && !BaseName.Contains("Timeless ") && BaseName != "Prophecy" &&
+                    !BaseName.Contains("Remnant of") && !BaseName.StartsWith("Vials ") && !BaseName.Contains("Timeless ") && BaseName != "Prophecy" &&
                     ClassName != "MapFragment" && !BaseName.EndsWith(" Fossil") && !BaseName.StartsWith("Splinter of ") && ClassName != "Incubator" &&
                     !BaseName.EndsWith(
                         " Catalyst") /*&& !BaseName.Contains("Shard") && BaseName != "Chaos Orb" && !BaseName.Contains("Wisdom")*/
@@ -223,7 +223,7 @@ namespace Ninja_Price.Main
                 }
                 else if (MapInfo.IsMap && Rarity != ItemRarity.Unique)
                 {
-                    ItemType = ItemTypes.NormalMap;
+                    ItemType = ItemTypes.Map;
                 }
                 else if (BaseName.EndsWith(" Fossil"))
                 {
@@ -240,6 +240,10 @@ namespace Ninja_Price.Main
                 else if (BaseName.EndsWith("Delirium Orb"))
                 {
                     ItemType = ItemTypes.DeliriumOrbs;
+                }
+                else if (BaseName.StartsWith("Vial "))
+                {
+                    ItemType = ItemTypes.Vials;
                 }
                 else if (BaseName.StartsWith("Maven's Invitation: "))
                 {

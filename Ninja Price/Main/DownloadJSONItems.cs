@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -28,7 +28,7 @@ namespace Ninja_Price.Main
         private const string Incubators_URL = "https://poe.ninja/api/data/itemoverview?type=Incubator&league=";
         private const string Oil_URL = "https://poe.ninja/api/data/itemoverview?type=Oil&league=";
         private const string DeliriumOrb_URL = "https://poe.ninja/api/data/itemoverview?type=DeliriumOrb&league=";
-        private const string Seed_URL = "https://poe.ninja/api/data/itemoverview?type=Seed&league=";
+        private const string Vial_URL = "https://poe.ninja/api/data/itemoverview?type=Vial&league=";
         private const string Invitation_URL = "https://poe.ninja/api/data/ItemOverview?type=Invitation&league=";
         private const string HelmetEnchants_URL = "https://poe.ninja/api/data/ItemOverview?type=HelmetEnchant&league=";
         private const string Artifacts_URL = "https://poe.ninja/api/data/ItemOverview?type=Artifact&league=";
@@ -64,6 +64,7 @@ namespace Ninja_Price.Main
                     Api.Json.SaveSettingFile(NinjaDirectory + "Incubators.json", JsonConvert.DeserializeObject<Incubators.RootObject>(Api.DownloadFromUrl(Incubators_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "Scarabs.json", JsonConvert.DeserializeObject<Scarab.RootObject>(Api.DownloadFromUrl(Scarabs_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "DeliriumOrbs.json", JsonConvert.DeserializeObject<DeliriumOrb.RootObject>(Api.DownloadFromUrl(DeliriumOrb_URL + league)));
+                    Api.Json.SaveSettingFile(NinjaDirectory + "Vials.json", JsonConvert.DeserializeObject<Vials.RootObject>(Api.DownloadFromUrl(Vial_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "Invitations.json", JsonConvert.DeserializeObject<Invitations.RootObject>(Api.DownloadFromUrl(Invitation_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "HelmetEnchants.json", JsonConvert.DeserializeObject<HelmetEnchants.RootObject>(Api.DownloadFromUrl(HelmetEnchants_URL + league)));
                     Api.Json.SaveSettingFile(NinjaDirectory + "Artifacts.json", JsonConvert.DeserializeObject<Artifacts.RootObject>(Api.DownloadFromUrl(Artifacts_URL + league)));
@@ -222,6 +223,13 @@ namespace Ninja_Price.Main
                     {
                         var json = r.ReadToEnd();
                         newData.DeliriumOrb = JsonConvert.DeserializeObject<DeliriumOrb.RootObject>(json);
+                    }
+
+                if (JsonExists("Vials.json"))
+                    using (var r = new StreamReader(NinjaDirectory + "Vials.json"))
+                    {
+                        var json = r.ReadToEnd();
+                        newData.Vials = JsonConvert.DeserializeObject<Vials.RootObject>(json);
                     }
 
                 if (JsonExists("Invitations.json"))

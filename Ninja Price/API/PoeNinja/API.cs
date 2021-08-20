@@ -18,7 +18,7 @@ namespace Ninja_Price.API.PoeNinja
                     return json;
                 }
             }
-            catch (CookieException e)
+            catch (CookieException)
             {
                 return "";
             }

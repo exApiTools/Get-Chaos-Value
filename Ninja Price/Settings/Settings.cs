@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+using System;
 using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
@@ -39,17 +38,10 @@ namespace Ninja_Price.Settings
             HighlightFontSize = new RangeNode<int>(20, 0, 200);
             HighlightSignificantDigits = new RangeNode<int>(5, 0, 10);
             InventoryValueCutOff = new RangeNode<int>(1, 0, 10);
-
-            ProphecyBackground = Color.Black;
-
-            ProphecyChaosValue = Color.White;
-            ProphecyProecyName = Color.White;
-            ProphecyProecySealColor = Color.White;
         }
 
         public DateTime LastUpDateTime { get; set; } = DateTime.Now;
         public bool FirstTime { get; set; } = false;
-
 
         [Menu("Value Loop Timer")]
         public RangeNode<int> ValueLoopTimerMS { get; set; } = new RangeNode<int>(250, 1, 2000);
@@ -72,33 +64,11 @@ namespace Ninja_Price.Settings
         [Menu("Plugin Wide Text Color", 355, 3)]
         public ColorNode UniTextColor { get; set; }
 
-
         [Menu("Debug", "Display debug strings", 6)]
         public ToggleNode Debug { get; set; }
 
-        [Menu("Prophecy Prices", "This shows your proph prices whilst you have your stash tab open", 567765)]
-        public ToggleNode ProphecyPrices { get; set; } = new ToggleNode(true);
-
         [Menu("Hovered Item", "This shows your prices oon items you hover over.", 567766)]
         public ToggleNode HoveredItem { get; set; } = new ToggleNode(true);
-
-        [Menu("Override Background Color from the default theme color", 123345, 567765)]
-        public ToggleNode ProphecyOverrideColors { get; set; } = new ToggleNode(true);
-
-        [Menu("Prophecy Background", 234, 567765)]
-        public ColorNode ProphecyBackground { get; set; }
-
-        [Menu("Prophecy Locked", "This will lock the proph box so you can click through it without accidentally moving it", 652, 567765)]
-        public ToggleNode ProphecyLocked { get; set; } = new ToggleNode(true);
-
-        [Menu("Chaos Value", 653, 567765)]
-        public ColorNode ProphecyChaosValue { get; set; }
-
-        [Menu("Prophecy Name", 654, 567765)]
-        public ColorNode ProphecyProecyName { get; set; }
-
-        [Menu("Prophecy Seal Cost", 655, 567765)]
-        public ColorNode ProphecyProecySealColor { get; set; }
 
         #region Visible Stash Value
 
@@ -123,8 +93,11 @@ namespace Ninja_Price.Settings
         [Menu("Currency Tab Specifc", 23452, 4)]
         public EmptyNode CurrencyTabSpecifc { get; set; }
 
-        [Menu("Currency Tab Specifc", 75465, 23452)]
+        [Menu("Currency Tab Specfic", 75465, 23452)]
         public ToggleNode CurrencyTabSpecifcToggle { get; set; } = new ToggleNode(true);
+
+        [Menu("Do Not Draw Currency Tab Specfic While Any Item Is Hovered", 75466, 23452)]
+        public ToggleNode DoNotDrawCurrencyTabSpecifcWhileItemHovered { get; set; } = new ToggleNode(false);
 
         [Menu("Value Font Size", 57, 23452)]
         public RangeNode<int> CurrencyTabFontSize { get; set; } = new RangeNode<int>(14, 5, 50);
