@@ -367,7 +367,8 @@ namespace Ninja_Price.Main
                 var pos = new Vector2(Settings.InventoryValueX.Value, Settings.InventoryValueY.Value);
                 if (!Settings.VisibleInventoryValue.Value || !inventory.IsVisible)
                 {
-                    Graphics.DrawText($"inventory.IsVisible: " + inventory.IsVisible, pos, Settings.UniTextColor, FontAlign.Left);
+                    if (Settings.Debug)
+                        Graphics.DrawText($"inventory.IsVisible: " + inventory.IsVisible, pos, Settings.UniTextColor, FontAlign.Left);
                     return;
                 }
                 {
