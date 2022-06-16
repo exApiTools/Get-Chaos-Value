@@ -325,8 +325,8 @@ namespace Ninja_Price.Main
 
         private void VisibleStashValue()
         {
-            try
-            {
+           // try
+           // {
                 var StashType = GameController.Game.IngameState.IngameUi.StashElement.VisibleStash.InvType;
                 if (!Settings.VisibleStashValue.Value || !StashPanel.IsVisible) return;
                 {
@@ -344,16 +344,15 @@ namespace Ninja_Price.Main
                     Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(StashTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
-            catch (Exception e)
+            /*catch (Exception e)
             {
-                // ignored
                 if (Settings.Debug)
                 {
 
                     LogMessage("Error in: VisibleStashValue, restart PoEHUD.", 5, Color.Red);
-                    LogMessage(e.StackTrace, 5, Color.Orange);
+                    LogMessage(e., 5, Color.Orange);
                 }
-            }
+            }*/
         }
 
         private void VisibleInventoryValue()
