@@ -328,9 +328,13 @@ namespace Ninja_Price.Main
             try
             {
                 var StashType = GameController.Game.IngameState.IngameUi.StashElement.VisibleStash.InvType;
-                if (!Settings.VisibleStashValue.Value || !StashPanel.IsVisible) return;
+                var pos = new Vector2(Settings.StashValueX.Value, Settings.StashValueY.Value);
+                if (!Settings.VisibleStashValue.Value || !StashPanel.IsVisible)
                 {
-                    var pos = new Vector2(Settings.StashValueX.Value, Settings.StashValueY.Value);
+                    Graphics.DrawText($"StashPanel.IsVisible: "+StashPanel.IsVisible, pos, Settings.UniTextColor, FontAlign.Left);
+                    return;
+                }
+                {
                     var significantDigits = Math.Round((decimal)StashTabValue, Settings.StashValueSignificantDigits.Value);
                     //Graphics.DrawText(
                     //    DrawImage($"{DirectoryFullName}//images//Chaos_Orb_inventory_icon.png",
@@ -360,9 +364,13 @@ namespace Ninja_Price.Main
             try
             {
                 var inventory = GameController.Game.IngameState.IngameUi.InventoryPanel;
-                if (!Settings.VisibleInventoryValue.Value || !inventory.IsVisible) return;
+                var pos = new Vector2(Settings.InventoryValueX.Value, Settings.InventoryValueY.Value);
+                if (!Settings.VisibleInventoryValue.Value || !inventory.IsVisible)
                 {
-                    var pos = new Vector2(Settings.InventoryValueX.Value, Settings.InventoryValueY.Value);
+                    Graphics.DrawText($"inventory.IsVisible: " + inventory.IsVisible, pos, Settings.UniTextColor, FontAlign.Left);
+                    return;
+                }
+                {
                     var significantDigits =
                         Math.Round((decimal)InventoryTabValue, Settings.InventoryValueSignificantDigits.Value);
                     Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(InventoryTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
