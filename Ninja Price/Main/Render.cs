@@ -351,7 +351,7 @@ namespace Ninja_Price.Main
                 {
 
                     LogMessage("Error in: VisibleStashValue, restart PoEHUD.", 5, Color.Red);
-                    LogMessage(e.ToString(), 5, Color.Orange);
+                    LogMessage(e.StackTrace, 5, Color.Orange);
                 }
             }
         }
