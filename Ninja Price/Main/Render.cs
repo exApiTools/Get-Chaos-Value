@@ -22,7 +22,7 @@ namespace Ninja_Price.Main
         public Stopwatch ValueUpdateTimer = Stopwatch.StartNew();
         public double StashTabValue { get; set; }
         public double InventoryTabValue { get; set; }
-        public double ExaltedValue { get; set; } = 0;
+        public double DivineValue { get; set; } = 0;
         public List<NormalInventoryItem> ItemList { get; set; } = new List<NormalInventoryItem>();
         public List<CustomItem> FortmattedItemList { get; set; } = new List<CustomItem>();
 
@@ -74,7 +74,7 @@ namespace Ninja_Price.Main
                 {
                     if (ShouldUpdateValues())
                     {
-                        ExaltedValue = (double)CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == "Exalted Orb").ChaosEquivalent;
+                        DivineValue = (double)CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == "Divine Orb").ChaosEquivalent;
                         // Format stash items
                         ItemList = new List<NormalInventoryItem>();
                         switch (tabType)
@@ -224,9 +224,9 @@ namespace Ninja_Price.Main
                     case ItemTypes.DeliriumOrbs:
                     case ItemTypes.Vials:
                     case ItemTypes.DivinationCard:
-                        if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
+                        if (Hovereditem.PriceData.MinChaosValue / DivineValue >= 0.1)
                         {
-                            text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
+                            text += $"\n\rDivine: {Hovereditem.PriceData.MinChaosValue / DivineValue:0.##}div";
                             text += $"\n\r{String.Concat(Enumerable.Repeat('-', changeTextLength))}";
                         }
                         text += $"\n\rChaos: {Hovereditem.PriceData.MinChaosValue / Hovereditem.CurrencyInfo.StackSize}c";
@@ -238,9 +238,9 @@ namespace Ninja_Price.Main
                     case ItemTypes.UniqueJewel:
                     case ItemTypes.UniqueMap:
                     case ItemTypes.UniqueWeapon:
-                        if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
+                        if (Hovereditem.PriceData.MinChaosValue / DivineValue >= 0.1)
                         {
-                            text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex - {Hovereditem.PriceData.MaxChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
+                            text += $"\n\rDivine: {Hovereditem.PriceData.MinChaosValue / DivineValue:0.##}div - {Hovereditem.PriceData.MaxChaosValue / DivineValue:0.##}div";
                             text += $"\n\r{String.Concat(Enumerable.Repeat('-', changeTextLength))}";
                         }
                         text += $"\n\rChaos: {Hovereditem.PriceData.MinChaosValue}c - {Hovereditem.PriceData.MaxChaosValue}c";
@@ -249,9 +249,9 @@ namespace Ninja_Price.Main
                     case ItemTypes.Map:
                     case ItemTypes.Incubator:
                     case ItemTypes.MavenInvitation:
-                        if (Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice >= 0.1)
+                        if (Hovereditem.PriceData.MinChaosValue / DivineValue >= 0.1)
                         {
-                            text += $"\n\rExalt: {Hovereditem.PriceData.MinChaosValue / Hovereditem.PriceData.ExaltedPrice:0.##}ex";
+                            text += $"\n\rDivine: {Hovereditem.PriceData.MinChaosValue / DivineValue:0.##}div";
                             text += $"\n\r{String.Concat(Enumerable.Repeat('-', changeTextLength))}";
                         }
                         text += $"\n\rChaos: {Hovereditem.PriceData.MinChaosValue}c";
@@ -345,7 +345,7 @@ namespace Ninja_Price.Main
                     //        : $"{significantDigits} Chaos", Settings.StashValueFontSize.Value, pos,
                     //    Settings.UniTextColor);
 
-                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(StashTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(StashTabValue / DivineValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -374,7 +374,7 @@ namespace Ninja_Price.Main
                 {
                     var significantDigits =
                         Math.Round((decimal)InventoryTabValue, Settings.InventoryValueSignificantDigits.Value);
-                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(InventoryTabValue / ExaltedValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(InventoryTabValue / DivineValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -452,8 +452,8 @@ namespace Ninja_Price.Main
                 var drawBox = new RectangleF(box.X + box.Width, box.Y - 2, 65, box.Height);
                 var position = new Vector2(drawBox.Center.X, drawBox.Center.Y - 7);
 
-                var textColor = data.PriceData.ExaltedPrice >= 1 ? Color.Black : Color.White;
-                var bgColor = data.PriceData.ExaltedPrice >= 1 ? Color.Goldenrod : Color.Black;
+                var textColor = data.PriceData.MinChaosValue/DivineValue >= 1 ? Color.Black : Color.White;
+                var bgColor = data.PriceData.MinChaosValue/DivineValue >= 1 ? Color.Goldenrod : Color.Black;
                 Graphics.DrawText(Math.Round((decimal) data.PriceData.MinChaosValue, 2).ToString() + "c", position, textColor, FontAlign.Center);
                 Graphics.DrawBox(drawBox, bgColor);
                 Graphics.DrawFrame(drawBox, Color.Black, 1);
