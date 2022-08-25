@@ -345,7 +345,7 @@ namespace Ninja_Price.Main
                     //        : $"{significantDigits} Chaos", Settings.StashValueFontSize.Value, pos,
                     //    Settings.UniTextColor);
 
-                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(StashTabValue / DivineValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rDivine: {Math.Round((decimal)(StashTabValue / DivineValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
@@ -374,7 +374,7 @@ namespace Ninja_Price.Main
                 {
                     var significantDigits =
                         Math.Round((decimal)InventoryTabValue, Settings.InventoryValueSignificantDigits.Value);
-                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rExalt: {Math.Round((decimal)(InventoryTabValue / DivineValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
+                    Graphics.DrawText($"Chaos: {significantDigits:#,##0.################}\n\rDivine: {Math.Round((decimal)(InventoryTabValue / DivineValue), Settings.StashValueSignificantDigits.Value):#,##0.################}", pos, Settings.UniTextColor, FontAlign.Left);
                 }
             }
             catch (Exception e)
