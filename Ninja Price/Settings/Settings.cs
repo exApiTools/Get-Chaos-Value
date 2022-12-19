@@ -90,14 +90,14 @@ namespace Ninja_Price.Settings
         [Menu("Significant Digits", 45, 4)]
         public RangeNode<int> StashValueSignificantDigits { get; set; }
 
-        [Menu("Currency Tab Specifc", 23452, 4)]
+        [Menu("Currency Tab Overlay", 23452, 4)]
         public EmptyNode CurrencyTabSpecifc { get; set; }
 
-        [Menu("Currency Tab Specfic", 75465, 23452)]
-        public ToggleNode CurrencyTabSpecifcToggle { get; set; } = new ToggleNode(true);
+        [Menu("Show Overlay", 75465, 23452)]
+        public ToggleNode CurrencyTabSpecificToggle { get; set; } = new ToggleNode(true);
 
-        [Menu("Do Not Draw Currency Tab Specfic While Any Item Is Hovered", 75466, 23452)]
-        public ToggleNode DoNotDrawCurrencyTabSpecifcWhileItemHovered { get; set; } = new ToggleNode(false);
+        [Menu("Do Not Draw Currency Tab Overlay While Any Item Is Hovered", 75466, 23452)]
+        public ToggleNode DoNotDrawCurrencyTabSpecificWhileItemHovered { get; set; } = new ToggleNode(true);
 
         [Menu("Value Font Size", 57, 23452)]
         public RangeNode<int> CurrencyTabFontSize { get; set; } = new RangeNode<int>(14, 5, 50);

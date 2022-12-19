@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using ExileCore;
 using Newtonsoft.Json;
@@ -35,18 +34,14 @@ namespace Ninja_Price.Main
         public override bool Initialise()
         {
             Name = "Ninja Price";
-            //base.InitializeSettingsMenu();
             Controller = this;
             BuildDate = new DateTime(2000, 1, 1).AddDays(Version.Build).AddSeconds(Version.Revision * 2);
             PluginVersion = $"{Version}";
             NinjaDirectory = DirectoryFullName + "\\NinjaData\\";
-            //LogMessage(DirectoryFullName, 50); // ????? i dont even understand why this is here.
-            // Make folder if it doesnt exist
             var file = new FileInfo(NinjaDirectory);
-            file.Directory?.Create(); // If the directory already exists, this method does nothing.
+            file.Directory?.Create();
 
             GatherLeagueNames();
-            //DownloadChaosIcon();
 
             if (Settings.FirstTime)
             {
@@ -59,7 +54,8 @@ namespace Ninja_Price.Main
                 UpdatePoeNinjaData();
             }
 
-            CurrentLeague = Settings.LeagueList.Value; //  Update selected league
+            CurrentLeague = Settings.LeagueList.Value;
+
             // Enable Events
             Settings.ReloadButton.OnPressed += LoadJsonData;
 

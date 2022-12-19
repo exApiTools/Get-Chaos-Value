@@ -262,3 +262,6 @@ __pycache__/
 
 # KDiff
 *.orig
+
+# FreeFileSync
+*.ffs*
