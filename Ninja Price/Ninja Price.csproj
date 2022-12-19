@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\PoeNinja\API.cs" />
+    <Compile Include="API\PoeNinja\Classes\Artifacts.cs" />
     <Compile Include="API\PoeNinja\Classes\Fossils.cs" />
     <Compile Include="API\PoeNinja\Classes\Invitations.cs" />
     <Compile Include="API\PoeNinja\Classes\Incubators.cs" />

@@ -23,6 +23,7 @@ namespace Ninja_Price.Enums
         Catalyst,
         DeliriumOrbs,
         Vials,
-        MavenInvitation
+        MavenInvitation,
+        Artifact
     }
 }

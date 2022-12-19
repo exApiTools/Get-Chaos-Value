@@ -216,6 +216,7 @@ namespace Ninja_Price.Main
                     case ItemTypes.Resonator:
                     case ItemTypes.Fossil:
                     case ItemTypes.Oil:
+                    case ItemTypes.Artifact:
                     case ItemTypes.Catalyst:
                     case ItemTypes.DeliriumOrbs:
                     case ItemTypes.Vials:

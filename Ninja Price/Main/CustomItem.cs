@@ -178,7 +178,8 @@ namespace Ninja_Price.Main
                 // sort items into types to use correct json data later from poe.ninja
                 // This might need tweaking since if this catches anything other than currency.
                 if (ClassName == "StackableCurrency" && !BaseName.StartsWith("Crescent Splinter") && !BaseName.StartsWith("Simulacrum") &&
-                    !BaseName.EndsWith("Delirium Orb") && !BaseName.Contains("Essence") && !BaseName.EndsWith(" Oil") &&
+                    !BaseName.EndsWith("Delirium Orb") && !BaseName.Contains("Essence") && !BaseName.EndsWith(" Oil") && !BaseName.EndsWith("Artifact") &&
+                    !BaseName.Contains("Astragali") && !BaseName.Contains("Burial Medallion") && !BaseName.Contains("Scrap Metal") && !BaseName.Contains("Exotic Coinage") &&
                     !BaseName.Contains("Remnant of") && !BaseName.StartsWith("Vials ") && !BaseName.Contains("Timeless ") && BaseName != "Prophecy" &&
                     ClassName != "MapFragment" && !BaseName.EndsWith(" Fossil") && !BaseName.StartsWith("Splinter of ") && ClassName != "Incubator" &&
                     !BaseName.EndsWith(
@@ -190,6 +191,10 @@ namespace Ninja_Price.Main
                 else if (BaseName.EndsWith(" Catalyst"))
                 {
                     ItemType = ItemTypes.Catalyst;
+                }
+                else if (BaseName.Contains("Artifact") || BaseName.Contains("Astragali") || BaseName.Contains("Burial Medallion") || BaseName.Contains("Scrap Metal") || BaseName.Contains("Exotic Coinage"))     
+                {
+                    ItemType = ItemTypes.Artifact;
                 }
                 else if (BaseName.EndsWith(" Oil"))
                 {
