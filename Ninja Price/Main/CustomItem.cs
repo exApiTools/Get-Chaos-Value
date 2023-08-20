@@ -196,7 +196,7 @@ public class CustomItem
             // sort items into types to use correct json data later from poe.ninja
             // This might need tweaking since if this catches anything other than currency.
             if (ClassName == "StackableCurrency" && !BaseName.StartsWith("Crescent Splinter") && !BaseName.StartsWith("Simulacrum") &&
-                !BaseName.EndsWith("Delirium Orb") && !BaseName.Contains("Essence") && !BaseName.EndsWith(" Oil") && !BaseName.EndsWith("Artifact") &&
+                !BaseName.EndsWith("Delirium Orb") && !BaseName.Contains("Essence") && !BaseName.EndsWith(" Oil") && !BaseName.Contains("Tattoo ") && !BaseName.StartsWith("Omen ") && !BaseName.EndsWith("Artifact") &&
                 !BaseName.Contains("Astragali") && !BaseName.Contains("Burial Medallion") && !BaseName.Contains("Scrap Metal") && !BaseName.Contains("Exotic Coinage") &&
                 !BaseName.Contains("Remnant of") && !BaseName.Contains("Timeless ") && BaseName != "Prophecy" &&
                 ClassName != "MapFragment" && !BaseName.EndsWith(" Fossil") && !BaseName.StartsWith("Splinter of ") && ClassName != "Incubator" &&
@@ -217,6 +217,14 @@ public class CustomItem
             else if (BaseName.EndsWith(" Oil"))
             {
                 ItemType = ItemTypes.Oil;
+            }
+            else if (BaseName.Contains("Tattoo "))
+            {
+                ItemType = ItemTypes.Tattoo;
+            }
+            else if (BaseName.StartsWith("Omen "))
+            {
+                ItemType = ItemTypes.Omen;
             }
             else if (Path.Contains("Metadata/Items/DivinationCards"))
             {
