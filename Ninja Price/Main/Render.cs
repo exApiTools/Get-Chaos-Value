@@ -237,6 +237,8 @@ public partial class Main
                 case ItemTypes.Vials:
                 case ItemTypes.DivinationCard:
                 case ItemTypes.Incubator:
+                case ItemTypes.Tattoo:
+                case ItemTypes.Omen:
                     if (priceInDivines >= 0.1)
                     {
                         var priceInDivinessPerOne = priceInDivines / HoveredItem.CurrencyInfo.StackSize;
