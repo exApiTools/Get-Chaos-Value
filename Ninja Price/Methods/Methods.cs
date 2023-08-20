@@ -173,6 +173,24 @@ public partial class Main
                             item.PriceData.DetailsId = oilSearch.DetailsId;
                         }
                         break;
+                    case ItemTypes.Tattoo:
+                        var tattooSearch = CollectedData.Tattoos.Lines.Find(x => x.Name == item.BaseName);
+                        if (tattooSearch != null)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * tattooSearch.ChaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = tattooSearch.Sparkline.TotalChange ?? 0;
+                            item.PriceData.DetailsId = tattooSearch.DetailsId;
+                        }
+                        break;
+                    case ItemTypes.Omen:
+                        var omenSearch = CollectedData.Omens.Lines.Find(x => x.Name == item.BaseName);
+                        if (omenSearch != null)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * omenSearch.ChaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = omenSearch.Sparkline.TotalChange ?? 0;
+                            item.PriceData.DetailsId = omenSearch.DetailsId;
+                        }
+                        break;
                     case ItemTypes.Artifact:
                         var artifactSearch = CollectedData.Artifacts.Lines.Find(x => x.Name == item.BaseName);
                         if (artifactSearch != null)
