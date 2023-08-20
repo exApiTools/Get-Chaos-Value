@@ -26,4 +26,6 @@ public enum ItemTypes
     Artifact,
     SkillGem,
     ClusterJewel,
+    Tattoo,
+    Omen,
 }
