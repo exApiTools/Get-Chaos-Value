@@ -697,4 +697,29 @@ public partial class Main
                        BaseName = enchantSearch.name
                    };
     }
+	
+	private CustomItem GetSanctumOfferValue(string SanctumOfferName, int stack)
+    {
+
+        if (SanctumOfferName.Equals("Chaos Orb"))
+        {
+            return null;
+        }
+        var currencySearch = CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName.Equals(SanctumOfferName));
+        return currencySearch == null
+                   ? null
+                   : new CustomItem
+                   {
+                       CurrencyInfo = new CustomItem.CurrencyData
+                       {
+                           IsShard = false,
+                           StackSize = stack
+
+
+                       },
+                       BaseName = currencySearch.CurrencyTypeName,
+                       ItemType = ItemTypes.Currency
+
+                   };
+    }
 }

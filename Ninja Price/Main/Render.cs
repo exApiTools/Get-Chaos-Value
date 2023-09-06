@@ -17,6 +17,7 @@ using Color = SharpDX.Color;
 using RectangleF = SharpDX.RectangleF;
 using ImGuiNET;
 using static Ninja_Price.Enums.HaggleTypes.HaggleType;
+using System.Text.RegularExpressions;
 
 namespace Ninja_Price.Main;
 
@@ -42,6 +43,8 @@ public partial class Main
     public CustomItem HoveredItem { get; set; }
 
     private readonly CachedValue<List<(CustomItem, GroundItemProcessingType)>> _groundItems;
+
+    private static readonly Regex SanctumOfferParse = new Regex("(Receive)\\s((?'currencysize'(\\d+))x(?'currencyname'.*))\\s(right now|at the end of the next Floor|at the end of the Floor|on completing the Sanctum)$", RegexOptions.Compiled);
 
     public Main()
     {
@@ -327,6 +330,8 @@ public partial class Main
 
         if (Settings.HelmetEnchantPrices)
             ShowHelmetEnchantPrices();
+
+        ShowSanctumOfferPrices();
 
         if (StashPanel.IsVisible)
         {
@@ -791,6 +796,54 @@ public partial class Main
             Graphics.DrawText($"{data.PriceData.MinChaosValue.FormatNumber(2)}c", position, textColor, FontAlign.Center);
         }
     }
+
+    private void ShowSanctumOfferPrices()
+    {
+
+        if (!GameController.IngameState.IngameUi.SanctumRewardWindow.IsVisible)
+            return;
+
+        var pathToOfferWindowRows = new int[] { 0, 1, 0, 1 };
+        var sanctumOfferWindow = GameController.IngameState.IngameUi.SanctumRewardWindow.GetChildFromIndices(pathToOfferWindowRows);
+        if (!sanctumOfferWindow.IsVisible)
+        {
+            sanctumOfferWindow = GameController.IngameState.IngameUi.SanctumRewardWindow.GetChildFromIndices(new int[] { 0, 1, 0, 2 });
+
+            if (!sanctumOfferWindow.IsVisible)
+            {
+                return;
+            }
+
+        }
+
+        foreach (var offer in sanctumOfferWindow.Children)
+        {
+            var offerText = offer.Children[1].Text;
+            if (offerText == null) continue;
+            var curr = SanctumOfferParse.Match(offerText).Groups["currencyname"].Value.Trim().Replace("Orbs", "Orb").TrimEnd('s');
+            if(curr.Equals("Chaos Orb"))
+                continue;
+            var currsize = SanctumOfferParse.Match(offerText).Groups["currencysize"].Value.Trim();
+            int stacksize = 0;
+            if (!int.TryParse(currsize, out stacksize))
+                continue;
+            var data = GetSanctumOfferValue(curr, stacksize);
+            if (data == null) continue;
+            GetValue(data);
+            var box = offer.GetClientRect();
+            var drawBox = new RectangleF(box.X + box.Width, box.Y - 2, 65, box.Height);
+            var position = new Vector2(drawBox.Center.X, drawBox.Center.Y - 7);
+
+            var textColor = data.PriceData.MinChaosValue >= DivinePrice ? Color.Black : Color.White;
+            var bgColor = data.PriceData.MinChaosValue >= DivinePrice ? Color.Goldenrod : Color.Black;
+            Graphics.DrawBox(drawBox, bgColor);
+            Graphics.DrawFrame(drawBox, Color.Black, 1);
+  
+            Graphics.DrawText($"{data.PriceData.MinChaosValue.FormatNumber(2)}c", position, textColor, FontAlign.Center);
+
+        }
+    }
+
 
     private bool TryGetArtifactPrice(CustomItem item, out double amount, out string artifactName)
     {
