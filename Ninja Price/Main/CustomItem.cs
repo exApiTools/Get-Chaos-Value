@@ -198,7 +198,11 @@ public class CustomItem
 
             // sort items into types to use correct json data later from poe.ninja
             // This might need tweaking since if this catches anything other than currency.
-            if (ClassName == "StackableCurrency" && 
+            if (ClassName == "MapFragment" && Path.StartsWith("Metadata/Items/Scarabs/"))
+            {
+                ItemType = ItemTypes.Scarab;
+            }
+            else if (ClassName == "StackableCurrency" && 
                 !BaseName.StartsWith("Crescent Splinter") &&
                 !BaseName.StartsWith("Simulacrum") &&
                 !BaseName.EndsWith("Delirium Orb") &&
@@ -248,21 +252,17 @@ public class CustomItem
             {
                 ItemType = ItemTypes.DivinationCard;
             }
-            else if (BaseName.Contains("Essence") || BaseName.Contains("Remnant of") && !Path.StartsWith("Metadata/Items/Scarabs/"))
+            else if (BaseName.Contains("Essence") || BaseName.Contains("Remnant of"))
             {
                 ItemType = ItemTypes.Essence;
             }
-            else if (((ClassName == "MapFragment" || BaseName.Contains("Timeless ") || BaseName.StartsWith("Simulacrum")) && !Path.StartsWith("Metadata/Items/Scarabs/")) ||
+            else if (ClassName == "MapFragment" || BaseName.Contains("Timeless ") || BaseName.StartsWith("Simulacrum") ||
                      ClassName == "StackableCurrency" && BaseName.StartsWith("Splinter of ") ||
                      BaseName.StartsWith("Crescent Splinter") ||
                      ClassName == "VaultKey" ||
                      BaseName == "Valdo's Puzzle Box")
             {
                 ItemType = ItemTypes.Fragment;
-            }
-            else if (ClassName == "MapFragment" && Path.StartsWith("Metadata/Items/Scarabs/"))
-            {
-                ItemType = ItemTypes.Scarab;
             }
             else if (MapInfo.IsMap && Rarity != ItemRarity.Unique)
             {
