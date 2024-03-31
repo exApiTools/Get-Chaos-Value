@@ -248,7 +248,7 @@ public class CustomItem
             {
                 ItemType = ItemTypes.DivinationCard;
             }
-            else if (BaseName.Contains("Essence") || BaseName.Contains("Remnant of"))
+            else if (BaseName.Contains("Essence") || BaseName.Contains("Remnant of") && !Path.StartsWith("Metadata/Items/Scarabs/"))
             {
                 ItemType = ItemTypes.Essence;
             }
