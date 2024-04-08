@@ -1,10 +1,9 @@
-﻿namespace Ninja_Price.Enums
+﻿namespace Ninja_Price.Enums;
+
+public enum MapTypes
 {
-    public enum MapTypes
-    {
-        None,
-        Elder,
-        Shaped,
-        Blighted
-    }
+    None,
+    Elder,
+    Shaped,
+    Blighted
 }

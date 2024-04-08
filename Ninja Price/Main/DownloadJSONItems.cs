@@ -1,262 +1,224 @@
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Ninja_Price.API.PoeNinja;
-using Ninja_Price.API.PoeNinja.Classes;
-using SharpDX;
 
-namespace Ninja_Price.Main
+namespace Ninja_Price.Main;
+
+public partial class Main
 {
-    public partial class Main
+    private const string CurrencyUrl = "https://poe.ninja/api/data/currencyoverview?league={0}&type=Currency&language=en";
+    private const string FragmentsUrl = "https://poe.ninja/api/data/currencyoverview?league={0}&type=Fragment&language=en";
+    private const string DivinationCardsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=DivinationCard&language=en";
+    private const string EssencesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Essence&language=en";
+    private const string UniqueAccessoriesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueAccessory&language=en";
+    private const string UniqueArmoursUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueArmour&language=en";
+    private const string UniqueFlasksUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueFlask&language=en";
+    private const string UniqueJewelsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueJewel&language=en";
+    private const string UniqueMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueMap&language=en";
+    private const string UniqueWeaponsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueWeapon&language=en";
+    private const string WhiteMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Map&language=en";
+    private const string ResonatorsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Resonator&language=en";
+    private const string FossilsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Fossil&language=en";
+    private const string ScarabsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Scarab&language=en";
+    private const string IncubatorsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Incubator&language=en";
+    private const string OilUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Oil&language=en";
+    private const string DeliriumOrbUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=DeliriumOrb&language=en";
+    private const string VialUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Vial&language=en";
+    private const string InvitationUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Invitation&language=en";
+    private const string HelmetEnchantsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=HelmetEnchant&language=en";
+    private const string ArtifactsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Artifact&language=en";
+    private const string SkillGemsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=SkillGem&language=en";
+    private const string ClusterJewelsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=ClusterJewel&language=en";
+    private const string TattooUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Tattoo&language=en";
+    private const string OmenUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Omen&language=en";
+    private const string CoffinUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Coffin&language=en";
+
+    private class LeagueMetadata
     {
-        private const string CurrencyURL = "https://poe.ninja/api/data/currencyoverview?type=Currency&league=";
-        private const string DivinationCards_URL = "https://poe.ninja/api/data/itemoverview?type=DivinationCard&league=";
-        private const string Essences_URL = "https://poe.ninja/api/data/itemoverview?type=Essence&league=";
-        private const string Fragments_URL = "https://poe.ninja/api/data/currencyoverview?type=Fragment&league=";
-        private const string Prophecies_URL = "https://poe.ninja/api/data/itemoverview?type=Prophecy&league=";
-        private const string UniqueAccessories_URL = "https://poe.ninja/api/data/itemoverview?type=UniqueAccessory&league=";
-        private const string UniqueArmours_URL = "https://poe.ninja/api/data/itemoverview?type=UniqueArmour&league=";
-        private const string UniqueFlasks_URL = "https://poe.ninja/api/data/itemoverview?type=UniqueFlask&league=";
-        private const string UniqueJewels_URL = "https://poe.ninja/api/data/itemoverview?type=UniqueJewel&league=";
-        private const string UniqueMaps_URL = "https://poe.ninja/api/data/itemoverview?type=UniqueMap&league=";
-        private const string UniqueWeapons_URL = "https://poe.ninja/api/data/itemoverview?type=UniqueWeapon&league=";
-        private const string WhiteMaps_URL = "https://poe.ninja/api/data/itemoverview?type=Map&league=";
-        private const string Resonators_URL = "https://poe.ninja/api/data/itemoverview?type=Resonator&league=";
-        private const string Fossils_URL = "https://poe.ninja/api/data/itemoverview?type=Fossil&league=";
-        private const string Scarabs_URL = "https://poe.ninja/api/data/itemoverview?type=Scarab&league=";
-        private const string Incubators_URL = "https://poe.ninja/api/data/itemoverview?type=Incubator&league=";
-        private const string Oil_URL = "https://poe.ninja/api/data/itemoverview?type=Oil&league=";
-        private const string DeliriumOrb_URL = "https://poe.ninja/api/data/itemoverview?type=DeliriumOrb&league=";
-        private const string Vial_URL = "https://poe.ninja/api/data/itemoverview?type=Vial&league=";
-        private const string Invitation_URL = "https://poe.ninja/api/data/ItemOverview?type=Invitation&league=";
-        private const string HelmetEnchants_URL = "https://poe.ninja/api/data/ItemOverview?type=HelmetEnchant&league=";
-        private const string Artifacts_URL = "https://poe.ninja/api/data/ItemOverview?type=Artifact&league=";
+        public DateTime LastLoadTime { get; set; }
+    }
 
-        private void GetJsonData(string league)
+    private void StartDataReload(string league, bool forceRefresh)
+    {
+        LogMessage($"Getting data for {league}", 5);
+
+        if (Interlocked.CompareExchange(ref _updating, 1, 0) != 0)
         {
-            Task.Run(() =>
-            {
-                try
-                {
-                    while (UpdatingFromAPI || UpdatingFromJson)
-                    {
-                        if (Settings.Debug) { LogMessage($"{GetCurrentMethod()}: Waiting on UpdatePoeNinjaData() to finish", 5, Color.Orange); }
-                        Thread.Sleep(250);
-                    }
-                    LogMessage("Gathering Data from Poe.Ninja.", 5);
-                    UpdatingFromAPI = true;
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Currency.json", JsonConvert.DeserializeObject<Currency.RootObject>(Api.DownloadFromUrl(CurrencyURL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "DivinationCards.json", JsonConvert.DeserializeObject<DivinationCards.RootObject>(Api.DownloadFromUrl(DivinationCards_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Essences.json", JsonConvert.DeserializeObject<Essences.RootObject>(Api.DownloadFromUrl(Essences_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Fragments.json", JsonConvert.DeserializeObject<Fragments.RootObject>(Api.DownloadFromUrl(Fragments_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Prophecies.json", JsonConvert.DeserializeObject<Prophecies.RootObject>(Api.DownloadFromUrl(Prophecies_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "UniqueAccessories.json", JsonConvert.DeserializeObject<UniqueAccessories.RootObject>(Api.DownloadFromUrl(UniqueAccessories_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "UniqueArmours.json", JsonConvert.DeserializeObject<UniqueArmours.RootObject>(Api.DownloadFromUrl(UniqueArmours_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "UniqueFlasks.json", JsonConvert.DeserializeObject<UniqueFlasks.RootObject>(Api.DownloadFromUrl(UniqueFlasks_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "UniqueJewels.json", JsonConvert.DeserializeObject<UniqueJewels.RootObject>(Api.DownloadFromUrl(UniqueJewels_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "UniqueMaps.json", JsonConvert.DeserializeObject<UniqueMaps.RootObject>(Api.DownloadFromUrl(UniqueMaps_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "UniqueWeapons.json", JsonConvert.DeserializeObject<UniqueWeapons.RootObject>(Api.DownloadFromUrl(UniqueWeapons_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "WhiteMaps.json", JsonConvert.DeserializeObject<WhiteMaps.RootObject>(Api.DownloadFromUrl(WhiteMaps_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Resonators.json", JsonConvert.DeserializeObject<Resonators.RootObject>(Api.DownloadFromUrl(Resonators_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Fossils.json", JsonConvert.DeserializeObject<Fossils.RootObject>(Api.DownloadFromUrl(Fossils_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Oils.json", JsonConvert.DeserializeObject<Oils.RootObject>(Api.DownloadFromUrl(Oil_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Incubators.json", JsonConvert.DeserializeObject<Incubators.RootObject>(Api.DownloadFromUrl(Incubators_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Scarabs.json", JsonConvert.DeserializeObject<Scarab.RootObject>(Api.DownloadFromUrl(Scarabs_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "DeliriumOrbs.json", JsonConvert.DeserializeObject<DeliriumOrb.RootObject>(Api.DownloadFromUrl(DeliriumOrb_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Vials.json", JsonConvert.DeserializeObject<Vials.RootObject>(Api.DownloadFromUrl(Vial_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Invitations.json", JsonConvert.DeserializeObject<Invitations.RootObject>(Api.DownloadFromUrl(Invitation_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "HelmetEnchants.json", JsonConvert.DeserializeObject<HelmetEnchants.RootObject>(Api.DownloadFromUrl(HelmetEnchants_URL + league)));
-                    Api.Json.SaveSettingFile(NinjaDirectory + "Artifacts.json", JsonConvert.DeserializeObject<Artifacts.RootObject>(Api.DownloadFromUrl(Artifacts_URL + league)));
-
-                    LogMessage("Finished Gathering Data from Poe.Ninja.", 5);
-                    UpdatingFromAPI = false;
-                    UpdatePoeNinjaData();
-                }
-                catch
-                {
-
-                    UpdatingFromAPI = false;
-                    UpdatePoeNinjaData();
-                }
-            });
+            LogMessage("Update is already in progress");
+            return;
         }
 
-        public bool JsonExists(string fileName)
+        Task.Run(async () =>
         {
-            return File.Exists(NinjaDirectory + fileName);
-        }
-
-        private void UpdatePoeNinjaData()
-        {
-            Task.Run(() =>
+            try
             {
-                while (UpdatingFromAPI || UpdatingFromJson)
-                {
-                    if (Settings.Debug) { LogMessage($"{GetCurrentMethod()}: Waiting on GetJsonData() to finish", 5, Color.Orange); }
-                    Thread.Sleep(250);
-                }
+                LogMessage("Gathering Data from Poe.Ninja.", 5);
+
                 var newData = new CollectiveApiData();
+                var tryWebFirst = forceRefresh;
+                var metadataPath = Path.Join(NinjaDirectory, league, "meta.json");
+                if (!tryWebFirst && Settings.AutoReload)
+                {
+                    tryWebFirst = await IsLocalCacheStale(metadataPath);
+                }
 
-                UpdatingFromJson = true;
-                if (JsonExists("Currency.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Currency.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Currency = JsonConvert.DeserializeObject<Currency.RootObject>(json);
-                    }
+                await LoadData<Currency.RootObject>("Currency.json", CurrencyUrl, league, tryWebFirst, t => newData.Currency = t);
+                await LoadData<DivinationCards.RootObject>("DivinationCards.json", DivinationCardsUrl, league, tryWebFirst, t => newData.DivinationCards = t);
+                await LoadData<Essences.RootObject>("Essences.json", EssencesUrl, league, tryWebFirst, t => newData.Essences = t);
+                await LoadData<Fragments.RootObject>("Fragments.json", FragmentsUrl, league, tryWebFirst, t => newData.Fragments = t);
+                await LoadData<UniqueAccessories.RootObject>("UniqueAccessories.json", UniqueAccessoriesUrl, league, tryWebFirst, t => newData.UniqueAccessories = t);
+                await LoadData<UniqueArmours.RootObject>("UniqueArmours.json", UniqueArmoursUrl, league, tryWebFirst, t => newData.UniqueArmours = t);
+                await LoadData<UniqueFlasks.RootObject>("UniqueFlasks.json", UniqueFlasksUrl, league, tryWebFirst, t => newData.UniqueFlasks = t);
+                await LoadData<UniqueJewels.RootObject>("UniqueJewels.json", UniqueJewelsUrl, league, tryWebFirst, t => newData.UniqueJewels = t);
+                await LoadData<UniqueMaps.RootObject>("UniqueMaps.json", UniqueMapsUrl, league, tryWebFirst, t => newData.UniqueMaps = t);
+                await LoadData<UniqueWeapons.RootObject>("UniqueWeapons.json", UniqueWeaponsUrl, league, tryWebFirst, t => newData.UniqueWeapons = t);
+                await LoadData<WhiteMaps.RootObject>("WhiteMaps.json", WhiteMapsUrl, league, tryWebFirst, t => newData.WhiteMaps = t);
+                await LoadData<Resonators.RootObject>("Resonators.json", ResonatorsUrl, league, tryWebFirst, t => newData.Resonators = t);
+                await LoadData<Fossils.RootObject>("Fossils.json", FossilsUrl, league, tryWebFirst, t => newData.Fossils = t);
+                await LoadData<Oils.RootObject>("Oils.json", OilUrl, league, tryWebFirst, t => newData.Oils = t);
+                await LoadData<Incubators.RootObject>("Incubators.json", IncubatorsUrl, league, tryWebFirst, t => newData.Incubators = t);
+                await LoadData<Scarab.RootObject>("Scarabs.json", ScarabsUrl, league, tryWebFirst, t => newData.Scarabs = t);
+                await LoadData<DeliriumOrb.RootObject>("DeliriumOrbs.json", DeliriumOrbUrl, league, tryWebFirst, t => newData.DeliriumOrb = t);
+                await LoadData<Vials.RootObject>("Vials.json", VialUrl, league, tryWebFirst, t => newData.Vials = t);
+                await LoadData<Invitations.RootObject>("Invitations.json", InvitationUrl, league, tryWebFirst, t => newData.Invitations = t);
+                await LoadData<Artifacts.RootObject>("Artifacts.json", ArtifactsUrl, league, tryWebFirst, t => newData.Artifacts = t);
+                await LoadData<SkillGems.RootObject>("SkillGems.json", SkillGemsUrl, league, tryWebFirst, t => newData.SkillGems = t);
+                await LoadData<ClusterJewelNinjaData>("ClusterJewels.json", ClusterJewelsUrl, league, tryWebFirst, t => newData.ClusterJewels = t);
+                await LoadData<Tattoos.RootObject>("Tattoos.json", TattooUrl, league, tryWebFirst, t => newData.Tattoos = t);
+                await LoadData<Omens.RootObject>("Omens.json", OmenUrl, league, tryWebFirst, t => newData.Omens = t);
+                await LoadData<Coffins.RootObject>("Coffins.json", CoffinUrl, league, tryWebFirst, t => newData.Coffins = t);
 
-                if (JsonExists("DivinationCards.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "DivinationCards.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.DivinationCards = JsonConvert.DeserializeObject<DivinationCards.RootObject>(json);
-                    }
+                new FileInfo(metadataPath).Directory?.Create();
+                await File.WriteAllTextAsync(metadataPath, JsonConvert.SerializeObject(new LeagueMetadata { LastLoadTime = DateTime.UtcNow }));
 
-                if (JsonExists("Essences.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Essences.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Essences = JsonConvert.DeserializeObject<Essences.RootObject>(json);
-                    }
-
-                if (JsonExists("Fragments.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Fragments.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Fragments = JsonConvert.DeserializeObject<Fragments.RootObject>(json);
-                    }
-
-                if (JsonExists("Prophecies.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Prophecies.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Prophecies = JsonConvert.DeserializeObject<Prophecies.RootObject>(json);
-                    }
-
-                if (JsonExists("UniqueAccessories.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "UniqueAccessories.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.UniqueAccessories = JsonConvert.DeserializeObject<UniqueAccessories.RootObject>(json);
-                    }
-
-                if (JsonExists("UniqueArmours.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "UniqueArmours.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.UniqueArmours = JsonConvert.DeserializeObject<UniqueArmours.RootObject>(json);
-                    }
-
-                if (JsonExists("UniqueFlasks.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "UniqueFlasks.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.UniqueFlasks = JsonConvert.DeserializeObject<UniqueFlasks.RootObject>(json);
-                    }
-
-                if (JsonExists("UniqueJewels.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "UniqueJewels.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.UniqueJewels = JsonConvert.DeserializeObject<UniqueJewels.RootObject>(json);
-                    }
-
-                if (JsonExists("UniqueMaps.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "UniqueMaps.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.UniqueMaps = JsonConvert.DeserializeObject<UniqueMaps.RootObject>(json);
-                    }
-
-                if (JsonExists("UniqueWeapons.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "UniqueWeapons.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.UniqueWeapons = JsonConvert.DeserializeObject<UniqueWeapons.RootObject>(json);
-                    }
-
-                if (JsonExists("WhiteMaps.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "WhiteMaps.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.WhiteMaps = JsonConvert.DeserializeObject<WhiteMaps.RootObject>(json);
-                    }
-
-                if (JsonExists("Resonators.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Resonators.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Resonators = JsonConvert.DeserializeObject<Resonators.RootObject>(json);
-                    }
-
-                if (JsonExists("Fossils.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Fossils.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Fossils = JsonConvert.DeserializeObject<Fossils.RootObject>(json);
-                    }
-
-                if (JsonExists("Incubators.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Incubators.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Incubators = JsonConvert.DeserializeObject<Incubators.RootObject>(json);
-                    }
-
-                if (JsonExists("Scarabs.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Scarabs.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Scarabs = JsonConvert.DeserializeObject<Scarab.RootObject>(json);
-                    }
-
-                if (JsonExists("Oils.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Oils.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Oils = JsonConvert.DeserializeObject<Oils.RootObject>(json);
-                    }
-
-                if (JsonExists("DeliriumOrbs.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "DeliriumOrbs.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.DeliriumOrb = JsonConvert.DeserializeObject<DeliriumOrb.RootObject>(json);
-                    }
-
-                if (JsonExists("Vials.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Vials.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Vials = JsonConvert.DeserializeObject<Vials.RootObject>(json);
-                    }
-
-                if (JsonExists("Invitations.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Invitations.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Invitations = JsonConvert.DeserializeObject<Invitations.RootObject>(json);
-                    }
-
-                if (JsonExists("HelmetEnchants.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "HelmetEnchants.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.HelmetEnchants = JsonConvert.DeserializeObject<HelmetEnchants.RootObject>(json);
-                    }
-
-                if (JsonExists("Artifacts.json"))
-                    using (var r = new StreamReader(NinjaDirectory + "Artifacts.json"))
-                    {
-                        var json = r.ReadToEnd();
-                        newData.Artifacts = JsonConvert.DeserializeObject<Artifacts.RootObject>(json);
-                    }
-
+                LogMessage("Finished Gathering Data from Poe.Ninja.", 5);
                 CollectedData = newData;
+                DivineDalue = CollectedData.Currency.Lines.Find(x => x.CurrencyTypeName == "Divine Orb")?.ChaosEquivalent;
                 LogMessage("Updated CollectedData.", 5);
-                UpdatingFromJson = false;
-            });
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _updating, 0);
+            }
+        });
+    }
+
+    private async Task<bool> IsLocalCacheStale(string metadataPath)
+    {
+        if (!File.Exists(metadataPath))
+        {
+            return true;
+        }
+
+        try
+        {
+            var metadata = JsonConvert.DeserializeObject<LeagueMetadata>(await File.ReadAllTextAsync(metadataPath));
+            return DateTime.UtcNow - metadata.LastLoadTime > TimeSpan.FromMinutes(Settings.ReloadTimer);
+        }
+        catch (Exception ex)
+        {
+            if (Settings.Debug)
+            {
+                LogError($"Metadata loading failed: {ex}");
+            }
+
+            return true;
+        }
+    }
+
+    private async Task LoadData<T>(string fileName, string url, string league, bool tryWebFirst, Action<T> dataAction)
+    {
+        var backupFile = Path.Join(NinjaDirectory, league, fileName);
+        if (tryWebFirst)
+        {
+            if (await LoadDataFromWeb(fileName, url, league, dataAction, backupFile))
+            {
+                return;
+            }
+        }
+
+        if (await LoadDataFromBackup(fileName, dataAction, backupFile))
+        {
+            return;
+        }
+
+        if (!tryWebFirst)
+        {
+            await LoadDataFromWeb(fileName, url, league, dataAction, backupFile);
+        }
+    }
+
+    private async Task<bool> LoadDataFromBackup<T>(string fileName, Action<T> dataAction, string backupFile)
+    {
+        if (File.Exists(backupFile))
+        {
+            try
+            {
+                var data = JsonConvert.DeserializeObject<T>(await File.ReadAllTextAsync(backupFile));
+                dataAction(data);
+                return true;
+            }
+            catch (Exception backupEx)
+            {
+                if (Settings.Debug)
+                {
+                    LogError($"{fileName} backup data load failed: {backupEx}");
+                }
+            }
+        }
+        else if (Settings.Debug)
+        {
+            LogError($"No backup for {fileName}");
+        }
+
+        return false;
+    }
+
+    private async Task<bool> LoadDataFromWeb<T>(string fileName, string url, string league, Action<T> dataAction, string backupFile)
+    {
+        try
+        {
+            if (Settings.Debug)
+            {
+                LogMessage($"Downloading {fileName}");
+            }
+
+            var data = JsonConvert.DeserializeObject<T>(await Utils.DownloadFromUrl(string.Format(url, league)));
+            if (Settings.Debug)
+            {
+                LogMessage($"{fileName} downloaded");
+            }
+
+            try
+            {
+                new FileInfo(backupFile).Directory.Create();
+                await File.WriteAllTextAsync(backupFile, JsonConvert.SerializeObject(data, Formatting.Indented));
+            }
+            catch (Exception ex)
+            {
+                var errorPath = backupFile + ".error";
+                new FileInfo(errorPath).Directory.Create();
+                await File.WriteAllTextAsync(errorPath, ex.ToString());
+                if (Settings.Debug)
+                {
+                    LogError($"{fileName} save failed: {ex}");
+                }
+            }
+
+            dataAction(data);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            if (Settings.Debug)
+            {
+                LogError($"{fileName} fresh data download failed: {ex}");
+            }
+
+            return false;
         }
     }
 }

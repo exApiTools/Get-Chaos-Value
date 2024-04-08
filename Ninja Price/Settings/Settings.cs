@@ -2,161 +2,173 @@ using System;
 using ExileCore.Shared.Attributes;
 using ExileCore.Shared.Interfaces;
 using ExileCore.Shared.Nodes;
+using Newtonsoft.Json;
 using SharpDX;
 
-namespace Ninja_Price.Settings
+namespace Ninja_Price.Settings;
+
+public class Settings : ISettings
 {
-    public class Settings : ISettings
-    {
-        public Settings()
-        {
-            LeagueList = new ListNode();
-            ReloadButton = new ButtonNode();
-            AutoReload = new ToggleNode();
-            AutoReloadTimer = new RangeNode<int>(15, 1, 60);
-            UniTextColor = Color.White;
-            Debug = new ToggleNode(false);
+    public DateTime LastUpDateTime { get; set; } = DateTime.Now;
 
-            // Visible stash tab
-            VisibleStashValue = new ToggleNode(true);
-            StashValueX = new RangeNode<int>(100, 0, 5000);
-            StashValueY = new RangeNode<int>(800, 0, 5000);
-            StashValueColorNode = new ColorNode(Color.AliceBlue);
-            StashValueFontSize = new RangeNode<int>(20, 0, 200);
-            StashValueSignificantDigits = new RangeNode<int>(5, 0, 10);
+    [Menu("Value Loop Timer")]
+    public RangeNode<int> ValueLoopTimerMS { get; set; } = new(250, 1, 2000);
 
-            // Inventory Value
-            VisibleInventoryValue = new ToggleNode(true);
-            InventoryValueX = new RangeNode<int>(100, 0, 5000);
-            InventoryValueY = new RangeNode<int>(800, 0, 5000);
-            InventoryValueColorNode = new ColorNode(Color.AliceBlue);
-            InventoryValueSignificantDigits = new RangeNode<int>(5, 0, 10);
+    [Menu("League", 1)]
+    public ListNode LeagueList { get; set; } = new();
 
-            HighlightUniqueJunk = new ToggleNode(true);
-            HelmetEnchantPrices = new ToggleNode(true);
-            HighlightColor = new ColorNode(Color.AliceBlue);
-            HighlightFontSize = new RangeNode<int>(20, 0, 200);
-            HighlightSignificantDigits = new RangeNode<int>(5, 0, 10);
-            InventoryValueCutOff = new RangeNode<int>(1, 0, 10);
-        }
+    public ToggleNode SyncCurrentLeague { get; set; } = new(true);
 
-        public DateTime LastUpDateTime { get; set; } = DateTime.Now;
-        public bool FirstTime { get; set; } = false;
+    [Menu("Map Variant Check", "Toggle Map Variant Checking", 1)]
+    public ToggleNode MapVariant { get; set; } = new(true);
 
-        [Menu("Value Loop Timer")]
-        public RangeNode<int> ValueLoopTimerMS { get; set; } = new RangeNode<int>(250, 1, 2000);
+    [JsonIgnore]
+    public ButtonNode ReloadPrices { get; set; } = new();
 
-        [Menu("League", 1)]
-        public ListNode LeagueList { get; set; }
+    [Menu("Auto Reload Toggle", 3)]
+    public ToggleNode AutoReload { get; set; } = new();
 
-        [Menu("Map Variant Check ?", "Toggle Map Variant Checking", 1)]
-        public ToggleNode MapVariant { get; set; } = new ToggleNode(true);
+    [Menu("Reload timer (Minutes)", 31, 3)]
+    public RangeNode<int> ReloadTimer { get; set; } = new(15, 1, 60);
 
-        [Menu("Reload", 2)]
-        public ButtonNode ReloadButton { get; set; }
+    [Menu("Plugin Wide Text Color", 355, 3)]
+    public ColorNode UniTextColor { get; set; } = Color.White;
 
-        [Menu("Auto Reload Toggle", 3)]
-        public ToggleNode AutoReload { get; set; }
+    [Menu("Debug", "Display debug strings", 6)]
+    public ToggleNode Debug { get; set; } = new(false);
 
-        [Menu("Auto Reload (Minutes)", 31, 3)]
-        public RangeNode<int> AutoReloadTimer { get; set; }
+    [Menu(null, "Set to 0 to disable")]
+    public RangeNode<float> MaximalValueForFractionalDisplay { get; set; } = new(0.2f, 0, 1);
 
-        [Menu("Plugin Wide Text Color", 355, 3)]
-        public ColorNode UniTextColor { get; set; }
+    [Menu(null, "ChaosEquivalent is not used by poe.ninja itself and can have weird values. If you like it better, try it")]
+    public ToggleNode UseChaosEquivalentDataForCurrency { get; set; } = new(false);
 
-        [Menu("Debug", "Display debug strings", 6)]
-        public ToggleNode Debug { get; set; }
+    [JsonProperty("visibleStashValue2")]
+    public StashValueSettings VisibleStashValue { get; set; } = new();
 
-        [Menu("Hovered Item", "This shows your prices oon items you hover over.", 567766)]
-        public ToggleNode HoveredItem { get; set; } = new ToggleNode(true);
+    public ToggleNode DisplayExpeditionVendorOverlay { get; set; } = new(false);
 
-        #region Visible Stash Value
+    public InventoryValueSettings InventoryValueSettings { get; set; } = new();
 
-        [Menu("Visible Stash Value", "Calculate value (in chaos) for the current visible stash tab.", 4)]
-        public ToggleNode VisibleStashValue { get; set; }
+    [Menu("Artifact Chaos Prices", "Display chaos equivalent price for items with artifact costs", 7)]
+    public ToggleNode ArtifactChaosPrices { get; set; } = new(true);
 
-        [Menu("X", "Horizontal position of where the value in chaos should be drawn.", 41, 4)]
-        public RangeNode<int> StashValueX { get; set; }
+    public GroundItemSettings GroundItemSettings { get; set; } = new();
+    public UniqueIdentificationSettings UniqueIdentificationSettings { get; set; } = new();
+    public TradeWindowSettings TradeWindowSettings { get; set; } = new();
+    public HoveredItemSettings HoveredItemSettings { get; set; } = new();
 
-        [Menu("Y", "Horizontal position of where the value in chaos should be drawn.", 42, 4)]
-        public RangeNode<int> StashValueY { get; set; }
+    public ToggleNode Enable { get; set; } = new(true);
+}
 
-        [Menu("Size", "Size of the font used to draw the chaos value of the visible stash tab.", 43, 4)]
-        public RangeNode<int> StashValueFontSize { get; set; }
+[Submenu]
+public class InventoryValueSettings
+{
+    [Menu(null, "Calculate value (in chaos) for the current visible Inventory tab.")]
+    public ToggleNode Show { get; set; } = new(true);
 
-        [Menu("Color", 44, 4)]
-        public ColorNode StashValueColorNode { get; set; }
+    [Menu(null, "Horizontal position of where the value in chaos should be drawn.")]
+    public RangeNode<int> PositionX { get; set; } = new(100, 0, 5000);
 
-        [Menu("Significant Digits", 45, 4)]
-        public RangeNode<int> StashValueSignificantDigits { get; set; }
+    [Menu(null, "Horizontal position of where the value in chaos should be drawn.")]
+    public RangeNode<int> PositionY { get; set; } = new(800, 0, 5000);
+}
 
-        [Menu("Currency Tab Overlay", 23452, 4)]
-        public EmptyNode CurrencyTabSpecifc { get; set; }
+[Submenu]
+public class TradeWindowSettings
+{
+    public ToggleNode Show { get; set; } = new(true);
+    public RangeNode<int> OffsetX { get; set; } = new(0, -2000, 2000);
+    public RangeNode<int> OffsetY { get; set; } = new(0, -2000, 2000);
+}
 
-        [Menu("Show Overlay", 75465, 23452)]
-        public ToggleNode CurrencyTabSpecificToggle { get; set; } = new ToggleNode(true);
+[Submenu]
+public class HoveredItemSettings
+{
+    public ToggleNode Show { get; set; } = new(true);
+    public RangeNode<int> ValuableColorThreshold { get; set; } = new(50, 0, 100000);
+    public ColorNode ValuableColor { get; set; } = new(Color.Violet);
+}
 
-        [Menu("Do Not Draw Currency Tab Overlay While Any Item Is Hovered", 75466, 23452)]
-        public ToggleNode DoNotDrawCurrencyTabSpecificWhileItemHovered { get; set; } = new ToggleNode(true);
+[Submenu]
+public class GroundItemSettings
+{
+    public ToggleNode PriceHeistRewards { get; set; } = new(true);
+    public ToggleNode PriceCoffins { get;set; } = new(true);
+    public ToggleNode PriceItemsOnGround { get; set; } = new(true);
 
-        [Menu("Value Font Size", 57, 23452)]
-        public RangeNode<int> CurrencyTabFontSize { get; set; } = new RangeNode<int>(14, 5, 50);
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ToggleNode OnlyPriceUniquesOnGround { get; set; } = new(true);
 
-        [Menu("Significant Digits Per Currency", 58, 23452)]
-        public RangeNode<int> CurrenctTabSigDigits { get; set; } = new RangeNode<int>(2, 0, 10);
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public RangeNode<float> GroundPriceTextScale { get; set; } = new(2, 0, 10);
 
-        [Menu("Box Height", 59, 23452)]
-        public RangeNode<int> CurrencyTabBoxHeight { get; set; } = new RangeNode<int>(15, 0, 100);
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ColorNode GroundPriceTextColor { get; set; } = new(Color.White);
 
-        [Menu("Font Color", 60, 23452)]
-        public ColorNode CurrencyTabFontColor { get; set; } = new Color(216, 216, 216, 255);
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ColorNode GroundPriceBackgroundColor { get; set; } = new(Color.Black);
 
-        [Menu("Background Color", 61, 23452)]
-        public ColorNode CurrencyTabBackgroundColor { get; set; } = new Color(0, 0, 0, 255);
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ToggleNode UseRawElementPositionWhileMoving { get; set; } = new(true);
 
-        [Menu("Border Color", 62, 23452)]
-        public ColorNode CurrencyTabBorderColor { get; set; } = new Color(146, 107, 43, 255);
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ToggleNode AlwaysUseRawElementPosition { get; set; } = new(false);
 
-        #endregion
+    public ToggleNode DisplayRealUniqueNameOnGround { get; set; } = new(true);
 
+    public ToggleNode OnlyDisplayRealUniqueNameForValuableUniques { get; set; } = new(false);
+    public ToggleNode DisplayWarningTextForUnknownUniques { get; set; } = new(true);
 
-        #region Visible Inventory Value
+    public RangeNode<float> UniqueLabelSize { get; set; } = new(0.8f, 0.1f, 1);
 
-        [Menu("Highlight Unique Junk", "Highlight unique items under X value (useful for quick-selling to vendor).", 5)]
-        public ToggleNode HighlightUniqueJunk { get; set; }
+    public ColorNode UniqueItemNameTextColor { get; set; } = new(Color.Black);
 
-        [Menu("Helmet Enchant Prices", "Display helmet enchant prices while in the laboratory.).", 6)]
-        public ToggleNode HelmetEnchantPrices { get; set; }
+    public ColorNode UniqueItemNameBackgroundColor { get; set; } = new(new Color(175, 96, 37));
 
-        [Menu("Size", "Size of the font used to draw the chaos value of the visible inventory.", 53, 5)]
-        public RangeNode<int> HighlightFontSize { get; set; }
+    public RangeNode<int> ValuableUniqueOnGroundValueThreshold { get; set; } = new(50, 0, 100000);
 
-        [Menu("Color", 54, 5)]
-        public ColorNode HighlightColor { get; set; }
+    public ColorNode ValuableUniqueItemNameTextColor { get; set; } = new(new Color(175, 96, 37));
 
-        [Menu("Significant Digits", "The number of wanted decimals", 55, 5)]
-        public RangeNode<int> HighlightSignificantDigits { get; set; }
+    public ColorNode ValuableUniqueItemNameBackgroundColor { get; set; } = new(Color.White);
+}
 
-        [Menu("Cut off Value", "Draws a border around unique items if it's under X value in chaos", 56, 5)]
-        public RangeNode<int> InventoryValueCutOff { get; set; }
+[Submenu]
+public class UniqueIdentificationSettings
+{
+    [JsonIgnore]
+    public ButtonNode RebuildUniqueItemArtMappingBackup { get; set; } = new();
 
-        [Menu("Visible Inventory Value", "Calculate value (in chaos) for the current visible Inventory tab.", 57, 5)]
-        public ToggleNode VisibleInventoryValue { get; set; }
+    [Menu(null, "Use if you want to ignore what's in game memory and rely only on your custom/builtin file")]
+    public ToggleNode IgnoreGameUniqueArtMapping { get; set; } = new(false);
+}
 
-        [Menu("Visible Inventory X", "Horizontal position of where the value in chaos should be drawn.", 58, 5)]
-        public RangeNode<int> InventoryValueX { get; set; }
+[Submenu]
+public class StashValueSettings
+{
+    [Menu(null, "Calculate value (in chaos) for the current visible stash tab.")]
+    public ToggleNode Show { get; set; } = new(true);
 
-        [Menu("Visible Inventory Y", "Horizontal position of where the value in chaos should be drawn.", 59, 5)]
-        public RangeNode<int> InventoryValueY { get; set; }
+    [Menu("X", "Horizontal position of where the value should be drawn.")]
+    public RangeNode<int> PositionX { get; set; } = new(100, 0, 5000);
 
-        [Menu("Visible Inventory Color", 61, 5)]
-        public ColorNode InventoryValueColorNode { get; set; }
+    [Menu("Y", "Horizontal position of where the value should be drawn.")]
+    public RangeNode<int> PositionY { get; set; } = new(100, 0, 5000);
 
-        [Menu("Visible Inventory Significant Digits", 62, 5)]
-        public RangeNode<int> InventoryValueSignificantDigits { get; set; }
+    public RangeNode<int> SignificantDigits { get; set; } = new(2, 0, 2);
+    public RangeNode<int> TopValuedItemCount { get; set; } = new(3, 0, 10);
+    public ToggleNode EnableBackground { get; set; } = new(true);
+    public CurrencyTabSettings CurrencyTabSettings { get; set; } = new();
+}
 
-        #endregion
-
-        public ToggleNode Enable { get; set; } = new ToggleNode(true);
-    }
+[Submenu]
+public class CurrencyTabSettings
+{
+    public ToggleNode ShowItemOverlay { get; set; } = new(true);
+    public ToggleNode DoNotDrawWhileAnItemIsHovered { get; set; } = new(true);
+    public RangeNode<int> FontSize { get; set; } = new(14, 5, 50);
+    public RangeNode<int> SignificantDigits { get; set; } = new(2, 0, 2);
+    public RangeNode<int> BoxHeight { get; set; } = new(15, 0, 100);
+    public ColorNode FontColor { get; set; } = new Color(216, 216, 216, 255);
+    public ColorNode BackgroundColor { get; set; } = new Color(0, 0, 0, 255);
 }
