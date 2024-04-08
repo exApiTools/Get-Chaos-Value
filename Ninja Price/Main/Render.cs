@@ -72,8 +72,8 @@ public partial class Main
                     GetValue(customItem);
                 }
 
-                var useRawPosition = Settings.GroundItemSettings.AlwaysUseRawElementPosition ||
-                                     Settings.GroundItemSettings.UseRawElementPositionWhileMoving &&
+                var useRawPosition = Settings.GroundItemSettings.PriceItemsOnGroundSettings.AlwaysUseRawElementPosition ||
+                                     Settings.GroundItemSettings.PriceItemsOnGroundSettings.UseRawElementPositionWhileMoving &&
                                      Entity.Player.GetComponent<Actor>()?.isMoving == true;
                 result.Add(new ItemOnGround(customItem, GroundItemProcessingType.WorldItem, useRawPosition ? null : description.ClientRect));
             }
@@ -659,7 +659,7 @@ public partial class Main
 
     private void ProcessItemsOnGround()
     {
-        if (!Settings.GroundItemSettings.PriceItemsOnGround && !Settings.GroundItemSettings.DisplayRealUniqueNameOnGround && !Settings.GroundItemSettings.PriceHeistRewards) return;
+        if (!Settings.GroundItemSettings.PriceItemsOnGroundSettings.PriceItemsOnGround && !Settings.GroundItemSettings.DisplayRealUniqueNameOnGround && !Settings.GroundItemSettings.PriceHeistRewards) return;
         //this window allows us to change the size of the text we draw to the background list
         //yeah, it's weird
         ImGui.Begin("lmao",
@@ -682,8 +682,8 @@ public partial class Main
                 {
                     if (!tooltipRect.Intersects(box) && !leftPanelRect.Intersects(box) && !rightPanelRect.Intersects(box))
                     {
-                        if (Settings.GroundItemSettings.PriceItemsOnGround && 
-                            (!Settings.GroundItemSettings.OnlyPriceUniquesOnGround || item.Rarity == ItemRarity.Unique))
+                        if (Settings.GroundItemSettings.PriceItemsOnGroundSettings.PriceItemsOnGround && 
+                            (!Settings.GroundItemSettings.PriceItemsOnGroundSettings.OnlyPriceUniquesOnGround || item.Rarity == ItemRarity.Unique))
                         {
                             if (item.PriceData.MinChaosValue > 0)
                             {
@@ -693,12 +693,12 @@ public partial class Main
                                     s += $"-{item.PriceData.MaxChaosValue.FormatNumber(2)}";
                                 }
 
-                                using (Graphics.SetTextScale(Settings.GroundItemSettings.GroundPriceTextScale))
+                                using (Graphics.SetTextScale(Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceTextScale))
                                 {
                                     var textSize = Graphics.MeasureText(s);
                                     var textPos = new Vector2(box.Right - textSize.X, box.Top);
-                                    Graphics.DrawBox(textPos, new Vector2(box.Right, box.Top + textSize.Y), Settings.GroundItemSettings.GroundPriceBackgroundColor);
-                                    Graphics.DrawText(s, textPos, Settings.GroundItemSettings.GroundPriceTextColor);
+                                    Graphics.DrawBox(textPos, new Vector2(box.Right, box.Top + textSize.Y), Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceBackgroundColor);
+                                    Graphics.DrawText(s, textPos, Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceTextColor);
                                 }
                             }
                         }
@@ -764,12 +764,12 @@ public partial class Main
                                 s += $"-{item.PriceData.MaxChaosValue.FormatNumber(2)}";
                             }
 
-                            using (Graphics.SetTextScale(Settings.GroundItemSettings.GroundPriceTextScale))
+                            using (Graphics.SetTextScale(Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceTextScale))
                             {
                                 var textSize = Graphics.MeasureText(s);
                                 var textPos = new Vector2(box.Right - textSize.X, box.Top);
-                                Graphics.DrawBox(textPos, textPos + textSize, Settings.GroundItemSettings.GroundPriceBackgroundColor);
-                                Graphics.DrawText(s, textPos, Settings.GroundItemSettings.GroundPriceTextColor);
+                                Graphics.DrawBox(textPos, textPos + textSize, Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceBackgroundColor);
+                                Graphics.DrawText(s, textPos, Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceTextColor);
                             }
                         }
                     }
