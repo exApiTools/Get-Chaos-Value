@@ -1,6 +1,7 @@
 using Ninja_Price.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.Elements.InventoryElements;
@@ -12,6 +13,8 @@ namespace Ninja_Price.Main;
 
 public partial class Main
 {
+    private readonly Stopwatch _sinceLastNecropolisReload = Stopwatch.StartNew();
+
     private static readonly Dictionary<string, string> ShardMapping = new()
     {
         { "Transmutation Shard", "Orb of Transmutation" },
@@ -196,9 +199,22 @@ public partial class Main
                         {
                             var modText = _necropolisModText.GetOrAdd(craftingMod, m =>
                             {
+                                var files = GameController.Game.Files;
+                                var statDescriptions = files.NecropolisStatDescriptions;
+                                if (Settings.ReloadNecropolisStatDescriptions &&
+                                    (statDescriptions.EntriesList.Count == 0 ||
+                                    statDescriptions.EntriesList[0].Sections.Count == 0) &&
+                                    _sinceLastNecropolisReload.Elapsed > TimeSpan.FromSeconds(10))
+                                {
+                                    files.LoadFiles();
+                                    _sinceLastNecropolisReload.Restart();
+                                    _necropolisModText.Clear();
+                                    statDescriptions = files.NecropolisStatDescriptions;
+                                }
+
                                 var r = StripTagsRegex();
                                 var dict = m.Stats.Zip(m.StatValues).Select(x => new Dictionary<GameStat, int> { { x.First.MatchingStat, x.Second } })
-                                    .Select(GameController.Game.Files.NecropolisStatDescriptions.TranslateMod).ToList();
+                                    .Select(statDescriptions.TranslateMod).ToList();
                                 return r.Replace(string.Join(", ", dict), "${data}");
                             });
 
@@ -210,6 +226,16 @@ public partial class Main
                                 item.PriceData.DetailsId = coffinSearch.detailsId;
                             }
                         }
+                        break;
+                    case ItemTypes.Allflame:
+                        var allflameSearch = CollectedData.Allflames.lines.Where(x => x.baseType == item.BaseName && x.levelRequired <= item.ItemLevel).MaxBy(x => x.levelRequired);
+                        if (allflameSearch != null)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * allflameSearch.chaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = allflameSearch.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = allflameSearch.detailsId;
+                        }
+
                         break;
                     case ItemTypes.Artifact:
                         var artifactSearch = CollectedData.Artifacts.Lines.Find(x => x.Name == item.BaseName);

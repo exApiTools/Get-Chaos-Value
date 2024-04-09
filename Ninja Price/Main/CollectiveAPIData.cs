@@ -29,4 +29,5 @@ public class CollectiveApiData
     public Tattoos.RootObject Tattoos { get; set; } = new();
     public Omens.RootObject Omens { get; set; } = new();
     public Coffins.RootObject Coffins { get; set; } = new();
+    public Allflames.RootObject Allflames { get; set; } = new();
 }

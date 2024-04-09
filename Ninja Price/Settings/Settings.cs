@@ -57,7 +57,7 @@ public class Settings : ISettings
     public UniqueIdentificationSettings UniqueIdentificationSettings { get; set; } = new();
     public TradeWindowSettings TradeWindowSettings { get; set; } = new();
     public HoveredItemSettings HoveredItemSettings { get; set; } = new();
-
+    public ToggleNode ReloadNecropolisStatDescriptions { get; set; } = new(true);
     public ToggleNode Enable { get; set; } = new(true);
 }
 
@@ -95,6 +95,10 @@ public class GroundItemSettings
 {
     public ToggleNode PriceHeistRewards { get; set; } = new(true);
     public ToggleNode PriceCoffins { get;set; } = new(true);
+
+    public ToggleNode PriceItemsOnGround { get; set; } = new(true);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
     public PriceItemsOnGroundSettings PriceItemsOnGroundSettings { get; set; } = new();
 
     public ToggleNode DisplayRealUniqueNameOnGround { get; set; } = new(true);
@@ -119,25 +123,13 @@ public class GroundItemSettings
 [Submenu]
 public class PriceItemsOnGroundSettings
 {
-    public ToggleNode PriceItemsOnGround { get; set; } = new(true);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
     public ToggleNode OnlyPriceUniquesOnGround { get; set; } = new(true);
-    
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
     public RangeNode<float> GroundPriceTextScale { get; set; } = new(2, 0, 10);
-    
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
     public ColorNode GroundPriceTextColor { get; set; } = new(Color.White);
-    
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
     public ColorNode GroundPriceBackgroundColor { get; set; } = new(Color.Black);
-    
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public ToggleNode UseRawElementPositionWhileMoving { get; set; } = new(true);
-    
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public ToggleNode AlwaysUseRawElementPosition { get; set; } = new(false);
+    public RangeNode<int> ValuableValueThreshold { get; set; } = new(50, 0, 100000);
+    public ColorNode ValuablePriceColor { get; set; } = new(Color.Violet);
+
 }
 
 [Submenu]

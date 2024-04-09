@@ -29,4 +29,5 @@ public enum ItemTypes
     Tattoo,
     Omen,
     Coffin,
+    Allflame,
 }

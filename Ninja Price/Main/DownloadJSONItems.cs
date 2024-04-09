@@ -28,13 +28,13 @@ public partial class Main
     private const string DeliriumOrbUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=DeliriumOrb&language=en";
     private const string VialUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Vial&language=en";
     private const string InvitationUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Invitation&language=en";
-    private const string HelmetEnchantsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=HelmetEnchant&language=en";
     private const string ArtifactsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Artifact&language=en";
     private const string SkillGemsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=SkillGem&language=en";
     private const string ClusterJewelsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=ClusterJewel&language=en";
     private const string TattooUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Tattoo&language=en";
     private const string OmenUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Omen&language=en";
     private const string CoffinUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Coffin&language=en";
+    private const string AllflameUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=AllflameEmber&language=en";
 
     private class LeagueMetadata
     {
@@ -90,6 +90,7 @@ public partial class Main
                 await LoadData<Tattoos.RootObject>("Tattoos.json", TattooUrl, league, tryWebFirst, t => newData.Tattoos = t);
                 await LoadData<Omens.RootObject>("Omens.json", OmenUrl, league, tryWebFirst, t => newData.Omens = t);
                 await LoadData<Coffins.RootObject>("Coffins.json", CoffinUrl, league, tryWebFirst, t => newData.Coffins = t);
+                await LoadData<Allflames.RootObject>("Allflames.json", AllflameUrl, league, tryWebFirst, t => newData.Allflames = t);
 
                 new FileInfo(metadataPath).Directory?.Create();
                 await File.WriteAllTextAsync(metadataPath, JsonConvert.SerializeObject(new LeagueMetadata { LastLoadTime = DateTime.UtcNow }));

@@ -9,7 +9,6 @@ using ExileCore.PoEMemory;
 using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.Elements.InventoryElements;
-using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Cache;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
@@ -17,7 +16,6 @@ using Color = SharpDX.Color;
 using RectangleF = SharpDX.RectangleF;
 using ImGuiNET;
 using static Ninja_Price.Enums.HaggleTypes.HaggleType;
-using Ninja_Price.API.PoeNinja;
 using ExileCore.PoEMemory.Elements.Necropolis;
 
 namespace Ninja_Price.Main;
@@ -72,10 +70,7 @@ public partial class Main
                     GetValue(customItem);
                 }
 
-                var useRawPosition = Settings.GroundItemSettings.PriceItemsOnGroundSettings.AlwaysUseRawElementPosition ||
-                                     Settings.GroundItemSettings.PriceItemsOnGroundSettings.UseRawElementPositionWhileMoving &&
-                                     Entity.Player.GetComponent<Actor>()?.isMoving == true;
-                result.Add(new ItemOnGround(customItem, GroundItemProcessingType.WorldItem, useRawPosition ? null : description.ClientRect));
+                result.Add(new ItemOnGround(customItem, GroundItemProcessingType.WorldItem, description.ClientRect));
             }
         }
         result.AddRange(_slowGroundItems.Value);
@@ -356,6 +351,7 @@ public partial class Main
             case ItemTypes.SkillGem:
             case ItemTypes.ClusterJewel:
             case ItemTypes.Coffin:
+            case ItemTypes.Allflame:
                 if (priceInDivines >= 0.1)
                 {
                     AddText($"\nDivine: {priceInDivinesText}d");
@@ -659,7 +655,7 @@ public partial class Main
 
     private void ProcessItemsOnGround()
     {
-        if (!Settings.GroundItemSettings.PriceItemsOnGroundSettings.PriceItemsOnGround && !Settings.GroundItemSettings.DisplayRealUniqueNameOnGround && !Settings.GroundItemSettings.PriceHeistRewards) return;
+        if (!Settings.GroundItemSettings.PriceItemsOnGround && !Settings.GroundItemSettings.DisplayRealUniqueNameOnGround && !Settings.GroundItemSettings.PriceHeistRewards) return;
         //this window allows us to change the size of the text we draw to the background list
         //yeah, it's weird
         ImGui.Begin("lmao",
@@ -682,7 +678,9 @@ public partial class Main
                 {
                     if (!tooltipRect.Intersects(box) && !leftPanelRect.Intersects(box) && !rightPanelRect.Intersects(box))
                     {
-                        if (Settings.GroundItemSettings.PriceItemsOnGroundSettings.PriceItemsOnGround && 
+                        var isValuable = item.PriceData.MaxChaosValue >= Settings.GroundItemSettings.PriceItemsOnGroundSettings.ValuableValueThreshold;
+
+                        if (Settings.GroundItemSettings.PriceItemsOnGround && 
                             (!Settings.GroundItemSettings.PriceItemsOnGroundSettings.OnlyPriceUniquesOnGround || item.Rarity == ItemRarity.Unique))
                         {
                             if (item.PriceData.MinChaosValue > 0)
@@ -698,7 +696,7 @@ public partial class Main
                                     var textSize = Graphics.MeasureText(s);
                                     var textPos = new Vector2(box.Right - textSize.X, box.Top);
                                     Graphics.DrawBox(textPos, new Vector2(box.Right, box.Top + textSize.Y), Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceBackgroundColor);
-                                    Graphics.DrawText(s, textPos, Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceTextColor);
+                                    Graphics.DrawText(s, textPos, isValuable ? Settings.GroundItemSettings.PriceItemsOnGroundSettings.ValuablePriceColor : Settings.GroundItemSettings.PriceItemsOnGroundSettings.GroundPriceTextColor);
                                 }
                             }
                         }
@@ -724,7 +722,6 @@ public partial class Main
 
                             if (item.UniqueNameCandidates.Any())
                             {
-                                var isValuable = item.PriceData.MaxChaosValue >= Settings.GroundItemSettings.ValuableUniqueOnGroundValueThreshold;
                                 if (Settings.GroundItemSettings.OnlyDisplayRealUniqueNameForValuableUniques && !isValuable)
                                 {
                                     continue;

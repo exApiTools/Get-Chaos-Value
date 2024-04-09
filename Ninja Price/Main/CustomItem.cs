@@ -118,6 +118,7 @@ public class CustomItem
                 IsElder = @base.isElder;
                 IsShaper = @base.isShaper;
                 IsCorrupted = @base.isCorrupted;
+                ItemLevel = @base.CurrencyItemLevel;
             }
 
             if (itemEntity.TryGetComponent<NecropolisCorpse>(out var corpse))
@@ -209,6 +210,10 @@ public class CustomItem
             if (BaseName == "Filled Coffin")
             {
                 ItemType = ItemTypes.Coffin;
+            }
+            else if (ClassName == "NecropolisPack")
+            {
+                ItemType = ItemTypes.Allflame;
             }
             else if (ClassName == "MiscMapItem" && Path.StartsWith("Metadata/Items/MapFragments/Primordial/", StringComparison.Ordinal) &&
                      Path.EndsWith("Key", StringComparison.Ordinal))
