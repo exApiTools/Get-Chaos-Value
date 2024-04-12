@@ -201,22 +201,27 @@ public partial class Main
                             {
                                 var files = GameController.Game.Files;
                                 var statDescriptions = files.NecropolisStatDescriptions;
+                                var r = StripTagsRegex();
+                                var dict = m.Stats.Zip(m.StatValues).Select(x => new Dictionary<GameStat, int> { { x.First.MatchingStat, x.Second } })
+                                    .Select(statDescriptions.TranslateMod).ToList();
+                                var result = r.Replace(string.Join(", ", dict), "${data}");
                                 if (Settings.ReloadNecropolisStatDescriptions &&
                                     (statDescriptions.EntriesList.Count == 0 ||
-                                    statDescriptions.EntriesList[0].Sections.Count == 0) &&
+                                     statDescriptions.EntriesList[0].Sections.Count == 0 ||
+                                     result.Contains('<')) &&
                                     _sinceLastNecropolisReload.Elapsed > TimeSpan.FromSeconds(10))
                                 {
                                     files.LoadFiles();
                                     _sinceLastNecropolisReload.Restart();
                                     _necropolisModText.Clear();
-                                    statDescriptions = files.NecropolisStatDescriptions;
                                 }
 
-                                var r = StripTagsRegex();
-                                var dict = m.Stats.Zip(m.StatValues).Select(x => new Dictionary<GameStat, int> { { x.First.MatchingStat, x.Second } })
-                                    .Select(statDescriptions.TranslateMod).ToList();
-                                return r.Replace(string.Join(", ", dict), "${data}");
+                                return result;
                             });
+                            if (modText.Contains('<'))
+                            {
+                                _necropolisModText.TryRemove(craftingMod, out _);
+                            }
 
                             var coffinSearch = CollectedData.Coffins.lines.Where(x => x.name == modText && x.levelRequired <= item.ItemLevel).MaxBy(x => x.levelRequired);
                             if (coffinSearch != null)
