@@ -19,46 +19,75 @@ public class Settings : ISettings
 
     public ToggleNode SyncCurrentLeague { get; set; } = new(true);
 
-    [Menu("Map Variant Check", "Toggle Map Variant Checking", 1)]
-    public ToggleNode MapVariant { get; set; } = new(true);
-
     [JsonIgnore]
     public ButtonNode ReloadPrices { get; set; } = new();
 
-    [Menu("Auto Reload Toggle", 3)]
-    public ToggleNode AutoReload { get; set; } = new();
+    public ReloadSettings ReloadSettings { get; set; } = new();
 
-    [Menu("Reload timer (Minutes)", 31, 3)]
-    public RangeNode<int> ReloadTimer { get; set; } = new(15, 1, 60);
+    public ValueSettings ValueSettings { get; set; } = new();
 
-    [Menu("Plugin Wide Text Color", 355, 3)]
+    public LeagueSpecificSettings LeagueSpecificSettings { get; set; } = new();
+    
+    public GroundItemSettings GroundItemSettings { get; set; } = new();
+
+    public UniqueIdentificationSettings UniqueIdentificationSettings { get; set; } = new();
+
+    public ToggleNode Enable { get; set; } = new(true);
+
+    [Menu("Map Variant Check", "Toggle Map Variant Checking", 1)]
+    public ToggleNode MapVariant { get; set; } = new(true);
+
+    [Menu("Plugin Wide Text Color")]
     public ColorNode UniTextColor { get; set; } = Color.White;
 
     [Menu("Debug", "Display debug strings", 6)]
     public ToggleNode Debug { get; set; } = new(false);
+}
 
+[Submenu]
+public class ReloadSettings
+{
+    [Menu("Auto Reload Toggle")]
+    public ToggleNode AutoReload { get; set; } = new();
+
+    [Menu("Reload timer (Minutes)")]
+    public RangeNode<int> ReloadTimer { get; set; } = new(15, 1, 60);
+}
+
+[Submenu]
+public class LeagueSpecificSettings
+{
+    [Menu("Artifact Chaos Prices", "Display chaos equivalent price for items with artifact costs", 7)]
+    public ToggleNode ArtifactChaosPrices { get; set; } = new(true);
+
+    public ToggleNode DisplayExpeditionVendorOverlay { get; set; } = new(false);
+
+    public ToggleNode ReloadNecropolisStatDescriptions { get; set; } = new(true);
+}
+
+[Submenu]
+public class ValueSettings
+{
     [Menu(null, "Set to 0 to disable")]
     public RangeNode<float> MaximalValueForFractionalDisplay { get; set; } = new(0.2f, 0, 1);
 
     [Menu(null, "ChaosEquivalent is not used by poe.ninja itself and can have weird values. If you like it better, try it")]
     public ToggleNode UseChaosEquivalentDataForCurrency { get; set; } = new(false);
 
-    [JsonProperty("visibleStashValue2")]
-    public StashValueSettings VisibleStashValue { get; set; } = new();
-
-    public ToggleNode DisplayExpeditionVendorOverlay { get; set; } = new(false);
-
+    [JsonProperty("InventoryValueSetting")]
     public InventoryValueSettings InventoryValueSettings { get; set; } = new();
 
-    [Menu("Artifact Chaos Prices", "Display chaos equivalent price for items with artifact costs", 7)]
-    public ToggleNode ArtifactChaosPrices { get; set; } = new(true);
+    [JsonProperty("StashValueSetting")]
+    public StashValueSettings VisibleStashValue { get; set; } = new();
 
-    public GroundItemSettings GroundItemSettings { get; set; } = new();
-    public UniqueIdentificationSettings UniqueIdentificationSettings { get; set; } = new();
+    [JsonProperty("StashTabSetting")]
+    public CurrencyTabSettings CurrencyTabSettings { get; set; } = new();
+
+    [JsonProperty("TradeSetting")]
     public TradeWindowSettings TradeWindowSettings { get; set; } = new();
+
+    [JsonProperty("HoveredSetting")]
     public HoveredItemSettings HoveredItemSettings { get; set; } = new();
-    public ToggleNode ReloadNecropolisStatDescriptions { get; set; } = new(true);
-    public ToggleNode Enable { get; set; } = new(true);
 }
 
 [Submenu]
@@ -158,7 +187,6 @@ public class StashValueSettings
     public RangeNode<int> SignificantDigits { get; set; } = new(2, 0, 2);
     public RangeNode<int> TopValuedItemCount { get; set; } = new(3, 0, 10);
     public ToggleNode EnableBackground { get; set; } = new(true);
-    public CurrencyTabSettings CurrencyTabSettings { get; set; } = new();
 }
 
 [Submenu]

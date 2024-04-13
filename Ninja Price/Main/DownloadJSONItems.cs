@@ -60,7 +60,7 @@ public partial class Main
                 var newData = new CollectiveApiData();
                 var tryWebFirst = forceRefresh;
                 var metadataPath = Path.Join(NinjaDirectory, league, "meta.json");
-                if (!tryWebFirst && Settings.AutoReload)
+                if (!tryWebFirst && Settings.ReloadSettings.AutoReload)
                 {
                     tryWebFirst = await IsLocalCacheStale(metadataPath);
                 }
@@ -117,7 +117,7 @@ public partial class Main
         try
         {
             var metadata = JsonConvert.DeserializeObject<LeagueMetadata>(await File.ReadAllTextAsync(metadataPath));
-            return DateTime.UtcNow - metadata.LastLoadTime > TimeSpan.FromMinutes(Settings.ReloadTimer);
+            return DateTime.UtcNow - metadata.LastLoadTime > TimeSpan.FromMinutes(Settings.ReloadSettings.ReloadTimer);
         }
         catch (Exception ex)
         {

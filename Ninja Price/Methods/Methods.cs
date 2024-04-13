@@ -98,7 +98,7 @@ public partial class Main
     {
         try
         {
-            if (item.BaseName.Contains("Rogue's Marker"))
+            if(item.BaseName.Contains("Rogue's Marker"))
             {
                 item.PriceData.MinChaosValue = 0;
             }
@@ -108,37 +108,37 @@ public partial class Main
                 {
                     // TODO: Complete
                     case ItemTypes.Currency:
+                    {
+                        if (item.BaseName.StartsWith("Chaos ")) // Chaos Orb or Shard
                         {
-                            if (item.BaseName.StartsWith("Chaos ")) // Chaos Orb or Shard
+                            switch (item.CurrencyInfo.IsShard)
                             {
-                                switch (item.CurrencyInfo.IsShard)
-                                {
-                                    case false:
-                                        item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize;
-                                        break;
-                                    case true:
-                                        item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize / 20.0;
-                                        break;
-                                }
-
-                                break;
-                            }
-
-                            var (pricedStack, pricedItem) = item.CurrencyInfo.IsShard && TryGetShardParent(item.BaseName, out var shardParent)
-                                ? (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20, shardParent)
-                                : (1, item.BaseName);
-                            var shardCurrencySearch = CollectedData.Currency.FindLine(pricedItem, Settings.UseChaosEquivalentDataForCurrency);
-                            if (shardCurrencySearch != null)
-                            {
-                                item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * shardCurrencySearch.ChaosEquivalent / pricedStack;
-                                item.PriceData.ChangeInLast7Days = shardCurrencySearch.PriceChange;
-                                item.PriceData.DetailsId = shardCurrencySearch.DetailsId;
+                                case false:
+                                    item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize;
+                                    break;
+                                case true:
+                                    item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize / 20.0;
+                                    break;
                             }
 
                             break;
                         }
+
+                        var (pricedStack, pricedItem) = item.CurrencyInfo.IsShard && TryGetShardParent(item.BaseName, out var shardParent)
+                            ? (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20, shardParent)
+                            : (1, item.BaseName);
+                        var shardCurrencySearch = CollectedData.Currency.FindLine(pricedItem, Settings.ValueSettings.UseChaosEquivalentDataForCurrency);
+                        if (shardCurrencySearch != null)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * shardCurrencySearch.ChaosEquivalent / pricedStack;
+                            item.PriceData.ChangeInLast7Days = shardCurrencySearch.PriceChange;
+                            item.PriceData.DetailsId = shardCurrencySearch.DetailsId;
+                        }
+
+                        break;
+                    }
                     case ItemTypes.Catalyst:
-                        var catalystSearch = CollectedData.Currency.FindLine(item.BaseName, Settings.UseChaosEquivalentDataForCurrency);
+                        var catalystSearch = CollectedData.Currency.FindLine(item.BaseName, Settings.ValueSettings.UseChaosEquivalentDataForCurrency);
                         if (catalystSearch != null)
                         {
                             item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * catalystSearch.ChaosEquivalent;
@@ -205,7 +205,7 @@ public partial class Main
                                 var dict = m.Stats.Zip(m.StatValues).Select(x => new Dictionary<GameStat, int> { { x.First.MatchingStat, x.Second } })
                                     .Select(statDescriptions.TranslateMod).ToList();
                                 var result = r.Replace(string.Join(", ", dict), "${data}");
-                                if (Settings.ReloadNecropolisStatDescriptions &&
+                                if (Settings.LeagueSpecificSettings.ReloadNecropolisStatDescriptions &&
                                     (statDescriptions.EntriesList.Count == 0 ||
                                      statDescriptions.EntriesList[0].Sections.Count == 0 ||
                                      result.Contains('<')) &&
@@ -253,20 +253,20 @@ public partial class Main
 
                         break;
                     case ItemTypes.Fragment:
+                    {
+                        var (pricedStack, pricedItem) = item.CurrencyInfo.IsShard && TryGetShardParent(item.BaseName, out var shardParent)
+                            ? (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20, shardParent)
+                            : (1, item.BaseName);
+                        var fragmentSearch = CollectedData.Fragments.Lines.Find(x => x.CurrencyTypeName == pricedItem);
+                        if (fragmentSearch != null)
                         {
-                            var (pricedStack, pricedItem) = item.CurrencyInfo.IsShard && TryGetShardParent(item.BaseName, out var shardParent)
-                                ? (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20, shardParent)
-                                : (1, item.BaseName);
-                            var fragmentSearch = CollectedData.Fragments.Lines.Find(x => x.CurrencyTypeName == pricedItem);
-                            if (fragmentSearch != null)
-                            {
-                                item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * (fragmentSearch.ChaosEquivalent ?? 0) / pricedStack;
-                                item.PriceData.ChangeInLast7Days = fragmentSearch.ReceiveSparkLine.TotalChange ?? 0;
-                                item.PriceData.DetailsId = fragmentSearch.DetailsId;
-                            }
-
-                            break;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * (fragmentSearch.ChaosEquivalent ?? 0) / pricedStack;
+                            item.PriceData.ChangeInLast7Days = fragmentSearch.ReceiveSparkLine.TotalChange ?? 0;
+                            item.PriceData.DetailsId = fragmentSearch.DetailsId;
                         }
+
+                        break;
+                    }
                     case ItemTypes.SkillGem:
                         var displayText = !string.IsNullOrEmpty(item.GemName) ? item.GemName : item.BaseName;
                         var fittingGems = CollectedData.SkillGems.Lines
@@ -383,39 +383,39 @@ public partial class Main
 
                         break;
                     case ItemTypes.UniqueArmour:
+                    {
+                        var allLinksLines = CollectedData.UniqueArmours.Lines.Where(x =>
+                            (x.Name == item.UniqueName || item.UniqueNameCandidates.Contains(x.Name)) &&
+                            !x.DetailsId.Contains("-relic"));
+                        var uniqueArmourSearchLinks = item.LargestLink switch
                         {
-                            var allLinksLines = CollectedData.UniqueArmours.Lines.Where(x =>
-                                (x.Name == item.UniqueName || item.UniqueNameCandidates.Contains(x.Name)) &&
-                                !x.DetailsId.Contains("-relic"));
-                            var uniqueArmourSearchLinks = item.LargestLink switch
-                            {
-                                < 5 => allLinksLines.Where(x => x.Links != 5 && x.Links != 6).ToList(),
-                                5 => allLinksLines.Where(x => x.Links == 5).ToList(),
-                                6 => allLinksLines.Where(x => x.Links == 6).ToList(),
-                                _ => new List<UniqueArmours.Line>()
-                            };
+                            < 5 => allLinksLines.Where(x => x.Links != 5 && x.Links != 6).ToList(),
+                            5 => allLinksLines.Where(x => x.Links == 5).ToList(),
+                            6 => allLinksLines.Where(x => x.Links == 6).ToList(),
+                            _ => new List<UniqueArmours.Line>()
+                        };
 
-                            if (uniqueArmourSearchLinks.Count == 1)
-                            {
-                                item.PriceData.MinChaosValue = uniqueArmourSearchLinks[0].ChaosValue ?? 0;
-                                item.PriceData.ChangeInLast7Days = uniqueArmourSearchLinks[0].Sparkline.TotalChange ?? 0;
-                                item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
-                            }
-                            else if (uniqueArmourSearchLinks.Count > 1)
-                            {
-                                item.PriceData.MinChaosValue = uniqueArmourSearchLinks.Min(x => x.ChaosValue) ?? 0;
-                                item.PriceData.MaxChaosValue = uniqueArmourSearchLinks.Max(x => x.ChaosValue) ?? 0;
-                                item.PriceData.ChangeInLast7Days = 0;
-                                item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
-                            }
-                            else
-                            {
-                                item.PriceData.MinChaosValue = 0;
-                                item.PriceData.ChangeInLast7Days = 0;
-                            }
-
-                            break;
+                        if (uniqueArmourSearchLinks.Count == 1)
+                        {
+                            item.PriceData.MinChaosValue = uniqueArmourSearchLinks[0].ChaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = uniqueArmourSearchLinks[0].Sparkline.TotalChange ?? 0;
+                            item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
                         }
+                        else if (uniqueArmourSearchLinks.Count > 1)
+                        {
+                            item.PriceData.MinChaosValue = uniqueArmourSearchLinks.Min(x => x.ChaosValue) ?? 0;
+                            item.PriceData.MaxChaosValue = uniqueArmourSearchLinks.Max(x => x.ChaosValue) ?? 0;
+                            item.PriceData.ChangeInLast7Days = 0;
+                            item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
+                        }
+                        else
+                        {
+                            item.PriceData.MinChaosValue = 0;
+                            item.PriceData.ChangeInLast7Days = 0;
+                        }
+
+                        break;
+                    }
                     case ItemTypes.UniqueFlask:
                         var uniqueFlaskSearch = CollectedData.UniqueFlasks.Lines.FindAll(x =>
                             (x.Name == item.UniqueName || item.UniqueNameCandidates.Contains(x.Name)) &&
@@ -509,38 +509,38 @@ public partial class Main
 
                         break;
                     case ItemTypes.UniqueWeapon:
+                    {
+                        var allLinksLines = CollectedData.UniqueWeapons.Lines.Where(x =>
+                            (x.Name == item.UniqueName || item.UniqueNameCandidates.Contains(x.Name)) &&
+                            !x.DetailsId.Contains("-relic"));
+                        var uniqueArmourSearchLinks = item.LargestLink switch
                         {
-                            var allLinksLines = CollectedData.UniqueWeapons.Lines.Where(x =>
-                                (x.Name == item.UniqueName || item.UniqueNameCandidates.Contains(x.Name)) &&
-                                !x.DetailsId.Contains("-relic"));
-                            var uniqueArmourSearchLinks = item.LargestLink switch
-                            {
-                                < 5 => allLinksLines.Where(x => x.Links != 5 && x.Links != 6).ToList(),
-                                5 => allLinksLines.Where(x => x.Links == 5).ToList(),
-                                6 => allLinksLines.Where(x => x.Links == 6).ToList(),
-                                _ => new List<UniqueWeapons.Line>()
-                            };
-                            if (uniqueArmourSearchLinks.Count == 1)
-                            {
-                                item.PriceData.MinChaosValue = uniqueArmourSearchLinks[0].ChaosValue ?? 0;
-                                item.PriceData.ChangeInLast7Days = uniqueArmourSearchLinks[0].Sparkline.TotalChange ?? 0;
-                                item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
-                            }
-                            else if (uniqueArmourSearchLinks.Count > 1)
-                            {
-                                item.PriceData.MinChaosValue = uniqueArmourSearchLinks.Min(x => x.ChaosValue) ?? 0;
-                                item.PriceData.MaxChaosValue = uniqueArmourSearchLinks.Max(x => x.ChaosValue) ?? 0;
-                                item.PriceData.ChangeInLast7Days = 0;
-                                item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
-                            }
-                            else
-                            {
-                                item.PriceData.MinChaosValue = 0;
-                                item.PriceData.ChangeInLast7Days = 0;
-                            }
-
-                            break;
+                            < 5 => allLinksLines.Where(x => x.Links != 5 && x.Links != 6).ToList(),
+                            5 => allLinksLines.Where(x => x.Links == 5).ToList(),
+                            6 => allLinksLines.Where(x => x.Links == 6).ToList(),
+                            _ => new List<UniqueWeapons.Line>()
+                        };
+                        if (uniqueArmourSearchLinks.Count == 1)
+                        {
+                            item.PriceData.MinChaosValue = uniqueArmourSearchLinks[0].ChaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = uniqueArmourSearchLinks[0].Sparkline.TotalChange ?? 0;
+                            item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
                         }
+                        else if (uniqueArmourSearchLinks.Count > 1)
+                        {
+                            item.PriceData.MinChaosValue = uniqueArmourSearchLinks.Min(x => x.ChaosValue) ?? 0;
+                            item.PriceData.MaxChaosValue = uniqueArmourSearchLinks.Max(x => x.ChaosValue) ?? 0;
+                            item.PriceData.ChangeInLast7Days = 0;
+                            item.PriceData.DetailsId = uniqueArmourSearchLinks[0].DetailsId;
+                        }
+                        else
+                        {
+                            item.PriceData.MinChaosValue = 0;
+                            item.PriceData.ChangeInLast7Days = 0;
+                        }
+
+                        break;
+                    }
                     case ItemTypes.Map:
                         switch (item.MapInfo.MapType)
                         {
@@ -666,20 +666,17 @@ public partial class Main
         {
             return false;
         }
+
         // TODO: Get inventory items and not just stash tab items, this will be done at a later date
         try
         {
-            if (!Settings.VisibleStashValue.Show.Value || !GameController.Game.IngameState.IngameUi.StashElement.IsVisible)
+            if ((Settings.ValueSettings.VisibleStashValue.Show.Value && GameController.Game.IngameState.IngameUi.StashElement.IsVisible &&
+                GameController.Game.IngameState.IngameUi.StashElement.VisibleStash?.VisibleInventoryItems != null) ||
+                (GameController.Game.IngameState.IngameUi.GuildStashElement.IsVisible &&
+                GameController.Game.IngameState.IngameUi.GuildStashElement.VisibleStash?.VisibleInventoryItems != null))
             {
-                if (Settings.Debug) { LogMessage($"{GetCurrentMethod()}.ShouldUpdateValues() Stash is not visible", 5, Color.DarkGray); }
-                return false;
-            }
-
-            // Dont continue if the stash page isnt even open
-            if (GameController.Game.IngameState.IngameUi.StashElement.VisibleStash?.VisibleInventoryItems == null)
-            {
-                if (Settings.Debug) LogMessage($"{GetCurrentMethod()}.ShouldUpdateValues() Items == null", 5, Color.DarkGray);
-                return false;
+                if (Settings.Debug) { LogMessage($"{GetCurrentMethod()}.ShouldUpdateValues() Stash or GuildStash is visible and items are not null", 5, Color.DarkGray); }
+                return true;
             }
         }
         catch (Exception)
@@ -688,8 +685,8 @@ public partial class Main
             return false;
         }
 
-        if (Settings.Debug) LogMessage($"{GetCurrentMethod()}.ShouldUpdateValues() == True", 5, Color.LimeGreen);
-        return true;
+        if (Settings.Debug) LogMessage($"{GetCurrentMethod()}.ShouldUpdateValues() == False", 5, Color.LimeGreen);
+        return false;
     }
 
     private bool ShouldUpdateValuesInventory()
@@ -706,7 +703,7 @@ public partial class Main
         // TODO: Get inventory items and not just stash tab items, this will be done at a later date
         try
         {
-            if (!Settings.InventoryValueSettings.Show.Value || !GameController.Game.IngameState.IngameUi.InventoryPanel.IsVisible)
+            if (!Settings.ValueSettings.InventoryValueSettings.Show.Value || !GameController.Game.IngameState.IngameUi.InventoryPanel.IsVisible)
             {
                 if (Settings.Debug) { LogMessage($"{GetCurrentMethod()}.ShouldUpdateValuesInventory() Inventory is not visible", 5, Color.DarkGray); }
                 return false;
