@@ -62,6 +62,10 @@ public class LeagueSpecificSettings
 
     public ToggleNode DisplayExpeditionVendorOverlay { get; set; } = new(false);
 
+    public ToggleNode PriceHeistRewards { get; set; } = new(true);
+    
+    public ToggleNode PriceCoffins { get;set; } = new(true);
+
     public ToggleNode ReloadNecropolisStatDescriptions { get; set; } = new(true);
 }
 
@@ -122,31 +126,12 @@ public class HoveredItemSettings
 [Submenu]
 public class GroundItemSettings
 {
-    public ToggleNode PriceHeistRewards { get; set; } = new(true);
-    public ToggleNode PriceCoffins { get;set; } = new(true);
-    public ToggleNode PriceItemsOnGround { get; set; } = new(true);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public ToggleNode OnlyPriceUniquesOnGround { get; set; } = new(true);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public RangeNode<float> GroundPriceTextScale { get; set; } = new(2, 0, 10);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public ColorNode GroundPriceTextColor { get; set; } = new(Color.White);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public ColorNode GroundPriceBackgroundColor { get; set; } = new(Color.Black);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public RangeNode<int> ValuableValueThreshold { get; set; } = new(50, 0, 100000);
-
-    [ConditionalDisplay(nameof(PriceItemsOnGround))]
-    public ColorNode ValuablePriceColor { get; set; } = new(Color.Violet);
-
+    public PriceItemsOnGroundSettings PriceItemsOnGroundSettings { get; set; } = new();
+    
     public ToggleNode DisplayRealUniqueNameOnGround { get; set; } = new(true);
 
     public ToggleNode OnlyDisplayRealUniqueNameForValuableUniques { get; set; } = new(false);
+
     public ToggleNode DisplayWarningTextForUnknownUniques { get; set; } = new(true);
 
     public RangeNode<float> UniqueLabelSize { get; set; } = new(0.8f, 0.1f, 1);
@@ -154,7 +139,6 @@ public class GroundItemSettings
     public ColorNode UniqueItemNameTextColor { get; set; } = new(Color.Black);
 
     public ColorNode UniqueItemNameBackgroundColor { get; set; } = new(new Color(175, 96, 37));
-
 
     public ColorNode ValuableUniqueItemNameTextColor { get; set; } = new(new Color(175, 96, 37));
 
@@ -199,4 +183,28 @@ public class CurrencyTabSettings
     public RangeNode<int> BoxHeight { get; set; } = new(15, 0, 100);
     public ColorNode FontColor { get; set; } = new Color(216, 216, 216, 255);
     public ColorNode BackgroundColor { get; set; } = new Color(0, 0, 0, 255);
+}
+
+[Submenu]
+public class PriceItemsOnGroundSettings
+{
+    public ToggleNode PriceItemsOnGround { get; set; } = new(true);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ToggleNode OnlyPriceUniquesOnGround { get; set; } = new(true);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public RangeNode<float> GroundPriceTextScale { get; set; } = new(2, 0, 10);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ColorNode GroundPriceTextColor { get; set; } = new(Color.White);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ColorNode GroundPriceBackgroundColor { get; set; } = new(Color.Black);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public RangeNode<int> ValuableValueThreshold { get; set; } = new(50, 0, 100000);
+
+    [ConditionalDisplay(nameof(PriceItemsOnGround))]
+    public ColorNode ValuablePriceColor { get; set; } = new(Color.Violet);
 }
