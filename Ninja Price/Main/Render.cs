@@ -680,7 +680,7 @@ public partial class Main
 
     private void ProcessItemsOnGround()
     {
-        if (!Settings.GroundItemSettings.PriceItemsOnGroundSettings.PriceItemsOnGround && !Settings.GroundItemSettings.DisplayRealUniqueNameOnGround && !Settings.GroundItemSettings.PriceHeistRewards) return;
+        if (!Settings.GroundItemSettings.PriceItemsOnGroundSettings.PriceItemsOnGround && !Settings.GroundItemSettings.DisplayRealUniqueNameOnGround && !Settings.LeagueSpecificSettings.PriceHeistRewards) return;
         //this window allows us to change the size of the text we draw to the background list
         //yeah, it's weird
         ImGui.Begin("lmao",
@@ -776,7 +776,7 @@ public partial class Main
                 }
                 case GroundItemProcessingType.HeistReward:
                 {
-                    if (Settings.GroundItemSettings.PriceHeistRewards && !leftPanelRect.Contains(box.TopRight) && !rightPanelRect.Contains(box.TopRight))
+                    if (Settings.LeagueSpecificSettings.PriceHeistRewards && !leftPanelRect.Contains(box.TopRight) && !rightPanelRect.Contains(box.TopRight))
                     {
                         if (item.PriceData.MinChaosValue > 0)
                         {
