@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.Elements.InventoryElements;
+using ExileCore.PoEMemory.FilesInMemory;
 using ExileCore.Shared.Enums;
 using Color = SharpDX.Color;
 using Ninja_Price.API.PoeNinja;
@@ -13,8 +14,6 @@ namespace Ninja_Price.Main;
 
 public partial class Main
 {
-    private readonly Stopwatch _sinceLastNecropolisReload = Stopwatch.StartNew();
-
     private static readonly Dictionary<string, string> ShardMapping = new()
     {
         { "Transmutation Shard", "Orb of Transmutation" },
@@ -200,24 +199,13 @@ public partial class Main
                             var modText = _necropolisModText.GetOrAdd(craftingMod, m =>
                             {
                                 var files = GameController.Game.Files;
-                                var statDescriptions = files.NecropolisStatDescriptions;
                                 var r = StripTagsRegex();
                                 var dict = m.Stats.Zip(m.StatValues).Select(x => new Dictionary<GameStat, int> { { x.First.MatchingStat, x.Second } })
-                                    .Select(statDescriptions.TranslateMod).ToList();
+                                    .Select(files.NecropolisStatDescriptions.TranslateMod).ToList();
                                 var result = r.Replace(string.Join(", ", dict), "${data}");
-                                if (Settings.LeagueSpecificSettings.ReloadNecropolisStatDescriptions &&
-                                    (statDescriptions.EntriesList.Count == 0 ||
-                                     statDescriptions.EntriesList[0].Sections.Count == 0 ||
-                                     result.Contains('<')) &&
-                                    _sinceLastNecropolisReload.Elapsed > TimeSpan.FromSeconds(10))
-                                {
-                                    files.LoadFiles();
-                                    _sinceLastNecropolisReload.Restart();
-                                    _necropolisModText.Clear();
-                                }
-
                                 return result;
                             });
+
                             if (modText.Contains('<'))
                             {
                                 _necropolisModText.TryRemove(craftingMod, out _);
