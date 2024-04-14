@@ -65,8 +65,6 @@ public class LeagueSpecificSettings
     public ToggleNode PriceHeistRewards { get; set; } = new(true);
     
     public ToggleNode PriceCoffins { get;set; } = new(true);
-
-    public ToggleNode ReloadNecropolisStatDescriptions { get; set; } = new(true);
 }
 
 [Submenu]
