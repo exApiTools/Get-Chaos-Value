@@ -201,7 +201,7 @@ public partial class Main
                                 var files = GameController.Game.Files;
                                 var r = StripTagsRegex();
                                 var dict = m.Stats.Zip(m.StatValues).Select(x => new Dictionary<GameStat, int> { { x.First.MatchingStat, x.Second } })
-                                    .Select(files.NecropolisStatDescriptions.TranslateMod).ToList();
+                                    .Select(x => files.NecropolisStatDescriptions.TranslateMod(x)).ToList();
                                 var result = r.Replace(string.Join(", ", dict), "${data}");
                                 return result;
                             });
