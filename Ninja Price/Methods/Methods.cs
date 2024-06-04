@@ -613,7 +613,7 @@ public partial class Main
             switch (item.ItemType) // easier to get data for each item type and handle logic based on that
             {
                 case ItemTypes.UniqueArmour:
-                    var uniqueArmourSearch = CollectedData.UniqueArmours.Lines.FindAll(x => x.BaseType == item.BaseName && x.IsChanceable() && (x.Links < 5 || x.Links == null));
+                    var uniqueArmourSearch = CollectedData.UniqueArmours.Lines.FindAll(x => x.BaseType == item.BaseName && x.IsChanceable() && csvItemData.Any(csvitem => csvitem.Name == x.Name) && (x.Links < 5 || x.Links == null));
                     if (uniqueArmourSearch.Count > 0)
                     {
                         foreach (var result in uniqueArmourSearch)
@@ -623,7 +623,7 @@ public partial class Main
                     }
                     break;
                 case ItemTypes.UniqueWeapon:
-                    var uniqueWeaponSearch = CollectedData.UniqueWeapons.Lines.FindAll(x => x.BaseType == item.BaseName && x.IsChanceable() && (x.Links < 5 || x.Links == null));
+                    var uniqueWeaponSearch = CollectedData.UniqueWeapons.Lines.FindAll(x => x.BaseType == item.BaseName && x.IsChanceable() && csvItemData.Any(csvitem => csvitem.Name == x.Name) && (x.Links < 5 || x.Links == null));
                     if (uniqueWeaponSearch.Count > 0)
                     {
                         foreach (var result in uniqueWeaponSearch)
@@ -633,7 +633,7 @@ public partial class Main
                     }
                     break;
                 case ItemTypes.UniqueAccessory:
-                    var uniqueAccessorySearch = CollectedData.UniqueAccessories.Lines.FindAll(x => x.BaseType == item.BaseName && x.IsChanceable());
+                    var uniqueAccessorySearch = CollectedData.UniqueAccessories.Lines.FindAll(x => x.BaseType == item.BaseName && x.IsChanceable() && csvItemData.Any(csvitem => csvitem.Name == x.Name));
                     if (uniqueAccessorySearch.Count > 0)
                     {
                         foreach (var result in uniqueAccessorySearch)
@@ -643,7 +643,7 @@ public partial class Main
                     }
                     break;
                 case ItemTypes.UniqueJewel:
-                    var uniqueJewelSearch = CollectedData.UniqueJewels.Lines.FindAll(x => x.DetailsId.Contains(item.BaseName.ToLower().Replace(" ", "-")) && x.IsChanceable());
+                    var uniqueJewelSearch = CollectedData.UniqueJewels.Lines.FindAll(x => x.DetailsId.Contains(item.BaseName.ToLower().Replace(" ", "-")) && x.IsChanceable() && csvItemData.Any(csvitem => csvitem.Name == x.Name));
                     if (uniqueJewelSearch.Count > 0)
                     {
                         foreach (var result in uniqueJewelSearch)
@@ -730,4 +730,5 @@ public partial class Main
         if (Settings.EnableDebugLogging) LogMessage($"{GetCurrentMethod()}.ShouldUpdateValuesInventory() == True", 5, Color.LimeGreen);
         return true;
     }
+
 }

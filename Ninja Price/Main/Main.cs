@@ -1,6 +1,7 @@
 ﻿using ExileCore;
 using ExileCore.PoEMemory.FilesInMemory;
 using ExileCore.PoEMemory.MemoryObjects;
+using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using Ninja_Price.API.PoeNinja.Classes;
 using System;
@@ -20,8 +21,10 @@ public partial class Main : BaseSettingsPlugin<Settings.Settings>
     private const string PoeLeagueApiList = "http://api.pathofexile.com/leagues?type=main&compact=1";
     private const string CustomUniqueArtMappingPath = "uniqueArtMapping.json";
     private const string DefaultUniqueArtMappingPath = "uniqueArtMapping.default.json";
+    private const string ItemDataCSVPath = "tainted_mythic_orb_outcomes.csv";
     private int _updating;
     public Dictionary<string, List<string>> UniqueArtMapping = new Dictionary<string, List<string>>();
+    public List<ItemData> csvItemData;
     private readonly ConcurrentDictionary<NecropolisCraftingMod, string> _necropolisModText = [];
 
     [GeneratedRegex("<[^>]*>{{(?<data>[^}]*)}}")]
@@ -51,6 +54,12 @@ public partial class Main : BaseSettingsPlugin<Settings.Settings>
         };
         Settings.DataSourceSettings.SyncCurrentLeague.OnValueChanged += (_, _) => SyncCurrentLeague();
         CustomItem.InitCustomItem(this);
+
+        csvItemData = ReadItemDataCsvFile();
+        //   foreach (var item in items)
+        //{
+        //   LogMessage($"Base Item: {item.BaseItem}, Chance: {item.Chance}, Average Orbs: {item.AverageOrbs}, Destruction Chance: {item.DestructionChance}, Base Item Disambiguation: {item.BaseItemDisambiguation}, Tier: {item.Tier}, Name: {item.Name}, Disambiguation: {item.Disambiguation}, Min ILvl: {item.MinILvl}, Weight: {item.Weight}, PoeWikiLink: {item.PoeWikiLink}",5);
+        //}
 
         GameController.PluginBridge.SaveMethod("NinjaPrice.GetValue", (Entity e) =>
         {
@@ -215,5 +224,88 @@ public partial class Main : BaseSettingsPlugin<Settings.Settings>
 
             return playerLeague;
         }
+    }
+    private double ParsePercentage(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return 0;
+
+        // Remove '%' character and convert to double
+        if (double.TryParse(value.Replace("%", ""), out double result))
+            return result / 100;
+        else
+            return 0;
+    }
+    static int ParseInt(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return 0;
+
+        int parsedValue;
+        if (int.TryParse(value, out parsedValue))
+            return parsedValue;
+        else
+            return 0;
+    }
+
+    static double ParseDouble(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return 0;
+
+        double parsedValue;
+        if (double.TryParse(value, out parsedValue))
+            return parsedValue;
+        else
+            return 0;
+    }
+
+    private List<ItemData> ReadItemDataCsvFile()
+    {
+        List<ItemData> items = new List<ItemData>();
+
+        var filePath = Path.Join(DirectoryFullName, ItemDataCSVPath);
+
+
+
+        if (!File.Exists(filePath))
+        {
+            LogError("Item data CSV File not found at " + filePath);
+            return items;
+        }
+
+        using (TextFieldParser parser = new TextFieldParser(filePath))
+        {
+            parser.TextFieldType = FieldType.Delimited;
+            parser.SetDelimiters(",");
+
+            parser.ReadLine();
+
+            while (!parser.EndOfData)
+            {
+                string[] fields = parser.ReadFields();
+                if (fields != null)
+                {
+                    ItemData item = new ItemData
+                    {
+                        BaseItem = fields[0],
+                        Chance = ParsePercentage(fields[1]),
+                        AverageOrbs = ParseInt(fields[2]),
+                        DestructionChance = ParsePercentage(fields[3]),
+                        BaseItemDisambiguation = fields[4],
+                        Tier = fields[5],
+                        Name = fields[6],
+                        Disambiguation = fields[7],
+                        MinILvl = ParseInt(fields[8]),
+                        Weight = ParseDouble(fields[9]),
+                        PoeWikiLink = fields[10]
+                    };
+
+                    items.Add(item);
+                }
+            }
+        }
+
+        return items;
     }
 }
