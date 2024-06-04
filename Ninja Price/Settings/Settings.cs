@@ -61,6 +61,8 @@ public class LeagueSpecificSettings
     [Menu("Artifact Chaos Prices", "Display chaos equivalent price for items with artifact costs", 7)]
     public ToggleNode ShowArtifactChaosPrices { get; set; } = new(true);
     public ToggleNode ShowUniquesGamble { get; set; } = new(true);
+    [Menu(null, "Assumes 1000 tribute is equal to 1 chaos, if enabled shows value against this baseline")]
+    public ToggleNode ShowCostPer1000Tribute { get; set; } = new(true);
 }
 [Submenu(CollapsedByDefault = true)]
 public class LeagueHighlight
@@ -73,7 +75,7 @@ public class LeagueHighlight
 
     public RangeNode<float> LesserBlackScytheThreshold { get; set; } = new(1.25f, 0, 5);
 
-    public RangeNode<int> GwennenChaosCutoff { get; set; } = new(0, 15, 200);
+    public RangeNode<int> GwennenChaosCutoff { get; set; } = new(15, 0, 200);
     public RangeNode<float> RitualThrehsold { get; set; } = new(1.0f, 0, 5);
     public ColorNode HighlightColor { get; set; } = new Color(0, 150, 0, 255);
 }

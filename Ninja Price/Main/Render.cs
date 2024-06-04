@@ -516,14 +516,13 @@ public partial class Main
         var valueToShow = item.PriceData.MinChaosValue;        
         if (RitualPanel.IsVisible)
         {
-            if (TryGetTributePrice(item, out var amount))
+            drawBox.Y += 13; // drawbox on Rituals seems a bit off due to using the item rect and not the window item rect itself
+            drawBox.X += 13; //move slightly to the right so we can see stack number
+            drawBox.Width -= 13; //to compensate moving
+            if (TryGetTributePrice(item, out var amount) && Settings.LeagueSpecificSettings.ShowCostPer1000Tribute)
             {
                 var auxvalueToShow = amount.ToString();
-                valueToShow = (valueToShow / amount)*1000;
-
-                drawBox.Y +=13; // drawbox on Rituals seems a bit off due to using the item rect and not the window item rect itself
-                drawBox.X += 13; //move slightly to the right so we can see stack number
-                drawBox.Width -= 13; //to compensate moving
+                valueToShow = (valueToShow / amount)*1000;                
                 if (valueToShow > Settings.LeagueHighlight.RitualThrehsold)
                     auxColor = Settings.LeagueHighlight.HighlightColor;
             }
