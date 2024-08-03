@@ -213,7 +213,15 @@ public class CustomItem
 
             // sort items into types to use correct json data later from poe.ninja
             // This might need tweaking since if this catches anything other than currency.
-            if (BaseName == "Imprinted Bestiary Orb")
+            if (Path.StartsWith("Metadata/Items/Currency/KalguuranRune"))
+            {
+                ItemType = ItemTypes.KalguuranRune;
+            }
+            else if (Path.StartsWith("Metadata/Items/MapFragments/CurrencyUberBossKey"))
+            {
+                ItemType = ItemTypes.Fragment;
+            }
+            else if (BaseName == "Imprinted Bestiary Orb")
             {
                 ItemType = ItemTypes.Beast;
             }

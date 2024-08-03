@@ -314,6 +314,7 @@ public partial class Main
             case ItemTypes.Incubator:
             case ItemTypes.Tattoo:
             case ItemTypes.Omen:
+            case ItemTypes.KalguuranRune:
                 if (priceInDivines >= 0.1)
                 {
                     var priceInDivinessPerOne = priceInDivines / HoveredItem.CurrencyInfo.StackSize;

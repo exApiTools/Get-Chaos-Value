@@ -32,4 +32,5 @@ public enum ItemTypes
     Allflame,
     Memory,
     Beast,
+    KalguuranRune,
 }

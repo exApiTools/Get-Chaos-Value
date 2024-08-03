@@ -32,4 +32,5 @@ public class CollectiveApiData
     public Allflames.RootObject Allflames { get; set; } = new();
     public Memories.RootObject Memories { get; set; } = new();
     public Beasts.RootObject Beasts { get; set; } = new();
+    public KalguuranRune.RootObject KalguuranRune { get; set; } = new();
 }

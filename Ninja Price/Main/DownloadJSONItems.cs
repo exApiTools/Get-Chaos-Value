@@ -37,6 +37,7 @@ public partial class Main
     private const string AllflameUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=AllflameEmber&language=en";
     private const string MemoriesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Memory&language=en";
     private const string BeastUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Beast&language=en";
+    private const string KalguuranRuneUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=KalguuranRune&language=en";
 
     private class LeagueMetadata
     {
@@ -95,6 +96,7 @@ public partial class Main
                 await LoadData<Allflames.RootObject>("Allflames.json", AllflameUrl, league, tryWebFirst, t => newData.Allflames = t);
                 await LoadData<Memories.RootObject>("Memories.json", MemoriesUrl, league, tryWebFirst, t => newData.Memories = t);
                 await LoadData<Beasts.RootObject>("Beasts.json", BeastUrl, league, tryWebFirst, t => newData.Beasts = t);
+                await LoadData<KalguuranRune.RootObject>("KalguuranRune.json", KalguuranRuneUrl, league, tryWebFirst, t => newData.KalguuranRune = t);
 
                 new FileInfo(metadataPath).Directory?.Create();
                 await File.WriteAllTextAsync(metadataPath, JsonConvert.SerializeObject(new LeagueMetadata { LastLoadTime = DateTime.UtcNow }));

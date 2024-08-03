@@ -183,6 +183,15 @@ public partial class Main
                             item.PriceData.DetailsId = tattooSearch.DetailsId;
                         }
                         break;
+                    case ItemTypes.KalguuranRune:
+                        var runeSearch = CollectedData.KalguuranRune.Lines.Find(x => x.Name == item.BaseName);
+                        if (runeSearch != null)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * runeSearch.ChaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = runeSearch.Sparkline.TotalChange ?? 0;
+                            item.PriceData.DetailsId = runeSearch.DetailsId;
+                        }
+                        break;
                     case ItemTypes.Omen:
                         var omenSearch = CollectedData.Omens.Lines.Find(x => x.Name == item.BaseName);
                         if (omenSearch != null)
