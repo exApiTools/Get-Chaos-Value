@@ -19,6 +19,7 @@ public class Settings : ISettings
     public HoveredItemSettings HoveredItemSettings { get; set; } = new();
     public PriceOverlaySettings PriceOverlaySettings { get; set; } = new();
     public LeagueSpecificSettings LeagueSpecificSettings { get; set; } = new();
+    public LeagueHighlight LeagueHighlight { get; set; } = new();
     public VisualPriceSettings VisualPriceSettings { get; set; } = new();
     public ToggleNode Enable { get; set; } = new(true);
 }
@@ -59,8 +60,25 @@ public class LeagueSpecificSettings
 
     [Menu("Artifact Chaos Prices", "Display chaos equivalent price for items with artifact costs", 7)]
     public ToggleNode ShowArtifactChaosPrices { get; set; } = new(true);
+    public ToggleNode ShowUniquesGamble { get; set; } = new(true);
+    [Menu(null, "Assumes 1000 tribute is equal to 1 chaos, if enabled shows value against this baseline")]
+    public ToggleNode ShowCostPer1000Tribute { get; set; } = new(true);
 }
+[Submenu(CollapsedByDefault = true)]
+public class LeagueHighlight
+{
+    public RangeNode<float> ExceptionalBlackScytheThreshold { get; set; } = new(5f, 0, 25);
 
+    public RangeNode<float> GrandBlackScytheThreshold { get; set; } = new(1.80f, 0, 5);
+
+    public RangeNode<float> GreaterBlackScytheThreshold { get; set; } = new(1.40f, 0, 5);
+
+    public RangeNode<float> LesserBlackScytheThreshold { get; set; } = new(1.25f, 0, 5);
+
+    public RangeNode<int> GwennenChaosCutoff { get; set; } = new(15, 0, 200);
+    public RangeNode<float> RitualThrehsold { get; set; } = new(1.0f, 0, 5);
+    public ColorNode HighlightColor { get; set; } = new Color(0, 150, 0, 255);
+}
 [Submenu(CollapsedByDefault = true)]
 public class InventoryValueSettings
 {

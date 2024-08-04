@@ -338,26 +338,59 @@ public class CustomItem
             }
             else
             {
-                switch (Rarity) // Unique information
+                if (IsCorrupted)
                 {
-                    case ItemRarity.Unique or ItemRarity.Normal when ClassName is "Amulet" or "Ring" or "Belt":
+                    // Handle corrupted items
+                    if (ClassName == "Amulet" || ClassName == "Ring" || ClassName == "Belt")
+                    {
                         ItemType = ItemTypes.UniqueAccessory;
-                        break;
-                    case ItemRarity.Unique or ItemRarity.Normal when itemEntity.HasComponent<Armour>() || ClassName == "Quiver":
+                    }
+                    else if (itemEntity.HasComponent<Armour>() || ClassName == "Quiver")
+                    {
                         ItemType = ItemTypes.UniqueArmour;
-                        break;
-                    case ItemRarity.Unique when itemEntity.HasComponent<Flask>():
-                        ItemType = ItemTypes.UniqueFlask;
-                        break;
-                    case ItemRarity.Unique or ItemRarity.Normal when ClassName == "Jewel":
+                    }
+
+                    else if (ClassName == "Jewel")
+                    {
                         ItemType = ItemTypes.UniqueJewel;
-                        break;
-                    case ItemRarity.Unique when MapInfo.IsMap:
-                        ItemType = ItemTypes.UniqueMap;
-                        break;
-                    case ItemRarity.Unique or ItemRarity.Normal when itemEntity.HasComponent<Weapon>():
+                    }
+
+                    else if (itemEntity.HasComponent<Weapon>())
+                    {
                         ItemType = ItemTypes.UniqueWeapon;
-                        break;
+                    }
+                    else
+                    {
+                        // Handle other cases or do nothing
+                    }
+                }
+                else
+                {
+                    switch (Rarity) // Unique information
+                    {
+                        case ItemRarity.Unique or ItemRarity.Normal when (ClassName == "Amulet" || ClassName == "Ring" || ClassName == "Belt"):
+                            ItemType = ItemTypes.UniqueAccessory;
+                            break;
+                        case ItemRarity.Unique or ItemRarity.Normal when (itemEntity.HasComponent<Armour>() || ClassName == "Quiver"):
+                            ItemType = ItemTypes.UniqueArmour;
+                            break;
+                        case ItemRarity.Unique when itemEntity.HasComponent<Flask>():
+                            ItemType = ItemTypes.UniqueFlask;
+                            break;
+                        case ItemRarity.Unique or ItemRarity.Normal when ClassName == "Jewel":
+                            ItemType = ItemTypes.UniqueJewel;
+                            break;
+                        case ItemRarity.Unique when MapInfo.IsMap:
+                            ItemType = ItemTypes.UniqueMap;
+                            break;
+                        case ItemRarity.Unique or ItemRarity.Normal when itemEntity.HasComponent<Weapon>():
+                            ItemType = ItemTypes.UniqueWeapon;
+                            break;
+                        default:
+                            // Handle other cases or do nothing
+                            break;
+                    }
+
                 }
             }
         }

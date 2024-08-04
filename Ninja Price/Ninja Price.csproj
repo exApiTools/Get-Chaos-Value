@@ -13,6 +13,10 @@
     <EmbeddedResource Include="uniqueArtMapping.default.json" LogicalName="uniqueArtMapping.default.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="tainted_mythic_orb_outcomes.csv" />
+    <Content Include="tainted_mythic_orb_outcomes.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ExileCore">
