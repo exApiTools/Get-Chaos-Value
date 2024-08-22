@@ -543,6 +543,7 @@ public partial class Main
             "Gamble" => Gamble,
             "Deal" => Deal,
             "Haggle" => Haggle,
+            "Purchase" => Purchase,
             _ => None
         };
 
@@ -611,6 +612,29 @@ public partial class Main
                     Graphics.DrawText(text, leftTop, Settings.VisualPriceSettings.FontColor);
                 }
             }
+        }
+
+        // Nameless Seer
+        if (haggleType == Purchase)
+        {
+            inventory = HagglePanel.GetChildFromIndices(8, 1, 1, 0); // Seer inventory is at a different index.
+            var formattedItemList = FormatItems(itemList);
+            formattedItemList.ForEach(GetValue);
+            var tooltipRect = HoveredItem?.Element.AsObject<HoverItemIcon>()?.Tooltip?.GetClientRect() ?? new RectangleF(0, 0, 0, 0);
+            foreach (var customItem in formattedItemList)
+            {
+                var box = customItem.Element.GetClientRectCache;
+                if (tooltipRect.Intersects(box))
+                {
+                    continue;
+                }
+
+                if (customItem.PriceData.MinChaosValue > 0)
+                {
+                    Graphics.DrawText(customItem.PriceData.MinChaosValue.FormatNumber(2), box.TopRight, Settings.VisualPriceSettings.FontColor,
+                        FontAlign.Right);
+                }
+            }    
         }
     }
 

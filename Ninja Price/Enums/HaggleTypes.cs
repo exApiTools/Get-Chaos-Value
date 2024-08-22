@@ -9,5 +9,6 @@ class HaggleTypes
         Gamble,     // Gwennen
         Deal,       // Rog
         Haggle,     // Tujen
+        Purchase,     // Nameless Seer
     }
 }
