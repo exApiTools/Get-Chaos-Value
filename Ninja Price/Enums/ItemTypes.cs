@@ -32,4 +32,5 @@ public enum ItemTypes
     Beast,
     KalguuranRune,
     InscribedUltimatum,
+    AllflameEmber,
 }

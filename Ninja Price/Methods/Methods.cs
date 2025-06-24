@@ -599,6 +599,16 @@ public partial class Main
                         }
 
                         break;
+                    case ItemTypes.AllflameEmber:
+                        var allflameSearch = CollectedData.AllflameEmbers.lines.Find(x => x.name == item.BaseName);
+                        if (allflameSearch != null)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * allflameSearch.chaosValue ?? 0;
+                            item.PriceData.ChangeInLast7Days = allflameSearch.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = allflameSearch.detailsId;
+                        }
+
+                        break;
                     case ItemTypes.InscribedUltimatum:
                         if (item.Entity.TryGetComponent<UltimatumTrial>(out var ultimatumTrial))
                         {
