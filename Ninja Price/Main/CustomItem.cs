@@ -249,7 +249,8 @@ public class CustomItem
         {
             ItemType = ItemTypes.KalguuranRune;
         }
-        else if (Path.StartsWith("Metadata/Items/MapFragments/CleansedAllflamePack", StringComparison.Ordinal))
+        else if (Path.StartsWith("Metadata/Items/MapFragments/", StringComparison.Ordinal) &&
+                Path.EndsWith("AllflamePack", StringComparison.Ordinal))
         {
             ItemType = ItemTypes.AllflameEmber;
         }
