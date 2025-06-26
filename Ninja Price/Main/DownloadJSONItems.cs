@@ -20,6 +20,8 @@ public partial class Main
     private const string UniqueMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueMap&language=en";
     private const string UniqueWeaponsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueWeapon&language=en";
     private const string WhiteMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Map&language=en";
+    private const string BlightedMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BlightedMap&language=en";
+    private const string BlightRavagedMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BlightRavagedMap&language=en";
     private const string ResonatorsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Resonator&language=en";
     private const string FossilsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Fossil&language=en";
     private const string ScarabsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Scarab&language=en";
@@ -78,6 +80,8 @@ public partial class Main
                 await LoadData<UniqueMaps.RootObject>("UniqueMaps.json", UniqueMapsUrl, league, tryWebFirst, t => newData.UniqueMaps = t);
                 await LoadData<UniqueWeapons.RootObject>("UniqueWeapons.json", UniqueWeaponsUrl, league, tryWebFirst, t => newData.UniqueWeapons = t);
                 await LoadData<WhiteMaps.RootObject>("WhiteMaps.json", WhiteMapsUrl, league, tryWebFirst, t => newData.WhiteMaps = t);
+                await LoadData<BlightedMaps.RootObject>("BlightedMaps.json", BlightedMapsUrl, league, tryWebFirst, t => newData.BlightedMaps = t);
+                await LoadData<BlightRavagedMaps.RootObject>("BlightRavagedMaps.json", BlightRavagedMapsUrl, league, tryWebFirst, t => newData.BlightRavagedMaps = t);
                 await LoadData<Resonators.RootObject>("Resonators.json", ResonatorsUrl, league, tryWebFirst, t => newData.Resonators = t);
                 await LoadData<Fossils.RootObject>("Fossils.json", FossilsUrl, league, tryWebFirst, t => newData.Fossils = t);
                 await LoadData<Oils.RootObject>("Oils.json", OilUrl, league, tryWebFirst, t => newData.Oils = t);

@@ -149,6 +149,7 @@ public class StashValueSettings
 
     public RangeNode<int> TopValuedItemCount { get; set; } = new(3, 0, 10);
     public ToggleNode EnableBackground { get; set; } = new(true);
+    public ToggleNode IgnoreChatPanel { get; set; } = new(false);
 }
 
 [Submenu(CollapsedByDefault = true)]

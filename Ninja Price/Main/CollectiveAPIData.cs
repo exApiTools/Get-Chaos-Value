@@ -15,6 +15,8 @@ public class CollectiveApiData
     public UniqueMaps.RootObject UniqueMaps { get; set; } = new();
     public UniqueWeapons.RootObject UniqueWeapons { get; set; } = new();
     public WhiteMaps.RootObject WhiteMaps { get; set; } = new();
+    public BlightedMaps.RootObject BlightedMaps { get; set; } = new();
+    public BlightRavagedMaps.RootObject BlightRavagedMaps { get; set; } = new();
     public Resonators.RootObject Resonators { get; set; } = new();
     public Fossils.RootObject Fossils { get; set; } = new();
     public Scarab.RootObject Scarabs { get; set; } = new();
