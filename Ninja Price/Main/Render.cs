@@ -449,7 +449,9 @@ public partial class Main
     {
         try
         {
-            if (!Settings.StashValueSettings.Show || !StashPanel.IsVisible) return;
+            if (!Settings.StashValueSettings.Show ||
+                !StashPanel.IsVisible ||
+                !Settings.StashValueSettings.IgnoreChatPanel && GameController.Game.IngameState.IngameUi.ChatTitlePanel.IsVisible) return;
             {
                 var pos = new Vector2(Settings.StashValueSettings.PositionX.Value, Settings.StashValueSettings.PositionY.Value);
                 var chaosValue = StashTabValue;

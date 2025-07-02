@@ -534,17 +534,35 @@ public partial class Main
 
                                 var blightedBaseName = $"Blighted {item.BaseName}";
                                 var normalBlightedMapSearch = Settings.DataSourceSettings.CheckMapVariant.Value
-                                                                  ? CollectedData.WhiteMaps.Lines.Find(x =>
-                                                                      x.BaseType == blightedBaseName && item.MapInfo.MapTier == x.MapTier &&
-                                                                      x.Variant == Settings.DataSourceSettings.League.Value)
-                                                                  : CollectedData.WhiteMaps.Lines.Find(x =>
-                                                                      x.BaseType == blightedBaseName && item.MapInfo.MapTier == x.MapTier);
+                                    ? CollectedData.BlightedMaps.Lines.Find(x =>
+                                        x.BaseType == blightedBaseName && item.MapInfo.MapTier == x.MapTier &&
+                                        x.Variant == Settings.DataSourceSettings.League.Value)
+                                    : CollectedData.BlightedMaps.Lines.Find(x =>
+                                        x.BaseType == blightedBaseName && item.MapInfo.MapTier == x.MapTier);
 
                                 if (normalBlightedMapSearch != null)
                                 {
                                     item.PriceData.MinChaosValue = normalBlightedMapSearch.ChaosValue ?? 0;
                                     item.PriceData.ChangeInLast7Days = normalBlightedMapSearch.Sparkline.TotalChange ?? 0;
                                     item.PriceData.DetailsId = normalBlightedMapSearch.DetailsId;
+                                }
+
+                                break;
+                            case MapTypes.BlightRavaged:
+
+                                var blightRavagedBaseName = $"Blight-ravaged {item.BaseName}";
+                                var blightRavagedMapSearch = Settings.DataSourceSettings.CheckMapVariant.Value
+                                    ? CollectedData.BlightRavagedMaps.Lines.Find(x =>
+                                        x.BaseType == blightRavagedBaseName && item.MapInfo.MapTier == x.MapTier &&
+                                        x.Variant == Settings.DataSourceSettings.League.Value)
+                                    : CollectedData.BlightRavagedMaps.Lines.Find(x =>
+                                        x.BaseType == blightRavagedBaseName && item.MapInfo.MapTier == x.MapTier);
+
+                                if (blightRavagedMapSearch != null)
+                                {
+                                    item.PriceData.MinChaosValue = blightRavagedMapSearch.ChaosValue ?? 0;
+                                    item.PriceData.ChangeInLast7Days = blightRavagedMapSearch.Sparkline.TotalChange ?? 0;
+                                    item.PriceData.DetailsId = blightRavagedMapSearch.DetailsId;
                                 }
 
                                 break;

@@ -205,9 +205,14 @@ public class CustomItem
                         MapInfo.MapType = MapTypes.Elder;
                         break;
                     }
-                    else if (itemList.RawName.Contains("Blighted "))
+                    else if (itemList.RawName == "InfectedMap")
                     {
                         MapInfo.MapType = MapTypes.Blighted;
+                        break;
+                    }
+                    else if (itemList.RawName == "UberInfectedMap__")
+                    {
+                        MapInfo.MapType = MapTypes.BlightRavaged;
                         break;
                     }
                 }
