@@ -112,6 +112,8 @@ public class GroundItemSettings
     public ToggleNode PriceHeistRewards { get; set; } = new(true);
     public ToggleNode PriceItemsOnGround { get; set; } = new(true);
     public ToggleNode OnlyPriceUniquesOnGround { get; set; } = new(false);
+    public ToggleNode OnlyPriceItemsAboveThreshold { get; set; } = new(false);
+    public RangeNode<int> ValueThreshold { get; set; } = new(50, 0, 1000);
     public RangeNode<float> GroundPriceTextScale { get; set; } = new(2, 0, 10);
     public ColorNode GroundPriceBackgroundColor { get; set; } = new(Color.Black);
 }

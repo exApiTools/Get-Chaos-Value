@@ -919,24 +919,21 @@ public partial class Main
                         var isValuable = item.PriceData.MaxChaosValue >= Settings.VisualPriceSettings.ValuableColorThreshold;
 
                         if (Settings.GroundItemSettings.PriceItemsOnGround &&
-                            (!Settings.GroundItemSettings.OnlyPriceUniquesOnGround ||
-                             item.Rarity == ItemRarity.Unique))
+                            (Settings.GroundItemSettings.OnlyPriceItemsAboveThreshold
+                                ? item.PriceData.MinChaosValue >= Settings.GroundItemSettings.ValueThreshold
+                                : item.PriceData.MinChaosValue > 0) &&
+                            (!Settings.GroundItemSettings.OnlyPriceUniquesOnGround || item.Rarity == ItemRarity.Unique))
                         {
-                            if (item.PriceData.MinChaosValue > 0)
-                            {
-                                var s = item.PriceData.MinChaosValue.FormatNumber(2);
-                                if (item.PriceData.MaxChaosValue > item.PriceData.MinChaosValue)
-                                {
-                                    s += $"-{item.PriceData.MaxChaosValue.FormatNumber(2)}";
-                                }
+                            var s = item.PriceData.MinChaosValue.FormatNumber(2);
+                            if (item.PriceData.MaxChaosValue > item.PriceData.MinChaosValue)
+                                s += $"-{item.PriceData.MaxChaosValue.FormatNumber(2)}";
 
-                                using (Graphics.SetTextScale(Settings.GroundItemSettings.GroundPriceTextScale))
-                                {
-                                    var textSize = Graphics.MeasureText(s);
-                                    var textPos = new Vector2(box.Right - textSize.X, box.Top);
-                                    Graphics.DrawBox(textPos, new Vector2(box.Right, box.Top + textSize.Y), Settings.GroundItemSettings.GroundPriceBackgroundColor);
-                                    Graphics.DrawText(s, textPos, isValuable ? Settings.VisualPriceSettings.ValuableColor : Settings.VisualPriceSettings.FontColor);
-                                }
+                            using (Graphics.SetTextScale(Settings.GroundItemSettings.GroundPriceTextScale))
+                            {
+                                var textSize = Graphics.MeasureText(s);
+                                var textPos = new Vector2(box.Right - textSize.X, box.Top);
+                                Graphics.DrawBox(textPos, new Vector2(box.Right, box.Top + textSize.Y), Settings.GroundItemSettings.GroundPriceBackgroundColor);
+                                Graphics.DrawText(s, textPos, isValuable ? Settings.VisualPriceSettings.ValuableColor : Settings.VisualPriceSettings.FontColor);
                             }
                         }
 
