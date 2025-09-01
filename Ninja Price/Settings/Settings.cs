@@ -72,8 +72,9 @@ public class LeagueSpecificSettings
     public ToggleNode ShowExpeditionVendorOverlay { get; set; } = new(false);
     public ToggleNode ShowUltimatumOverlay { get; set; } = new(true);
 
-    [Menu("Artifact Chaos Prices", "Display chaos equivalent price for items with artifact costs", 7)]
-    public ToggleNode ShowArtifactChaosPrices { get; set; } = new(true);
+    [Menu(null, "Display chaos equivalent price for items with artifact costs")]
+    [JsonProperty("ShowArtifactChaosPricesv2")]
+    public ToggleNode ShowArtifactChaosPrices { get; set; } = new(false);
 }
 
 [Submenu(CollapsedByDefault = true)]

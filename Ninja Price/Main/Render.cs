@@ -1150,18 +1150,21 @@ public partial class Main
         if (item?.Element == null)
             return false;
 
-        Element GetElementByString(Element element, string str)
+        Element GetElementByString(Element element, string str, int maxDepth)
         {
-            if (element == null || string.IsNullOrWhiteSpace(str))
+            if (element == null || string.IsNullOrWhiteSpace(str) || !element.IsValid)
                 return null;
 
             if (element.Text?.Trim() == str)
                 return element;
 
-            return element.Children.Select(c => GetElementByString(c, str)).FirstOrDefault(e => e != null);
+            if (maxDepth <= 0)
+                return null;
+
+            return element.Children.Select(c => GetElementByString(c, str, maxDepth - 1)).FirstOrDefault(e => e != null);
         }
 
-        var costElement = GetElementByString(item.Element?.AsObject<HoverItemIcon>()?.Tooltip, "Cost:");
+        var costElement = GetElementByString(item.Element?.AsObject<HoverItemIcon>()?.Tooltip, "Cost:", 15);
         if (costElement?.Parent == null || 
             costElement.Parent.ChildCount < 2 ||
             costElement.Parent.GetChildAtIndex(1).ChildCount < 3)
