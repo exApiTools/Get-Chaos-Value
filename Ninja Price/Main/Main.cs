@@ -152,7 +152,11 @@ public partial class Main : BaseSettingsPlugin<Settings.Settings>
 
         mapping ??= GetEmbeddedUniqueArtMapping();
         mapping ??= [];
-        return mapping.ToDictionary(x => x.Key, x => x.Value.Select(str => str.Replace('’', '\'')).ToList());
+        return mapping.ToDictionary(x => x.Key, x =>
+            x.Value.Select(str => str.Replace('’', '\''))
+            .Except(Settings.UniqueIdentificationSettings.ExcludedUniques.Content.Select(c => c.Value), 
+                StringComparer.InvariantCultureIgnoreCase)
+            .ToList());
     }
 
     private Dictionary<string, List<string>> GetEmbeddedUniqueArtMapping()

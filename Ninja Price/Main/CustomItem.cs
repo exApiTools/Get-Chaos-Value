@@ -395,7 +395,7 @@ public class CustomItem
                 case ItemRarity.Unique when itemEntity?.HasComponent<Flask>() == true:
                     ItemType = ItemTypes.UniqueFlask;
                     break;
-                case ItemRarity.Unique or ItemRarity.Normal when ClassName == "Jewel":
+                case ItemRarity.Unique or ItemRarity.Normal when ClassName == "Jewel" || ClassName == "AbyssJewel":
                     ItemType = ItemTypes.UniqueJewel;
                     break;
                 case ItemRarity.Unique when MapInfo.IsMap:

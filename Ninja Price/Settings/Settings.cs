@@ -135,6 +135,7 @@ public class UniqueIdentificationSettings
     public ColorNode UniqueItemNameBackgroundColor { get; set; } = new(new Color(175, 96, 37));
     public ColorNode ValuableUniqueItemNameTextColor { get; set; } = new(new Color(175, 96, 37));
     public ColorNode ValuableUniqueItemNameBackgroundColor { get; set; } = new(Color.White);
+    public ContentNode<TextNode> ExcludedUniques { get; set; } = new ContentNode<TextNode> { EnableControls = true, UseFlatItems = true, ItemFactory = () => new TextNode("") };
 }
 
 [Submenu(CollapsedByDefault = true)]
