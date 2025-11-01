@@ -2661,6 +2661,9 @@
   "Art/2DItems/Weapons/OneHandWeapons/OneHandAxes/HanlonsRazor.dds": [
     "Actum"
   ],
+  "Art/2DItems/Weapons/OneHandWeapons/OneHandAxes/SeethingWraith.dds": [
+    "The Grey Wind"
+  ],
   "Art/2DItems/Armours/Helmets/MawOfMischief.dds": [
     "Maw of Mischief"
   ],
@@ -2735,6 +2738,9 @@
   ],
   "Art/2DItems/Weapons/OneHandWeapons/Daggers/GoblinEdge.dds": [
     "Goblinedge"
+  ],
+  "Art/2DItems/Weapons/OneHandWeapons/Daggers/Virulence.dds": [
+    "Festering Resentment"
   ],
   "Art/2DItems/Armours/BodyArmours/CollectorsGarbDiff.dds": [
     "Doppelgänger Guise"
@@ -3730,6 +3736,9 @@
   "Art/2DItems/Armours/Gloves/UberShaperGloves.dds": [
     "Entropic Devastation"
   ],
+  "Art/2DItems/Flasks/BottledFutures.dds": [
+    "Wine of the Prophet"
+  ],
   "Art/2DItems/Flasks/UberSirusFlask.dds": [
     "Oriath's End"
   ],
@@ -3783,6 +3792,9 @@
   ],
   "Art/2DItems/Weapons/TwoHandWeapons/Bows/WidowhailBow.dds": [
     "Widowhail"
+  ],
+  "Art/2DItems/Weapons/TwoHandWeapons/Bows/FearoftheFall.dds": [
+    "Wing of the Wyvern"
   ],
   "Art/2DItems/Belts/UnhealthyBurden.dds": [
     "Chain of Endurance"
@@ -3947,11 +3959,23 @@
   "Art/2DItems/Weapons/TwoHandWeapons/TwoHandSwords/GreeneyesSword.dds": [
     "The Living Blade"
   ],
+  "Art/2DItems/Weapons/TwoHandWeapons/TwoHandSwords/Faithstealer.dds": [
+    "The Golden Charlatan"
+  ],
   "Art/2DItems/Armours/Gloves/HornedOneGloves.dds": [
     "Admiral's Arrogance"
   ],
+  "Art/2DItems/Armours/Gloves/Painshed.dds": [
+    "The Caged Mammoth"
+  ],
   "Art/2DItems/Weapons/TwoHandWeapons/TwoHandMaces/JadeMarohiErqiHammer.dds": [
     "Tawhoa's Felling"
+  ],
+  "Art/2DItems/Armours/Helmets/KaomsMask.dds": [
+    "Kaom's Command"
+  ],
+  "Art/2DItems/Armours/Helmets/TheHallowedMonarch.dds": [
+    "The Hallowed Monarch"
   ],
   "Art/2DItems/Belts/KalguuranWardBelt.dds": [
     "Ynda's Stand"
@@ -3994,5 +4018,128 @@
   ],
   "Art/2DItems/Jewels/UberCortexJewel.dds": [
     "Rational Doctrine"
+  ],
+  "Art/2DItems/Rings/CircleofDarkRituals.dds": [
+    "Coiling Whisper"
+  ],
+  "Art/2DItems/Amulets/VenariusAstrolabe.dds": [
+    "Venarius' Astrolabe"
+  ],
+  "Art/2DItems/Weapons/TwoHandWeapons/TwoHandAxes/Starfell.dds": [
+    "Starcaller"
+  ],
+  "Art/2DItems/Amulets/WhispersofInfinity.dds": [
+    "Whispers of Infinity"
+  ],
+  "Art/2DItems/Armours/Helmets/TheDarkMonarch.dds": [
+    "The Dark Monarch"
+  ],
+  "Art/2DItems/Armours/BodyArmours/SevenTeachings.dds": [
+    "Seven Teachings"
+  ],
+  "Art/2DItems/Weapons/TwoHandWeapons/Staves/WhisperingNebula.dds": [
+    "Legacy of the Rose"
+  ],
+  "Art/2DItems/Armours/BodyArmours/Deepcaller.dds": [
+    "Servant of Decay"
+  ],
+  "Art/2DItems/Weapons/OneHandWeapons/Scepters/PrimordialCane.dds": [
+    "Cadigan's Authority"
+  ],
+  "Art/2DItems/Armours/Helmets/WillfulIgnorance.dds": [
+    "Refuge in Isolation"
+  ],
+  "Art/2DItems/Weapons/OneHandWeapons/Wands/WandofBlasting.dds": [
+    "Mystic Refractor"
+  ],
+  "Art/2DItems/Weapons/OneHandWeapons/Wands/TheDarkBargain.dds": [
+    "Unlight Extant"
+  ],
+  "Art/2DItems/Armours/Gloves/Obeisance.dds": [
+    "Hand of the Lords"
+  ],
+  "Art/2DItems/Armours/Shields/TheHollowFortress.dds": [
+    "Cowards' Wail"
+  ],
+  "Art/2DItems/Armours/Shields/Indifference.dds": [
+    "Bitter Instinct"
+  ],
+  "Art/2DItems/Armours/Shields/AzadiCrest.dds": [
+    "Azadi Crest"
+  ],
+  "Art/2DItems/Rings/EnmitysEmbrace.dds": [
+    "Enmity's Embrace"
+  ],
+  "Art/2DItems/Rings/BetrayalsSting.dds": [
+    "Betrayal's Sting"
+  ],
+  "Art/2DItems/Amulets/ForgottenPain.dds": [
+    "Haunting Memories"
+  ],
+  "Art/2DItems/Amulets/Deathward.dds": [
+    "Bonemeld"
+  ],
+  "Art/2DItems/Flasks/MysteriousPhylactery.dds": [
+    "Wellwater Phylactery"
+  ],
+  "Art/2DItems/Rings/ShieldBand.dds": [
+    "Prospero's Protection"
+  ],
+  "Art/2DItems/Armours/Boots/MistySteps.dds": [
+    "Scornflux"
+  ],
+  "Art/2DItems/Armours/Helmets/Howlcrack.dds": [
+    "Howlcrack"
+  ],
+  "Art/2DItems/Belts/LashofRetribution.dds": [
+    "Lash of Retribution"
+  ],
+  "Art/2DItems/Armours/Gloves/HandofHeresy.dds": [
+    "Hand of Heresy"
+  ],
+  "Art/2DItems/Weapons/TwoHandWeapons/Staves/BatteryofYixavim.dds": [
+    "Jiquani's Potential"
+  ],
+  "Art/2DItems/Belts/TinkerersTools.dds": [
+    "The Arkhon's Tools"
+  ],
+  "Art/2DItems/Rings/WrithingLoop.dds": [
+    "Squirming Terror"
+  ],
+  "Art/2DItems/Rings/PrismOfFear.dds": [
+    "The Unseen Hue"
+  ],
+  "Art/2DItems/Rings/Splinterheart.dds": [
+    "Woespike"
+  ],
+  "Art/2DItems/Rings/BreachlordRingUnique_Tul.dds": [
+    "The Will of Tul"
+  ],
+  "Art/2DItems/Rings/BreachlordRingUnique_Xoph.dds": [
+    "The Will of Xoph"
+  ],
+  "Art/2DItems/Rings/BreachlordRingUnique_Esh.dds": [
+    "The Will of Esh"
+  ],
+  "Art/2DItems/Rings/BreachlordRingUnique_UulNetol.dds": [
+    "The Will of Uul-Netol"
+  ],
+  "Art/2DItems/Rings/BreachlordRingUnique_Chayula.dds": [
+    "The Sundered Will"
+  ],
+  "Art/2DItems/Rings/BreachlordRingUnique_AllCombined.dds": [
+    "Lost Unity"
+  ],
+  "Art/2DItems/Quivers/Spinehail.dds": [
+    "Spinehail"
+  ],
+  "Art/2DItems/Armours/BodyArmours/ThePackmaster.dds": [
+    "Rigwald's Hunt"
+  ],
+  "Art/2DItems/Weapons/OneHandWeapons/OneHandMaces/TheBellRinger.dds": [
+    "The Monastery Bell"
+  ],
+  "Art/2DItems/Jewels/BoundByDestiny.dds": [
+    "Bound By Destiny"
   ]
 }
