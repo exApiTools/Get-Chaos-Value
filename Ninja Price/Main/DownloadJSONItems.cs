@@ -9,10 +9,22 @@ namespace Ninja_Price.Main;
 
 public partial class Main
 {
-    private const string CurrencyUrl = "https://poe.ninja/api/data/currencyoverview?league={0}&type=Currency&language=en";
-    private const string FragmentsUrl = "https://poe.ninja/api/data/currencyoverview?league={0}&type=Fragment&language=en";
-    private const string DivinationCardsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=DivinationCard&language=en";
-    private const string EssencesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Essence&language=en";
+    private const string CurrencyUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Currency";
+    private const string FragmentsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Fragment";
+    private const string DivinationCardsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=DivinationCard";
+    private const string EssencesUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Essence";
+    private const string ResonatorsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Resonator";
+    private const string FossilsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Fossil";
+    private const string ScarabsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Scarab";
+    private const string OilUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Oil";
+    private const string DeliriumOrbUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=DeliriumOrb";
+    private const string ArtifactsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Artifact";
+    private const string TattooUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Tattoo";
+    private const string OmenUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Omen";
+    private const string KalguuranRunesUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Runegraft";
+    private const string AllflameEmbersUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=AllflameEmber";
+
+    private const string InvitationUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Invitation&language=en";
     private const string UniqueAccessoriesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueAccessory&language=en";
     private const string UniqueArmoursUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueArmour&language=en";
     private const string UniqueFlasksUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueFlask&language=en";
@@ -22,23 +34,11 @@ public partial class Main
     private const string WhiteMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Map&language=en";
     private const string BlightedMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BlightedMap&language=en";
     private const string BlightRavagedMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BlightRavagedMap&language=en";
-    private const string ResonatorsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Resonator&language=en";
-    private const string FossilsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Fossil&language=en";
-    private const string ScarabsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Scarab&language=en";
     private const string IncubatorsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Incubator&language=en";
-    private const string OilUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Oil&language=en";
-    private const string DeliriumOrbUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=DeliriumOrb&language=en";
-    private const string VialUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Vial&language=en";
-    private const string InvitationUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Invitation&language=en";
-    private const string ArtifactsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Artifact&language=en";
     private const string SkillGemsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=SkillGem&language=en";
     private const string ClusterJewelsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=ClusterJewel&language=en";
-    private const string TattooUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Tattoo&language=en";
-    private const string OmenUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Omen&language=en";
-    private const string MemoriesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Memory&language=en";
     private const string BeastUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Beast&language=en";
-    private const string KalguuranRunesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Runegraft&language=en";
-    private const string AllflameEmbersUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=AllflameEmber&language=en";
+    private const string VialUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Vial&language=en";
 
     private class LeagueMetadata
     {
@@ -69,10 +69,27 @@ public partial class Main
                     tryWebFirst = await IsLocalCacheStale(metadataPath);
                 }
 
-                await LoadData<Currency.RootObject>("Currency.json", CurrencyUrl, league, tryWebFirst, t => newData.Currency = t);
-                await LoadData<DivinationCards.RootObject>("DivinationCards.json", DivinationCardsUrl, league, tryWebFirst, t => newData.DivinationCards = t);
-                await LoadData<Essences.RootObject>("Essences.json", EssencesUrl, league, tryWebFirst, t => newData.Essences = t);
-                await LoadData<Fragments.RootObject>("Fragments.json", FragmentsUrl, league, tryWebFirst, t => newData.Fragments = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Currency2.json", CurrencyUrl, league, tryWebFirst, t => newData.Currency = t);
+                await LoadData<CurrencyOverviewData.RootObject>("DivinationCards2.json", DivinationCardsUrl, league, tryWebFirst, t => newData.DivinationCards = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Essences2.json", EssencesUrl, league, tryWebFirst, t => newData.Essences = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Fragments2.json", FragmentsUrl, league, tryWebFirst, t => newData.Fragments = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Resonators2.json", ResonatorsUrl, league, tryWebFirst, t => newData.Resonators = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Fossils2.json", FossilsUrl, league, tryWebFirst, t => newData.Fossils = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Oils2.json", OilUrl, league, tryWebFirst, t => newData.Oils = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Scarabs2.json", ScarabsUrl, league, tryWebFirst, t => newData.Scarabs = t);
+                await LoadData<CurrencyOverviewData.RootObject>("DeliriumOrbs2.json", DeliriumOrbUrl, league, tryWebFirst, t => newData.DeliriumOrb = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Artifacts2.json", ArtifactsUrl, league, tryWebFirst, t => newData.Artifacts = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Tattoos2.json", TattooUrl, league, tryWebFirst, t => newData.Tattoos = t);
+                await LoadData<CurrencyOverviewData.RootObject>("Omens2.json", OmenUrl, league, tryWebFirst, t => newData.Omens = t);
+                await LoadData<CurrencyOverviewData.RootObject>("KalguuranRunes2.json", KalguuranRunesUrl, league, tryWebFirst, t => newData.KalguuranRunes = t);
+                await LoadData<CurrencyOverviewData.RootObject>("AllflameEmbers2.json", AllflameEmbersUrl, league, tryWebFirst, t => newData.AllflameEmbers = t);
+
+                await LoadData<Invitations.RootObject>("Invitations.json", InvitationUrl, league, tryWebFirst, t => newData.Invitations = t);
+                await LoadData<Vials.RootObject>("Vials.json", VialUrl, league, tryWebFirst, t => newData.Vials = t);
+                await LoadData<Incubators.RootObject>("Incubators.json", IncubatorsUrl, league, tryWebFirst, t => newData.Incubators = t);
+                await LoadData<SkillGems.RootObject>("SkillGems.json", SkillGemsUrl, league, tryWebFirst, t => newData.SkillGems = t);
+                await LoadData<ClusterJewelNinjaData>("ClusterJewels.json", ClusterJewelsUrl, league, tryWebFirst, t => newData.ClusterJewels = t);
+                await LoadData<Beasts.RootObject>("Beasts.json", BeastUrl, league, tryWebFirst, t => newData.Beasts = t);
                 await LoadData<UniqueAccessories.RootObject>("UniqueAccessories.json", UniqueAccessoriesUrl, league, tryWebFirst, t => newData.UniqueAccessories = t);
                 await LoadData<UniqueArmours.RootObject>("UniqueArmours.json", UniqueArmoursUrl, league, tryWebFirst, t => newData.UniqueArmours = t);
                 await LoadData<UniqueFlasks.RootObject>("UniqueFlasks.json", UniqueFlasksUrl, league, tryWebFirst, t => newData.UniqueFlasks = t);
@@ -82,23 +99,6 @@ public partial class Main
                 await LoadData<WhiteMaps.RootObject>("WhiteMaps.json", WhiteMapsUrl, league, tryWebFirst, t => newData.WhiteMaps = t);
                 await LoadData<BlightedMaps.RootObject>("BlightedMaps.json", BlightedMapsUrl, league, tryWebFirst, t => newData.BlightedMaps = t);
                 await LoadData<BlightRavagedMaps.RootObject>("BlightRavagedMaps.json", BlightRavagedMapsUrl, league, tryWebFirst, t => newData.BlightRavagedMaps = t);
-                await LoadData<Resonators.RootObject>("Resonators.json", ResonatorsUrl, league, tryWebFirst, t => newData.Resonators = t);
-                await LoadData<Fossils.RootObject>("Fossils.json", FossilsUrl, league, tryWebFirst, t => newData.Fossils = t);
-                await LoadData<Oils.RootObject>("Oils.json", OilUrl, league, tryWebFirst, t => newData.Oils = t);
-                await LoadData<Incubators.RootObject>("Incubators.json", IncubatorsUrl, league, tryWebFirst, t => newData.Incubators = t);
-                await LoadData<Scarab.RootObject>("Scarabs.json", ScarabsUrl, league, tryWebFirst, t => newData.Scarabs = t);
-                await LoadData<DeliriumOrb.RootObject>("DeliriumOrbs.json", DeliriumOrbUrl, league, tryWebFirst, t => newData.DeliriumOrb = t);
-                await LoadData<Vials.RootObject>("Vials.json", VialUrl, league, tryWebFirst, t => newData.Vials = t);
-                await LoadData<Invitations.RootObject>("Invitations.json", InvitationUrl, league, tryWebFirst, t => newData.Invitations = t);
-                await LoadData<Artifacts.RootObject>("Artifacts.json", ArtifactsUrl, league, tryWebFirst, t => newData.Artifacts = t);
-                await LoadData<SkillGems.RootObject>("SkillGems.json", SkillGemsUrl, league, tryWebFirst, t => newData.SkillGems = t);
-                await LoadData<ClusterJewelNinjaData>("ClusterJewels.json", ClusterJewelsUrl, league, tryWebFirst, t => newData.ClusterJewels = t);
-                await LoadData<Tattoos.RootObject>("Tattoos.json", TattooUrl, league, tryWebFirst, t => newData.Tattoos = t);
-                await LoadData<Omens.RootObject>("Omens.json", OmenUrl, league, tryWebFirst, t => newData.Omens = t);
-                await LoadData<Memories.RootObject>("Memories.json", MemoriesUrl, league, tryWebFirst, t => newData.Memories = t);
-                await LoadData<Beasts.RootObject>("Beasts.json", BeastUrl, league, tryWebFirst, t => newData.Beasts = t);
-                await LoadData<KalguuranRunes.Rootobject>("KalguuranRunes.json", KalguuranRunesUrl, league, tryWebFirst, t => newData.KalguuranRunes = t);
-                await LoadData<AllflameEmbers.Rootobject>("AllflameEmbers.json", AllflameEmbersUrl, league, tryWebFirst, t => newData.AllflameEmbers = t);
 
                 new FileInfo(metadataPath).Directory?.Create();
                 await File.WriteAllTextAsync(metadataPath, JsonConvert.SerializeObject(new LeagueMetadata { LastLoadTime = DateTime.UtcNow }));

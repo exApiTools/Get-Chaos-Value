@@ -48,7 +48,8 @@ public partial class Main
         { "Simulacrum Splinter", "Simulacrum" },
     };
 
-    private double DivinePrice => CollectedData.Currency.FindLine("Divine Orb", Settings.DataSourceSettings.UseChaosEquivalentDataForCurrency)?.ChaosEquivalent ?? throw new Exception("Divine price is missing");
+    private double DivinePrice =>
+        CollectedData.Currency.LinesByName.GetValueOrDefault("Divine Orb") switch { (null, null, 0) => throw new Exception("Divine price is missing"), var o => o.ChaosEquivalent };
 
     private List<NormalInventoryItem> GetInventoryItems()
     {
@@ -166,80 +167,80 @@ public partial class Main
                         var (pricedStack, pricedItem) = item.CurrencyInfo.IsShard && TryGetShardParent(item.BaseName, out var shardParent)
                             ? (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20, shardParent)
                             : (1, item.BaseName);
-                        var shardCurrencySearch = CollectedData.Currency.FindLine(pricedItem, Settings.DataSourceSettings.UseChaosEquivalentDataForCurrency);
-                        if (shardCurrencySearch != null)
+                        var currencySearch = CollectedData.Currency.LinesByName.GetValueOrDefault(pricedItem);
+                        if (currencySearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * shardCurrencySearch.ChaosEquivalent / pricedStack;
-                            item.PriceData.ChangeInLast7Days = shardCurrencySearch.PriceChange;
-                            item.PriceData.DetailsId = shardCurrencySearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * currencySearch.ChaosEquivalent / pricedStack;
+                            item.PriceData.ChangeInLast7Days = currencySearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = currencySearch.Item.detailsId;
                         }
 
                         break;
                     }
                     case ItemTypes.Catalyst:
-                        var catalystSearch = CollectedData.Currency.FindLine(item.BaseName, Settings.DataSourceSettings.UseChaosEquivalentDataForCurrency);
-                        if (catalystSearch != null)
+                        var catalystSearch = CollectedData.Currency.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (catalystSearch != default)
                         {
                             item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * catalystSearch.ChaosEquivalent;
-                            item.PriceData.ChangeInLast7Days = catalystSearch.PriceChange;
-                            item.PriceData.DetailsId = catalystSearch.DetailsId;
+                            item.PriceData.ChangeInLast7Days = catalystSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = catalystSearch.Item.detailsId;
                         }
 
                         break;
                     case ItemTypes.DivinationCard:
-                        var divinationSearch = CollectedData.DivinationCards.Lines.Find(x => x.Name == item.BaseName);
-                        if (divinationSearch != null)
+                        var divinationSearch = CollectedData.DivinationCards.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (divinationSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * divinationSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = divinationSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = divinationSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * divinationSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = divinationSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = divinationSearch.Item.detailsId;
                         }
 
                         break;
                     case ItemTypes.Essence:
-                        var essenceSearch = CollectedData.Essences.Lines.Find(x => x.Name == item.BaseName);
-                        if (essenceSearch != null)
+                        var essenceSearch = CollectedData.Essences.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (essenceSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * essenceSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = essenceSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = essenceSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * essenceSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = essenceSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = essenceSearch.Item.detailsId;
                         }
 
                         break;
                     case ItemTypes.Oil:
-                        var oilSearch = CollectedData.Oils.Lines.Find(x => x.Name == item.BaseName);
-                        if (oilSearch != null)
+                        var oilSearch = CollectedData.Oils.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (oilSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * oilSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = oilSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = oilSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * oilSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = oilSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = oilSearch.Item.detailsId;
                         }
                         break;
                     case ItemTypes.Tattoo:
-                        var tattooSearch = CollectedData.Tattoos.Lines.Find(x => x.Name == item.BaseName);
-                        if (tattooSearch != null)
+                        var tattooSearch = CollectedData.Tattoos.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (tattooSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * tattooSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = tattooSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = tattooSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * tattooSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = tattooSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = tattooSearch.Item.detailsId;
                         }
                         break;
                     case ItemTypes.Omen:
-                        var omenSearch = CollectedData.Omens.Lines.Find(x => x.Name == item.BaseName);
-                        if (omenSearch != null)
+                        var omenSearch = CollectedData.Omens.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (omenSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * omenSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = omenSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = omenSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * omenSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = omenSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = omenSearch.Item.detailsId;
                         }
                         break;
                     case ItemTypes.Artifact:
-                        var artifactSearch = CollectedData.Artifacts.Lines.Find(x => x.Name == item.BaseName);
-                        if (artifactSearch != null)
+                        var artifactSearch = CollectedData.Artifacts.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (artifactSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * artifactSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = artifactSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = artifactSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * artifactSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = artifactSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = artifactSearch.Item.detailsId;
                         }
 
                         break;
@@ -248,12 +249,12 @@ public partial class Main
                         var (pricedStack, pricedItem) = item.CurrencyInfo.IsShard && TryGetShardParent(item.BaseName, out var shardParent)
                             ? (item.CurrencyInfo.MaxStackSize > 0 ? item.CurrencyInfo.MaxStackSize : 20, shardParent)
                             : (1, item.BaseName);
-                        var fragmentSearch = CollectedData.Fragments.Lines.Find(x => x.CurrencyTypeName == pricedItem);
-                        if (fragmentSearch != null)
+                        var fragmentSearch = CollectedData.Fragments.LinesByName.GetValueOrDefault(pricedItem);
+                        if (fragmentSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * (fragmentSearch.ChaosEquivalent ?? 0) / pricedStack;
-                            item.PriceData.ChangeInLast7Days = fragmentSearch.ReceiveSparkLine.TotalChange ?? 0;
-                            item.PriceData.DetailsId = fragmentSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * fragmentSearch.ChaosEquivalent / pricedStack;
+                            item.PriceData.ChangeInLast7Days = fragmentSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = fragmentSearch.Item.detailsId;
                         }
 
                         break;
@@ -310,12 +311,12 @@ public partial class Main
 
                         break;
                     case ItemTypes.DeliriumOrbs:
-                        var deliriumOrbsSearch = CollectedData.DeliriumOrb.Lines.Find(x => x.Name == item.BaseName);
-                        if (deliriumOrbsSearch != null)
+                        var deliriumOrbsSearch = CollectedData.DeliriumOrb.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (deliriumOrbsSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * deliriumOrbsSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = deliriumOrbsSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = deliriumOrbsSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * deliriumOrbsSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = deliriumOrbsSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = deliriumOrbsSearch.Item.detailsId;
                         }
 
                         break;
@@ -340,12 +341,12 @@ public partial class Main
 
                         break;
                     case ItemTypes.Scarab:
-                        var scarabSearch = CollectedData.Scarabs.Lines.Find(x => x.Name == item.BaseName);
-                        if (scarabSearch != null)
+                        var scarabSearch = CollectedData.Scarabs.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (scarabSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * scarabSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = scarabSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = scarabSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * scarabSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = scarabSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = scarabSearch.Item.detailsId;
                         }
 
                         break;
@@ -476,22 +477,22 @@ public partial class Main
 
                         break;
                     case ItemTypes.Resonator:
-                        var resonatorSearch = CollectedData.Resonators.Lines.Find(x => x.Name == item.BaseName);
-                        if (resonatorSearch != null)
+                        var resonatorSearch = CollectedData.Resonators.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (resonatorSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * resonatorSearch.ChaosValue;
-                            item.PriceData.ChangeInLast7Days = resonatorSearch.Sparkline.TotalChange;
-                            item.PriceData.DetailsId = resonatorSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * resonatorSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = resonatorSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = resonatorSearch.Item.detailsId;
                         }
 
                         break;
                     case ItemTypes.Fossil:
-                        var fossilSearch = CollectedData.Fossils.Lines.Find(x => x.Name == item.BaseName);
-                        if (fossilSearch != null)
+                        var fossilSearch = CollectedData.Fossils.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (fossilSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * fossilSearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = fossilSearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = fossilSearch.DetailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * fossilSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = fossilSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = fossilSearch.Item.detailsId;
                         }
 
                         break;
@@ -585,18 +586,6 @@ public partial class Main
                         }
 
                         break;
-                    case ItemTypes.Memory:
-                        item.Entity.TryGetComponent<Mods>(out var modsComp);
-                        var modName = modsComp.ExplicitMods.Find(x => x.ModRecord.Group == "MemoryLineType").DisplayName;
-                        var memorySearch = CollectedData.Memories.Lines.Find(x => x.Name == $"{item.BaseName} {modName}");
-                        if (memorySearch != null)
-                        {
-                            item.PriceData.MinChaosValue = memorySearch.ChaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = memorySearch.Sparkline.TotalChange ?? 0;
-                            item.PriceData.DetailsId = memorySearch.DetailsId;
-                        }
-
-                        break;
                     case ItemTypes.Beast:
                         var beastSearch = CollectedData.Beasts.lines.Find(x => x.name == item.CapturedMonsterName);
                         if (beastSearch != null)
@@ -608,22 +597,22 @@ public partial class Main
 
                         break;
                     case ItemTypes.KalguuranRune:
-                        var runeSearch = CollectedData.KalguuranRunes.lines.Find(x => x.name == item.BaseName);
-                        if (runeSearch != null)
+                        var runeSearch = CollectedData.KalguuranRunes.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (runeSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * runeSearch.chaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = runeSearch.sparkline.totalChange ?? 0;
-                            item.PriceData.DetailsId = runeSearch.detailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * runeSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = runeSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = runeSearch.Item.detailsId;
                         }
 
                         break;
                     case ItemTypes.AllflameEmber:
-                        var allflameSearch = CollectedData.AllflameEmbers.lines.Find(x => x.name == item.BaseName);
-                        if (allflameSearch != null)
+                        var allflameSearch = CollectedData.AllflameEmbers.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (allflameSearch != default)
                         {
-                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * allflameSearch.chaosValue ?? 0;
-                            item.PriceData.ChangeInLast7Days = allflameSearch.sparkline.totalChange ?? 0;
-                            item.PriceData.DetailsId = allflameSearch.detailsId;
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * allflameSearch.ChaosEquivalent;
+                            item.PriceData.ChangeInLast7Days = allflameSearch.Line.sparkline.totalChange ?? 0;
+                            item.PriceData.DetailsId = allflameSearch.Item.detailsId;
                         }
 
                         break;
@@ -634,9 +623,9 @@ public partial class Main
                             {
                                 case UltimatumItemisedRewardType.Mirror:
                                 {
-                                    var line = CollectedData.Currency.FindLine("Mirror of Kalandra", Settings.DataSourceSettings.UseChaosEquivalentDataForCurrency) ?? new Currency.SearchResult(100000, 0, "mirror");
+                                    var line = CollectedData.Currency.LinesByName.GetValueOrDefault("Mirror of Kalandra") switch { (null, null, 0) => (null, null, 100000), var o => o };
                                     item.PriceData.MinChaosValue = line.ChaosEquivalent;
-                                    item.PriceData.ChangeInLast7Days = line.PriceChange;
+                                    item.PriceData.ChangeInLast7Days = line.Line?.sparkline.totalChange ?? 0;
                                     item.PriceData.DetailsId = "ultimatum-inscribed-mirror";
                                     break;
                                 }

@@ -263,10 +263,6 @@ public class CustomItem
         {
             ItemType = ItemTypes.Beast;
         }
-        else if (ClassName == "MemoryLine")
-        {
-            ItemType = ItemTypes.Memory;
-        }
         else if (ClassName == "MiscMapItem" &&
                  Path.StartsWith("Metadata/Items/MapFragments/Primordial/", StringComparison.Ordinal) &&
                  Path.EndsWith("Key", StringComparison.Ordinal))

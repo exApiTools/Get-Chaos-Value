@@ -213,7 +213,7 @@ public partial class Main : BaseSettingsPlugin<Settings.Settings>
 
         try
         {
-            var leagueListFromUrl = Utils.DownloadFromUrl("https://poe.ninja/api/data/index-state").Result;
+            var leagueListFromUrl = Utils.DownloadFromUrl("https://poe.ninja/poe1/api/data/index-state").Result;
             var leagueData = JsonConvert.DeserializeObject<NinjaLeagueListRootObject>(leagueListFromUrl);
             leagueList.UnionWith(leagueData.economyLeagues.Where(league => league.indexed).Select(league => league.name));
         }

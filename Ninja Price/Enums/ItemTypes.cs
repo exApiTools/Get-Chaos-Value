@@ -28,7 +28,6 @@ public enum ItemTypes
     ClusterJewel,
     Tattoo,
     Omen,
-    Memory,
     Beast,
     KalguuranRune,
     InscribedUltimatum,

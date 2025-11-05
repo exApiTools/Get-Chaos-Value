@@ -57,9 +57,6 @@ public class DataSourceSettings
     public RangeNode<int> ReloadPeriod { get; set; } = new(15, 1, 60);
 
     public ToggleNode CheckMapVariant { get; set; } = new(false);
-
-    [Menu(null, "ChaosEquivalent is not used by poe.ninja itself and can have weird values. If you like it better, try it")]
-    public ToggleNode UseChaosEquivalentDataForCurrency { get; set; } = new(false);
 }
 
 [Submenu(CollapsedByDefault = true)]

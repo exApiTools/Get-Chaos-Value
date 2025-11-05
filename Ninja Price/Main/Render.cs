@@ -395,7 +395,6 @@ public partial class Main
             case ItemTypes.SkillGem:
             case ItemTypes.ClusterJewel:
             case ItemTypes.InscribedUltimatum:
-            case ItemTypes.Memory:
             case ItemTypes.Beast:
                 if (priceInDivines >= 0.1)
                 {

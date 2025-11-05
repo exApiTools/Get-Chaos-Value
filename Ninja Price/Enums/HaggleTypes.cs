@@ -1,6 +1,6 @@
 ﻿namespace Ninja_Price.Enums;
 
-class HaggleTypes
+public class HaggleTypes
 {
     public enum HaggleType
     {
