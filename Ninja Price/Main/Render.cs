@@ -246,6 +246,7 @@ public partial class Main
         ProcessUltimatumPanel();
         ProcessHoveredItem();
         VisibleInventoryValue();
+        ProcessExchangeCurrencyPicker();
 
         if (StashPanel.IsVisible)
         {
@@ -286,6 +287,71 @@ public partial class Main
                 {
                     if (customItem.ItemType == ItemTypes.None) continue;
                     DrawItemPriceInline(customItem);
+                }
+            }
+        }
+    }
+
+    public void ProcessExchangeCurrencyPicker()
+    {
+        if (GameController.IngameState.IngameUi.CurrencyExchangePanel?.CurrencyPicker is { IsValid: true, IsVisible: true } picker)
+        {
+            var pickerRect = picker.OptionContainer.GetClientRectCache;
+            var anyIntersect = false;
+            Element tooltip = null;
+            if (GameController.Game.IngameState.UIHover is { Address: not 0, IsValid: true } hover &&
+                hover.Tooltip is { IsValid: true, IsVisible: true } foundTooltip)
+            {
+                tooltip = foundTooltip;
+            }
+
+            foreach (var currencyOption in picker.Options)
+            {
+                var optionRect = currencyOption.GetClientRectCache;
+                if (pickerRect.Contains(optionRect.TopLeft))
+                {
+                    anyIntersect = true;
+                    if (currencyOption.ItemType is { } itemType)
+                    {
+                        var item = new CustomItem(itemType);
+                        GetValue(item);
+                        var topRight = optionRect.TopRight.ToVector2Num();
+                        var bottomRight = optionRect.BottomRight.ToVector2Num();
+                        var typePrice = item.PriceData.MinChaosValue;
+                        {
+                            var text = typePrice.FormatNumber(Settings.VisualPriceSettings.SignificantDigits.Value);
+                            var textSize = Graphics.MeasureText(text);
+                            var textRect = new RectangleF(topRight.X - textSize.X, topRight.Y, textSize.X, textSize.Y);
+                            if ((HoveredItemTooltipRect?.Intersects(textRect) ?? false) ||
+                                (tooltip?.GetClientRectCache.Intersects(textRect) ?? false))
+                            {
+                                continue;
+                            }
+
+                            Graphics.DrawTextWithBackground(text, topRight, Settings.VisualPriceSettings.FontColor, FontAlign.Right, Color.Black);
+                        }
+
+                        if (currencyOption.Owned is > 0 and var owned)
+                        {
+                            var totalOwned = typePrice * owned;
+                            var text2 = $"Owned: {totalOwned.FormatNumber(Settings.VisualPriceSettings.SignificantDigits.Value)}";
+                            var textSize2 = Graphics.MeasureText(text2);
+                            var textRect2 = new RectangleF(bottomRight.X - textSize2.X, bottomRight.Y - textSize2.Y, textSize2.X, textSize2.Y);
+                            if ((HoveredItemTooltipRect?.Intersects(textRect2) ?? false) ||
+                                (tooltip?.GetClientRectCache.Intersects(textRect2) ?? false))
+                            {
+                                continue;
+                            }
+
+                            Graphics.DrawTextWithBackground(text2, textRect2.TopLeft.ToVector2Num(), totalOwned >= Settings.VisualPriceSettings.ValuableColorThreshold
+                                ? Settings.VisualPriceSettings.ValuableColor
+                                : Settings.VisualPriceSettings.FontColor, Color.Black);
+                        }
+                    }
+                }
+                else if (anyIntersect)
+                {
+                    break;
                 }
             }
         }

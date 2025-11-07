@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExileCore;
+using ExileCore.PoEMemory;
 using ExileCore.PoEMemory.FilesInMemory;
 using Color = SharpDX.Color;
 
@@ -72,7 +73,7 @@ public partial class Main
         try
         {
             var uiHover = GameController.Game.IngameState.UIHover;
-            if (uiHover.AsObject<HoverItemIcon>().ToolTipType != ToolTipType.ItemInChat)
+            if (uiHover.Address != 0 && uiHover.AsObject<HoverItemIcon>().ToolTipType != ToolTipType.ItemInChat)
             {
                 var inventoryItemIcon = uiHover.AsObject<NormalInventoryItem>();
                 var tooltip = inventoryItemIcon.Tooltip;
