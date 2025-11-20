@@ -615,7 +615,15 @@ public partial class Main
         {
             Graphics.DrawBox(drawBox, Settings.VisualPriceSettings.BackgroundColor);
             var textPosition = new Vector2(drawBox.Center.X, drawBox.Center.Y - ImGui.GetTextLineHeight() / 2);
-            Graphics.DrawText(item.PriceData.MinChaosValue.FormatNumber(Settings.VisualPriceSettings.SignificantDigits.Value), textPosition,
+
+            var itemValue = item.PriceData.MinChaosValue;
+            if (Settings.PriceOverlaySettings.ShowUnitValue)
+            {
+                itemValue /= item.CurrencyInfo.StackSize;
+                if (itemValue < Settings.PriceOverlaySettings.UnitValueHintThreshold) textColor = Color.Red;
+            }
+            
+            Graphics.DrawText(itemValue.FormatNumber(Settings.VisualPriceSettings.SignificantDigits.Value), textPosition,
                 textColor, FontAlign.Center);
         }
     }
