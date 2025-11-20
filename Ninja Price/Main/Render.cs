@@ -168,9 +168,9 @@ public partial class Main
                     ItemList = ritualItems;
                 }
                 else if (Settings.LeagueSpecificSettings.ShowVillageRewardWindowPrices &&
-                         GameController.Game.IngameState.IngameUi.VillageRewardWindow is { IsVisible: true, Items: { Count: > 0 } villageItems })
+                         GameController.Game.IngameState.IngameUi.VillageRewardWindow is { IsVisible: true, TabContainer.VisibleStash.VisibleInventoryItems: { Count: > 0 } villageItems })
                 {
-                    ItemList = villageItems;
+                    ItemList = villageItems.ToList();
                 }
                 else if (Settings.LeagueSpecificSettings.ShowPurchaseWindowPrices &&
                          GameController.Game.IngameState.IngameUi.PurchaseWindow?.TabContainer?.VisibleStash is { IsVisible: true, VisibleInventoryItems: { Count: > 0 } purchaseWindowItems })
