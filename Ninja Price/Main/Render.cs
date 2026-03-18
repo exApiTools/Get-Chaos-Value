@@ -8,6 +8,7 @@ using ExileCore.Shared.Helpers;
 using ImGuiNET;
 using Ninja_Price.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -53,6 +54,35 @@ public partial class Main
         _slowGroundItems = new TimeCache<List<ItemOnGround>>(GetItemsOnGroundSlow, 500);
         _groundItems = new FrameCache<List<ItemOnGround>>(CacheUtils.RememberLastValue(GetItemsOnGround, new List<ItemOnGround>()));
         _disenchantCache = new TimeCache<List<VillageUniqueDisenchantValue>>(() => GameController.Files.VillageUniqueDisenchantValues.EntriesList, 1000);
+    }
+
+    private object GetOptionalIngameUiWindow(string propertyName)
+    {
+        var ingameUi = GameController?.Game?.IngameState?.IngameUi;
+        return ingameUi?.GetType().GetProperty(propertyName)?.GetValue(ingameUi);
+    }
+
+    private static bool IsWindowVisible(object window)
+    {
+        return window?.GetType().GetProperty("IsVisible")?.GetValue(window) is bool isVisible && isVisible;
+    }
+
+    private List<NormalInventoryItem> GetTrappedStashItems()
+    {
+        var trappedStashWindow = GetOptionalIngameUiWindow("TrappedStashWindow");
+        if (!IsWindowVisible(trappedStashWindow))
+        {
+            return [];
+        }
+
+        return trappedStashWindow?.GetType().GetProperty("Items")?.GetValue(trappedStashWindow) is IEnumerable items
+            ? items.OfType<NormalInventoryItem>().ToList()
+            : [];
+    }
+
+    private bool IsTrappedStashVisible()
+    {
+        return IsWindowVisible(GetOptionalIngameUiWindow("TrappedStashWindow"));
     }
 
     private List<ItemOnGround> GetItemsOnGround(List<ItemOnGround> previousValue)
@@ -110,6 +140,8 @@ public partial class Main
 
     public override void Render()
     {
+        SyncCurrentLeague();
+
         #region Reset All Data
 
         StashTabValue = 0;
@@ -167,8 +199,8 @@ public partial class Main
                 {
                     ItemList = ritualItems;
                 }
-                if (Settings.LeagueSpecificSettings.ShowTrappedStashPrices &&
-                    GameController.Game.IngameState.IngameUi.TrappedStashWindow is { IsVisible: true, Items: { Count: > 0 } trappedStashItems })
+                var trappedStashItems = Settings.LeagueSpecificSettings.ShowTrappedStashPrices ? GetTrappedStashItems() : [];
+                if (trappedStashItems.Count > 0)
                 {
                     ItemList = trappedStashItems;
                 }
@@ -281,7 +313,7 @@ public partial class Main
             }
         }
         else if (
-            Settings.LeagueSpecificSettings.ShowTrappedStashPrices && GameController.IngameState.IngameUi.TrappedStashWindow.IsVisible ||
+            Settings.LeagueSpecificSettings.ShowTrappedStashPrices && IsTrappedStashVisible() ||
             Settings.LeagueSpecificSettings.ShowRitualWindowPrices && GameController.IngameState.IngameUi.RitualWindow.IsVisible ||
             Settings.LeagueSpecificSettings.ShowVillageRewardWindowPrices && GameController.IngameState.IngameUi.VillageRewardWindow.IsVisible ||
             Settings.LeagueSpecificSettings.ShowMercenaryInventoryPrices && GameController.IngameState.IngameUi.MercenaryEncounterWindow.IsVisible ||
