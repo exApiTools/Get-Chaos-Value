@@ -81,6 +81,70 @@ public class CustomItem
         public int MaxStackSize = 0;
     }
 
+    private static bool IsLikelyMapItem(string path, string className, string baseName)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return false;
+        }
+
+        if (path.Contains("MapKey", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("Metadata/Items/Maps/", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (!string.IsNullOrEmpty(className) &&
+            className.Contains("Map", StringComparison.OrdinalIgnoreCase) &&
+            !className.Contains("Fragment", StringComparison.OrdinalIgnoreCase) &&
+            !className.Contains("MiscMapItem", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return !string.IsNullOrEmpty(baseName) && baseName.Contains("Map", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static int GetFallbackMapTier(string path, string baseName)
+    {
+        var tierFromPath = ExtractTrailingNumber(path, "MapKeyTier");
+        if (tierFromPath > 0)
+        {
+            return tierFromPath;
+        }
+
+        var tierFromName = ExtractTrailingNumber(baseName, "(Tier ");
+        if (tierFromName > 0)
+        {
+            return tierFromName;
+        }
+
+        return 0;
+    }
+
+    private static int ExtractTrailingNumber(string value, string token)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return 0;
+        }
+
+        var tokenIndex = value.IndexOf(token, StringComparison.OrdinalIgnoreCase);
+        if (tokenIndex < 0)
+        {
+            return 0;
+        }
+
+        var numberStart = tokenIndex + token.Length;
+        var numberEnd = numberStart;
+        while (numberEnd < value.Length && char.IsDigit(value[numberEnd]))
+        {
+            numberEnd++;
+        }
+
+        return numberEnd > numberStart && int.TryParse(value[numberStart..numberEnd], out var number) ? number : 0;
+    }
+
     public CustomItem()
     {
     }
@@ -237,8 +301,12 @@ public class CustomItem
             if (weaponClass.Any(ClassName.Equals))
                 IsWeapon = true;
 
-            MapInfo.MapTier = itemEntity.TryGetComponent<MapKey>(out var map) ? map.Tier : 0;
-            MapInfo.IsMap = MapInfo.MapTier > 0;
+            MapInfo.MapTier = GetFallbackMapTier(Path, BaseName);
+            MapInfo.IsMap = MapInfo.MapTier > 0 || IsLikelyMapItem(Path, ClassName, BaseName);
+            if (MapInfo.IsMap && MapInfo.MapTier == 0)
+            {
+                MapInfo.MapTier = 1;
+            }
 
             if (Rarity != ItemRarity.Unique && MapInfo.IsMap)
             {
