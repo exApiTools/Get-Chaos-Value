@@ -412,6 +412,90 @@ public partial class Main
             textColor, FontAlign.Center, backgroundColor);
     }
 
+    private string GetMatchingCustomSoundFile(CustomItem item)
+    {
+        return item.UniqueNameCandidates.Any() || !string.IsNullOrEmpty(item.UniqueName)
+            ? item.UniqueNameCandidates
+                .DefaultIfEmpty(item.UniqueName)
+                .Select(x => _soundFiles.GetValueOrDefault(x))
+                .FirstOrDefault(x => x != null)
+            : null;
+    }
+
+    private bool ShouldPlaySoundForItem(CustomItem item, string matchingCustomFile)
+    {
+        if (!Settings.SoundNotificationSettings.Enabled || !IsSoundCategoryEnabled(item))
+        {
+            return false;
+        }
+
+        return item.PriceData.MaxChaosValue >= Settings.SoundNotificationSettings.ValueThreshold.Value ||
+               Settings.SoundNotificationSettings.PlayCustomSoundsIfBelowThreshold && matchingCustomFile != null;
+    }
+
+    private bool IsSoundCategoryEnabled(CustomItem item)
+    {
+        return item.ItemType switch
+        {
+            ItemTypes.UniqueAccessory or
+            ItemTypes.UniqueArmour or
+            ItemTypes.UniqueFlask or
+            ItemTypes.UniqueJewel or
+            ItemTypes.UniqueMap or
+            ItemTypes.UniqueWeapon => Settings.SoundNotificationSettings.AlertForUniques,
+
+            ItemTypes.Currency or
+            ItemTypes.DjinnCoin or
+            ItemTypes.Wombgift or
+            ItemTypes.Catalyst or
+            ItemTypes.Artifact or
+            ItemTypes.Oil or
+            ItemTypes.Tattoo or
+            ItemTypes.Omen or
+            ItemTypes.Resonator or
+            ItemTypes.Fossil or
+            ItemTypes.Incubator or
+            ItemTypes.DeliriumOrbs or
+            ItemTypes.Vials or
+            ItemTypes.KalguuranRune or
+            ItemTypes.AllflameEmber => Settings.SoundNotificationSettings.AlertForCurrency,
+
+            ItemTypes.Fragment or
+            ItemTypes.Scarab or
+            ItemTypes.Invitation or
+            ItemTypes.InscribedUltimatum => Settings.SoundNotificationSettings.AlertForFragments,
+
+            ItemTypes.Map => Settings.SoundNotificationSettings.AlertForMaps,
+            ItemTypes.DivinationCard => Settings.SoundNotificationSettings.AlertForDivinationCards,
+            ItemTypes.Essence => Settings.SoundNotificationSettings.AlertForEssences,
+            ItemTypes.SkillGem or
+            ItemTypes.ClusterJewel => Settings.SoundNotificationSettings.AlertForGemsAndJewels,
+            ItemTypes.Beast => Settings.SoundNotificationSettings.AlertForBeasts,
+            _ => Settings.SoundNotificationSettings.AlertForOtherTypes
+        };
+    }
+
+    private void PlaySoundAlert(string matchingCustomFile)
+    {
+        var defaultFile = Path.Join(ConfigDirectory, Main.DefaultWav);
+        if (matchingCustomFile != null && !File.Exists(matchingCustomFile))
+        {
+            LogError($"Unable to find {matchingCustomFile}. It was probably deleted. Reload the sound list to update your preferences");
+            matchingCustomFile = null;
+        }
+
+        var fileToPlay = matchingCustomFile ?? defaultFile;
+        if (File.Exists(fileToPlay))
+        {
+            GameController.SoundController.PlaySound(fileToPlay, Settings.SoundNotificationSettings.Volume);
+        }
+        else if (fileToPlay == defaultFile)
+        {
+            LogError(
+                $"Unable to find the default sound file ({defaultFile}) to play. Disable the sound notification feature, reload the sound list to let the plugin create it, or create it yourself");
+        }
+    }
+
     private void ProcessHoveredItem()
     {
         if (!Settings.HoveredItemSettings.Show) return;
@@ -1019,37 +1103,12 @@ public partial class Main
                     if (Settings.SoundNotificationSettings.Enabled && 
                         !_soundPlayedTracker.ContainsKey(item.EntityId))
                     {
-                        var matchingCustomFile =
-                            item.UniqueNameCandidates.Any() ||
-                            !string.IsNullOrEmpty(item.UniqueName)
-                                ? item.UniqueNameCandidates
-                                    .DefaultIfEmpty(item.UniqueName)
-                                    .Select(x => _soundFiles.GetValueOrDefault(x))
-                                    .FirstOrDefault(x => x != null)
-                                : null;
-                        if (item.PriceData.MaxChaosValue >= Settings.SoundNotificationSettings.ValueThreshold ||
-                            Settings.SoundNotificationSettings.PlayCustomSoundsIfBelowThreshold && matchingCustomFile != null)
+                        var matchingCustomFile = GetMatchingCustomSoundFile(item);
+                        if (ShouldPlaySoundForItem(item, matchingCustomFile))
                         {
                             if (_soundPlayedTracker.TryAdd(item.EntityId, true))
                             {
-                                var defaultFile = Path.Join(ConfigDirectory, "default.wav");
-                                if (matchingCustomFile != null && !File.Exists(matchingCustomFile))
-                                {
-                                    LogError($"Unable to find {matchingCustomFile}. It was probably deleted. Reload the sound list to update your preferences");
-                                    matchingCustomFile = null;
-                                }
-
-                                var fileToPlay = matchingCustomFile ?? defaultFile;
-
-                                if (File.Exists(fileToPlay))
-                                {
-                                    GameController.SoundController.PlaySound(fileToPlay, Settings.SoundNotificationSettings.Volume);
-                                }
-                                else if (fileToPlay == defaultFile)
-                                {
-                                    LogError(
-                                        $"Unable to find the default sound file ({defaultFile}) to play. Disable the sound notification feature, reload the sound list to let the plugin create it, or create it yourself");
-                                }
+                                PlaySoundAlert(matchingCustomFile);
                             }
                         }
                     }

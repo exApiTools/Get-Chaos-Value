@@ -209,4 +209,13 @@ public class SoundNotificationSettings
     public RangeNode<float> Volume { get; set; } = new(1, 0, 2);
     public RangeNode<int> ValueThreshold { get; set; } = new(50, 0, 100000);
     public ToggleNode PlayCustomSoundsIfBelowThreshold { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForUniques { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForCurrency { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForFragments { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForMaps { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForDivinationCards { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForEssences { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForGemsAndJewels { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForBeasts { get; set; } = new ToggleNode(true);
+    public ToggleNode AlertForOtherTypes { get; set; } = new ToggleNode(true);
 }
