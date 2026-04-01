@@ -1,4 +1,4 @@
-﻿using Ninja_Price.Enums;
+using Ninja_Price.Enums;
 using System.Collections.Generic;
 
 namespace Ninja_Price.Main;
@@ -10,6 +10,7 @@ public partial class Main
         public double MinChaosValue { get; set; }
         public double MaxChaosValue { get; set; }
         public double ChangeInLast7Days { get; set; }
+        public List<float?> ChangeSparkline7Days { get; set; } = new List<float?>();
         public ItemTypes ItemType { get; set; }
         public List<double> ItemBasePrices { get; set; } = new List<double>();
         public string DetailsId { get; set; }

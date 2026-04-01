@@ -375,12 +375,9 @@ public partial class Main
         void AddText(string text) => textSections[^1] += text;
 
         var changeText = $"Change in last 7 Days: {HoveredItem.PriceData.ChangeInLast7Days:+#;-#;0}%";
-        var changeTextLength = changeText.Length - 1;
-        var sectionBreak = $"\n{new string('-', changeTextLength)}\n";
-        if (Math.Abs(HoveredItem.PriceData.ChangeInLast7Days) > 0.5)
-        {
-            AddText(changeText);
-        }
+        var hasMeaningfulSparklinePoints = HoveredItem.PriceData.ChangeSparkline7Days.Any(x => x.HasValue && x.Value != 0f);
+        var hasBasePrice = HoveredItem.PriceData.MinChaosValue > 0 || HoveredItem.PriceData.MaxChaosValue > 0;
+        var showChangeLine = hasBasePrice && hasMeaningfulSparklinePoints;
 
         var priceInChaos = HoveredItem.PriceData.MinChaosValue;
         var priceInDivines = priceInChaos / DivinePrice;
@@ -491,29 +488,124 @@ public partial class Main
             }
         }
 
-        var tooltipText = string.Join(sectionBreak, textSections.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim()));
-        if (!string.IsNullOrWhiteSpace(tooltipText))
+        var nonEmptySections = textSections.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim()).ToList();
+        if (nonEmptySections.Count > 0 || showChangeLine)
         {
             ImGui.BeginTooltip();
-            var hoverTextColor = priceInChaos >= Settings.VisualPriceSettings.ExtraValuableColorThreshold.Value
-                ? Settings.VisualPriceSettings.ExtraValuableColor
-                : priceInChaos >= Settings.VisualPriceSettings.ValuableColorThreshold.Value
-                    ? Settings.VisualPriceSettings.ValuableColor
-                    : priceInChaos >= Settings.VisualPriceSettings.SemiValuableColorThreshold.Value
-                        ? Settings.VisualPriceSettings.SemiValuableColor
-                        : null;
+            var hoverTextColor = priceInChaos >= Settings.VisualPriceSettings.ExtraValuableColorThreshold.Value ? Settings.VisualPriceSettings.ExtraValuableColor :
+                priceInChaos >= Settings.VisualPriceSettings.ValuableColorThreshold.Value ? Settings.VisualPriceSettings.ValuableColor :
+                priceInChaos >= Settings.VisualPriceSettings.SemiValuableColorThreshold.Value ? Settings.VisualPriceSettings.SemiValuableColor : null;
+
             if (hoverTextColor != null)
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, hoverTextColor.Value.ToImgui());
             }
 
-            ImGui.TextUnformatted(tooltipText);
+            if (showChangeLine)
+            {
+                ImGui.TextUnformatted(changeText);
+                if (Settings.HoveredItemSettings.Sparkline.Enabled)
+                {
+                    ImGui.SameLine();
+                    DrawInlineSparkline(HoveredItem.PriceData.ChangeSparkline7Days, Settings.HoveredItemSettings.Sparkline);
+                }
+
+                if (nonEmptySections.Count > 0)
+                {
+                    ImGui.Separator();
+                }
+            }
+
+            for (var i = 0; i < nonEmptySections.Count; i++)
+            {
+                if (i > 0)
+                {
+                    ImGui.Separator();
+                }
+
+                ImGui.TextUnformatted(nonEmptySections[i]);
+            }
+
             if (hoverTextColor != null)
             {
                 ImGui.PopStyleColor();
             }
 
             ImGui.EndTooltip();
+        }
+    }
+
+    private static void DrawInlineSparkline(List<float?> sparklinePoints, HoveredItemSparklineSettings sparklineSettings)
+    {
+        var chartWidth = Math.Max(20f, sparklineSettings.Width.Value);
+        var chartHeight = Math.Max(8f, sparklineSettings.Height.Value);
+        var chartPadding = Math.Max(0f, sparklineSettings.Padding.Value);
+        var axisThickness = Math.Max(0.5f, sparklineSettings.BorderThickness.Value);
+        var trendThickness = Math.Max(0.5f, sparklineSettings.TrendThickness.Value);
+
+        ImGui.BeginGroup();
+        var drawList = ImGui.GetWindowDrawList();
+        var chartOrigin = ImGui.GetCursorScreenPos();
+
+        var axisColor = ImGui.GetColorU32(sparklineSettings.AxisColor.Value.ToImgui());
+        var upColor = ImGui.GetColorU32(sparklineSettings.UpTrendColor.Value.ToImgui());
+        var downColor = ImGui.GetColorU32(sparklineSettings.DownTrendColor.Value.ToImgui());
+
+        var chartMax = chartOrigin + new Vector2(chartWidth, chartHeight);
+        drawList.AddRect(chartOrigin, chartMax, axisColor, 0f, ImDrawFlags.None, axisThickness);
+
+        var innerMin = chartOrigin + new Vector2(chartPadding, chartPadding);
+        var innerMax = chartMax - new Vector2(chartPadding, chartPadding);
+        var innerSize = new Vector2(Math.Max(1f, innerMax.X - innerMin.X), Math.Max(1f, innerMax.Y - innerMin.Y));
+
+        var numericPoints = sparklinePoints.Where(value => value.HasValue).Select(value => value.Value).ToList();
+        if (numericPoints.Count < 2)
+        {
+            ImGui.Dummy(new Vector2(chartWidth, chartHeight));
+            ImGui.EndGroup();
+            return;
+        }
+
+        var minValue = numericPoints.Min();
+        var maxValue = numericPoints.Max();
+        var valueRange = Math.Max(maxValue - minValue, 0.001f);
+
+        if (minValue < 0 && maxValue > 0)
+        {
+            var zeroY = innerMin.Y + innerSize.Y - (0 - minValue) / valueRange * innerSize.Y;
+            zeroY = Clamp(zeroY, innerMin.Y, innerMax.Y);
+            drawList.AddLine(innerMin with {Y = zeroY}, innerMax with {Y = zeroY}, axisColor, axisThickness);
+        }
+
+        Vector2? previousScreenPoint = null;
+        for (var i = 0; i < sparklinePoints.Count; i++)
+        {
+            var pointValue = sparklinePoints[i];
+            if (!pointValue.HasValue)
+            {
+                previousScreenPoint = null;
+                continue;
+            }
+
+            var xRatio = sparklinePoints.Count == 1 ? 0 : i / (float)(sparklinePoints.Count - 1);
+            var screenX = Clamp(innerMin.X + xRatio * innerSize.X, innerMin.X, innerMax.X);
+            var screenY = Clamp(innerMin.Y + innerSize.Y - (pointValue.Value - minValue) / valueRange * innerSize.Y, innerMin.Y, innerMax.Y);
+            var currentScreenPoint = new Vector2(screenX, screenY);
+            if (previousScreenPoint.HasValue)
+            {
+                drawList.AddLine(previousScreenPoint.Value, currentScreenPoint, pointValue.Value >= 0 ? upColor : downColor, trendThickness);
+            }
+
+            previousScreenPoint = currentScreenPoint;
+        }
+
+        ImGui.Dummy(new Vector2(chartWidth, chartHeight));
+        ImGui.EndGroup();
+        return;
+
+        static float Clamp(float value, float min, float max)
+        {
+            return Math.Max(min, Math.Min(max, value));
         }
     }
 

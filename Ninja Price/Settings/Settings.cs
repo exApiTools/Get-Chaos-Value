@@ -106,6 +106,21 @@ public class TradeWindowSettings
 public class HoveredItemSettings
 {
     public ToggleNode Show { get; set; } = new(true);
+    public HoveredItemSparklineSettings Sparkline { get; set; } = new();
+}
+
+[Submenu(CollapsedByDefault = true)]
+public class HoveredItemSparklineSettings
+{
+    public ToggleNode Enabled { get; set; } = new(true);
+    public RangeNode<int> Width { get; set; } = new(54, 20, 180);
+    public RangeNode<int> Height { get; set; } = new(16, 8, 48);
+    public RangeNode<float> BorderThickness { get; set; } = new(1f, 0.5f, 4f);
+    public RangeNode<float> TrendThickness { get; set; } = new(1.5f, 0.5f, 4f);
+    public RangeNode<float> Padding { get; set; } = new(1.5f, 0f, 6f);
+    public ColorNode AxisColor { get; set; } = new(new Color(140, 140, 140, 204));
+    public ColorNode UpTrendColor { get; set; } = new(new Color(77, 230, 77, 255));
+    public ColorNode DownTrendColor { get; set; } = new(new Color(242, 89, 89, 255));
 }
 
 [Submenu(CollapsedByDefault = true)]
