@@ -492,9 +492,13 @@ public partial class Main
         if (nonEmptySections.Count > 0 || showChangeLine)
         {
             ImGui.BeginTooltip();
-            var hoverTextColor = priceInChaos >= Settings.VisualPriceSettings.ExtraValuableColorThreshold.Value ? Settings.VisualPriceSettings.ExtraValuableColor :
-                priceInChaos >= Settings.VisualPriceSettings.ValuableColorThreshold.Value ? Settings.VisualPriceSettings.ValuableColor :
-                priceInChaos >= Settings.VisualPriceSettings.SemiValuableColorThreshold.Value ? Settings.VisualPriceSettings.SemiValuableColor : null;
+            var hoverTextColor = priceInChaos >= Settings.VisualPriceSettings.ExtraValuableColorThreshold.Value 
+                ? Settings.VisualPriceSettings.ExtraValuableColor 
+                : priceInChaos >= Settings.VisualPriceSettings.ValuableColorThreshold.Value 
+                    ? Settings.VisualPriceSettings.ValuableColor
+                    : priceInChaos >= Settings.VisualPriceSettings.SemiValuableColorThreshold.Value 
+                        ? Settings.VisualPriceSettings.SemiValuableColor 
+                        : null;
 
             if (hoverTextColor != null)
             {

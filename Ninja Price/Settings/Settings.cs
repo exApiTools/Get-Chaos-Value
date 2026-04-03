@@ -112,7 +112,7 @@ public class HoveredItemSettings
 [Submenu(CollapsedByDefault = true)]
 public class HoveredItemSparklineSettings
 {
-    public ToggleNode Enabled { get; set; } = new(true);
+    public ToggleNode Enabled { get; set; } = new(false);
     public RangeNode<int> Width { get; set; } = new(54, 20, 180);
     public RangeNode<int> Height { get; set; } = new(16, 8, 48);
     public RangeNode<float> BorderThickness { get; set; } = new(1f, 0.5f, 4f);
