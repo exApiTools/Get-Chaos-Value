@@ -448,7 +448,7 @@ public partial class Main
 
                         var uniqueAccessorySearch = CollectedData.UniqueAccessories.Lines.FindAll(x =>
                             x.Name == uniqueName || item.UniqueNameCandidates.Contains(x.Name));
-                        if (uniqueAccessorySearch.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers.Select(m => m.Text))).ToList() is { Count: > 0 } refined)
+                        if (uniqueAccessorySearch.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers?.Select(m => m.Text) ?? [])).ToList() is { Count: > 0 } refined)
                         {
                             uniqueAccessorySearch = refined;
                         }
@@ -492,7 +492,7 @@ public partial class Main
                             6 => allLinksLines.Where(x => x.Links == 6).ToList(),
                             _ => new List<UniqueArmours.Line>()
                         };
-                        if (uniqueArmourSearchLinks.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers.Select(m => m.Text))).ToList() is { Count: > 0 } refined)
+                        if (uniqueArmourSearchLinks.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers?.Select(m => m.Text) ?? [])).ToList() is { Count: > 0 } refined)
                         {
                             uniqueArmourSearchLinks = refined;
                         }
@@ -528,10 +528,6 @@ public partial class Main
 
                         var uniqueFlaskSearch = CollectedData.UniqueFlasks.Lines.FindAll(x =>
                             x.Name == uniqueName || item.UniqueNameCandidates.Contains(x.Name));
-                        if (uniqueFlaskSearch.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers.Select(m => m.Text))).ToList() is { Count: > 0 } refined)
-                        {
-                            uniqueFlaskSearch = refined;
-                        }
 
                         if (uniqueFlaskSearch.Count == 1)
                         {
@@ -564,7 +560,7 @@ public partial class Main
                         
                         var uniqueJewelSearch = CollectedData.UniqueJewels.Lines.FindAll(x =>
                             x.Name == uniqueName || item.UniqueNameCandidates.Contains(x.Name));
-                        if (uniqueJewelSearch.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers.Select(m => m.Text))).ToList() is { Count: > 0 } refined)
+                        if (uniqueJewelSearch.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers?.Select(m => m.Text) ?? [])).ToList() is { Count: > 0 } refined)
                         {
                             uniqueJewelSearch = refined;
                         }
@@ -652,7 +648,7 @@ public partial class Main
                             _ => new List<UniqueWeapons.Line>()
                         };
 
-                        if (uniqueArmourSearchLinks.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers.Select(m => m.Text))).ToList() is { Count: > 0 } refined)
+                        if (uniqueArmourSearchLinks.Where(x => item.FoulbornMods.SetEquals(x.MutatedModifiers?.Select(m => m.Text) ?? [])).ToList() is { Count: > 0 } refined)
                         {
                             uniqueArmourSearchLinks = refined;
                         }

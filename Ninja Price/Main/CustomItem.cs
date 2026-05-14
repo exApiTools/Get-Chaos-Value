@@ -354,7 +354,8 @@ public class CustomItem
                  !BaseName.EndsWith(" Catalyst") &&
                  BaseName != "Valdo's Puzzle Box" &&
                  !BaseName.StartsWith("Coin of") &&
-                 !BaseName.EndsWith(" Astrolabe"))
+                 !BaseName.EndsWith(" Astrolabe") && 
+                 !BaseName.StartsWith("Memory of ", StringComparison.OrdinalIgnoreCase))
         {
             ItemType = ItemTypes.Currency;
         }
@@ -402,7 +403,8 @@ public class CustomItem
                  ClassName == "StackableCurrency" && BaseName.StartsWith("Splinter of ") ||
                  BaseName.StartsWith("Crescent Splinter") ||
                  ClassName == "VaultKey" ||
-                 BaseName == "Valdo's Puzzle Box")
+                 BaseName == "Valdo's Puzzle Box" || 
+                 BaseName.StartsWith("Memory of ", StringComparison.OrdinalIgnoreCase))
         {
             ItemType = ItemTypes.Fragment;
         }

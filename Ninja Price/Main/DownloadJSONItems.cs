@@ -26,24 +26,24 @@ public partial class Main
     private const string DjinnCoinsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=DjinnCoin";
     private const string AstrolabeUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Astrolabe";
 
-    private const string InvitationUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=Invitation&language=en";
-    private const string UniqueAccessoriesUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueAccessory&language=en";
-    private const string UniqueArmoursUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueArmour&language=en";
-    private const string UniqueFlasksUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueFlask&language=en";
-    private const string UniqueJewelsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueJewel&language=en";
-    private const string UniqueMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueMap&language=en";
-    private const string UniqueWeaponsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=UniqueWeapon&language=en";
-    private const string WhiteMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Map&language=en";
-    private const string BlightedMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BlightedMap&language=en";
-    private const string BlightRavagedMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BlightRavagedMap&language=en";
-    private const string ValdoMapsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=ValdoMap&language=en";
-    private const string IncubatorsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Incubator&language=en";
-    private const string WombgiftsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Wombgift&language=en";
-    private const string SkillGemsUrl = "https://poe.ninja/api/data/ItemOverview?league={0}&type=SkillGem&language=en";
-    private const string ClusterJewelsUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=ClusterJewel&language=en";
-    private const string BeastUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Beast&language=en";
-    private const string VialUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=Vial&language=en";
-    private const string BaseTypeUrl = "https://poe.ninja/api/data/itemoverview?league={0}&type=BaseType&language=en";
+    private const string InvitationUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Invitation";
+    private const string UniqueAccessoriesUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueAccessory";
+    private const string UniqueArmoursUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueArmour";
+    private const string UniqueFlasksUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueFlask";
+    private const string UniqueJewelsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueJewel";
+    private const string UniqueMapsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueMap";
+    private const string UniqueWeaponsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueWeapon";
+    private const string WhiteMapsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Map";
+    private const string BlightedMapsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=BlightedMap";
+    private const string BlightRavagedMapsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=BlightRavagedMap";
+    private const string ValdoMapsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=ValdoMap";
+    private const string IncubatorsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Incubator";
+    private const string WombgiftsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Wombgift";
+    private const string SkillGemsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=SkillGem";
+    private const string ClusterJewelsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=ClusterJewel";
+    private const string BeastUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Beast";
+    private const string VialUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Vial";
+    private const string BaseTypeUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=BaseType";
 
     private class LeagueMetadata
     {
