@@ -3,6 +3,7 @@ using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.Elements.InventoryElements;
 using ExileCore.PoEMemory.FilesInMemory;
+using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Cache;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
@@ -39,6 +40,7 @@ public partial class Main
     public List<CustomItem> ItemsToDrawList { get; set; } = new List<CustomItem>();
     public List<CustomItem> InventoryItemsToDrawList { get; set; } = new List<CustomItem>();
     public StashElement StashPanel { get; set; }
+    public Inventory VisibleStash { get; set; }
     public InventoryElement InventoryPanel { get; set; }
     public Element HagglePanel { get; set; }
 
@@ -115,6 +117,23 @@ public partial class Main
 
     // TODO: Get hovered items && items from inventory - Getting hovered item  will become useful later on
 
+    // ExileCore resolves StashElement.StashTabContainer through a pointer slot that the game
+    // repurposes for an inline sub-object once a Map stash tab has been opened in that panel.
+    // From then on ExileCore reads that object's vtable as if it were the container, so
+    // TotalStashes/IndexVisibleStash come back as garbage and VisibleStash is null for the rest
+    // of the session - which zeroes the whole overlay for the guild stash. The real container is
+    // still sitting in the panel's child tree, so walk to it instead.
+    private static readonly int[] StashTabContainerChildPath = [2, 0, 0, 1];
+
+    private static Inventory ResolveVisibleStash(StashElement stash)
+    {
+        if (stash is not { IsVisible: true }) return null;
+        if (stash.VisibleStash is { } visibleStash) return visibleStash;
+
+        var container = stash.GetChildFromIndices(StashTabContainerChildPath)?.AsObject<StashTabContainer>();
+        return container is { TotalStashes: > 0 } ? container.VisibleStash : null;
+    }
+
     public override void Render()
     {
         #region Reset All Data
@@ -127,10 +146,10 @@ public partial class Main
             GameController.InspectObject(_inspectedItem, "Ninja pricer hovered item");
         }
 
-        StashPanel = (GameController.Game.IngameState.IngameUi.StashElement, GameController.Game.IngameState.IngameUi.GuildStashElement) switch
+        (StashPanel, VisibleStash) = (GameController.Game.IngameState.IngameUi.StashElement, GameController.Game.IngameState.IngameUi.GuildStashElement) switch
         {
-            ({ IsVisible: false }, { IsVisible: true, IsValid: true } gs) => gs,
-            var (s, _) => s
+            ({ IsVisible: false }, { IsVisible: true, IsValid: true } gs) when ResolveVisibleStash(gs) is { } guildStash => (gs, guildStash),
+            var (s, _) => (s, ResolveVisibleStash(s))
         };
         InventoryPanel = GameController.Game.IngameState.IngameUi.InventoryPanel;
         HagglePanel = GameController.Game.IngameState.IngameUi.HaggleWindow;
@@ -155,13 +174,13 @@ public partial class Main
         if (Settings.DebugSettings.EnableDebugLogging)
             LogMessage($"{GetCurrentMethod()}: Selected League: {Settings.DataSourceSettings.EffectiveLeague}", 5, Color.White);
 
-        var tabType = StashPanel.VisibleStash?.InvType;
+        var tabType = VisibleStash?.InvType;
 
         // Everything is updated, lets check if we should draw
         if (ShouldUpdateValues())
         {
             // Format stash items
-            ItemList = StashPanel.IsVisible && tabType != null ? StashPanel.VisibleStash?.VisibleInventoryItems?.ToList() ?? [] : [];
+            ItemList = StashPanel.IsVisible && tabType != null ? VisibleStash?.VisibleInventoryItems?.ToList() ?? [] : [];
             if (ItemList.Count == 0)
             {
                 if (Settings.LeagueSpecificSettings.ShowMercenaryInventoryPrices &&
@@ -266,7 +285,7 @@ public partial class Main
         {
             VisibleStashValue();
 
-            var tabType = StashPanel.VisibleStash?.InvType;
+            var tabType = VisibleStash?.InvType;
             var layout = Settings.StashValueSettings.GetPriceOverlayLayout(tabType);
             if (!Settings.PriceOverlaySettings.Show ||
                 Settings.PriceOverlaySettings.DoNotDrawWhileAnItemIsHovered && HoveredItem != null ||
