@@ -872,7 +872,8 @@ public partial class Main
                                     GetValue(sacItem);
                                     var gainItem = new CustomItem(ultimatumTrial.RewardItemWord.Text, gainUniqueType ?? ItemTypes.None) { MapInfo = { MapTier = 16 } };
                                     GetValue(gainItem);
-                                    item.PriceData.MinChaosValue = gainItem.PriceData.MinChaosValue - sacItem.PriceData.MinChaosValue;
+                                    // the reward name can match several lines (variants, links), and MaxChaosValue is what this plugin uses elsewhere to flag value, so take the dearest match
+                                    item.PriceData.MinChaosValue = gainItem.PriceData.MaxChaosValue - sacItem.PriceData.MinChaosValue;
                                     item.PriceData.DetailsId = $"ultimatum-inscribed-unique-{sacItem.PriceData.DetailsId}-{gainItem.PriceData.DetailsId}";
                                     break;
                                 }
