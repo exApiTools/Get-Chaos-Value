@@ -414,6 +414,7 @@ public partial class Main
             case ItemTypes.DjinnCoin:
             case ItemTypes.Astrolabe:
             case ItemTypes.Ducat:
+            case ItemTypes.EnshroudingCrystal:
                 if (priceInDivines >= 0.1)
                 {
                     var priceInDivinessPerOne = priceInDivines / HoveredItem.CurrencyInfo.StackSize;

@@ -236,6 +236,16 @@ public partial class Main
                         }
 
                         break;
+                    case ItemTypes.EnshroudingCrystal:
+                        var enshroudingCrystalSearch = CollectedData.EnshroudingCrystals.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (enshroudingCrystalSearch != default)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * enshroudingCrystalSearch.ChaosEquivalent;
+                            SetPriceChangeData(item.PriceData, enshroudingCrystalSearch.Line.sparkline.totalChange, enshroudingCrystalSearch.Line.sparkline.data);
+                            item.PriceData.DetailsId = enshroudingCrystalSearch.Item.detailsId;
+                        }
+
+                        break;
                     case ItemTypes.Catalyst:
                         var catalystSearch = CollectedData.Currency.LinesByName.GetValueOrDefault(item.BaseName);
                         if (catalystSearch != default)

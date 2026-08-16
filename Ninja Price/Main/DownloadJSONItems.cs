@@ -26,6 +26,7 @@ public partial class Main
     private const string DjinnCoinsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=DjinnCoin";
     private const string AstrolabeUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Astrolabe";
     private const string DucatUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=Ducat";
+    private const string EnshroudingCrystalsUrl = "https://poe.ninja/poe1/api/economy/exchange/current/overview?league={0}&type=EnshroudingCrystal";
 
     private const string InvitationUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Invitation";
     private const string UniqueAccessoriesUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=UniqueAccessory";
@@ -93,6 +94,7 @@ public partial class Main
                 await LoadData<CurrencyOverviewData.RootObject>("DjinnCoinsUrl2.json", DjinnCoinsUrl, league, tryWebFirst, t => newData.DjinnCoins = t);
                 await LoadData<CurrencyOverviewData.RootObject>("Astrolabe2.json", AstrolabeUrl, league, tryWebFirst, t => newData.Astrolabe = t);
                 await LoadData<CurrencyOverviewData.RootObject>("Ducats.json", DucatUrl, league, tryWebFirst, t => newData.Ducats = t);
+                await LoadData<CurrencyOverviewData.RootObject>("EnshroudingCrystals.json", EnshroudingCrystalsUrl, league, tryWebFirst, t => newData.EnshroudingCrystals = t);
 
                 await LoadData<Invitations.RootObject>("Invitations.json", InvitationUrl, league, tryWebFirst, t => newData.Invitations = t);
                 await LoadData<Vials.RootObject>("Vials.json", VialUrl, league, tryWebFirst, t => newData.Vials = t);

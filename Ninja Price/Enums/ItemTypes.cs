@@ -37,4 +37,5 @@ public enum ItemTypes
     Astrolabe,
     BaseType,
     Ducat,
+    EnshroudingCrystal,
 }
