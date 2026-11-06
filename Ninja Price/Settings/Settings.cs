@@ -397,6 +397,9 @@ public class SoundNotificationSettings
     public RangeNode<float> Volume { get; set; } = new(1, 0, 2);
     public RangeNode<int> ValueThreshold { get; set; } = new(50, 0, 100000);
     public ToggleNode PlayCustomSoundsIfBelowThreshold { get; set; } = new ToggleNode(true);
+
+    [Menu(null, "Valuable items dropping together play one sound: the custom one if any, else the most valuable item's. Others within this gap are skipped, not queued.")]
+    public RangeNode<int> MinimumMsBetweenSounds { get; set; } = new(1000, 0, 10000);
 }
 
 public enum PriceOverlayVertical

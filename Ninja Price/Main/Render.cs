@@ -49,6 +49,11 @@ public partial class Main
     private readonly CachedValue<List<ItemOnGround>> _groundItems;
     private readonly Dictionary<uint, bool> _soundPlayedTracker = new Dictionary<uint, bool>();
 
+    // When the last notification sound started, so a burst of valuable drops plays one sound rather than one per item.
+    // Seven Divine Orbs dropping together - seven PlaySound calls in one frame - were followed within a second by the
+    // HUD process crashing with an access violation in xaudio2_9.dll, three times in a row.
+    private readonly Stopwatch _sinceLastSound = new Stopwatch();
+
     public Main()
     {
         _slowGroundItems = new TimeCache<List<ItemOnGround>>(GetItemsOnGroundSlow, 500);
@@ -1135,6 +1140,9 @@ public partial class Main
         var rightPanelRect = GameController.IngameState.IngameUi.OpenRightPanel.Address != 0
                                  ? GameController.IngameState.IngameUi.OpenRightPanel.GetClientRectCache
                                  : RectangleF.Empty;
+        // At most one notification sound per frame: the best of this frame's new valuable items, played after the loop.
+        (string File, bool Custom, double Value)? soundToPlay = null;
+
         foreach (var (item, processingType, clientRect) in _groundItems.Value)
         {
             var box = clientRect ?? item.Element.GetClientRect();
@@ -1169,7 +1177,16 @@ public partial class Main
 
                                 if (File.Exists(fileToPlay))
                                 {
-                                    GameController.SoundController.PlaySound(fileToPlay, Settings.SoundNotificationSettings.Volume);
+                                    // A per-unique sound wins over the default one, then the more valuable item.
+                                    var isCustom = matchingCustomFile != null;
+                                    var value = item.PriceData.MaxChaosValue;
+
+                                    if (soundToPlay is not { } best ||
+                                        (isCustom && !best.Custom) ||
+                                        (isCustom == best.Custom && value > best.Value))
+                                    {
+                                        soundToPlay = (fileToPlay, isCustom, value);
+                                    }
                                 }
                                 else if (fileToPlay == defaultFile)
                                 {
@@ -1277,6 +1294,14 @@ public partial class Main
                 }
             }
                 
+        }
+
+        // Items that qualified during the gap are already marked as notified, so they do not queue up and play later.
+        if (soundToPlay is { } sound &&
+            (!_sinceLastSound.IsRunning || _sinceLastSound.ElapsedMilliseconds >= Settings.SoundNotificationSettings.MinimumMsBetweenSounds.Value))
+        {
+            GameController.SoundController.PlaySound(sound.File, Settings.SoundNotificationSettings.Volume);
+            _sinceLastSound.Restart();
         }
         
         ImGui.End();
