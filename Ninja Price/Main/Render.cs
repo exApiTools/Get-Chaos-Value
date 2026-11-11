@@ -572,7 +572,7 @@ public partial class Main
         var downColor = ImGui.GetColorU32(sparklineSettings.DownTrendColor.Value.ToImgui());
 
         var chartMax = chartOrigin + new Vector2(chartWidth, chartHeight);
-        drawList.AddRect(chartOrigin, chartMax, axisColor, 0f, ImDrawFlags.None, axisThickness);
+        drawList.AddRect(chartOrigin, chartMax, axisColor, 0f, axisThickness);
 
         var innerMin = chartOrigin + new Vector2(chartPadding, chartPadding);
         var innerMax = chartMax - new Vector2(chartPadding, chartPadding);
@@ -1213,13 +1213,13 @@ public partial class Main
 
                             void DrawOnItemLabel(float scale, string text, Color backgroundColor, Color textColor)
                             {
-                                ImGui.SetWindowFontScale(scale);
+                                ImGui.PushFont(null, ImGui.GetStyle().FontSizeBase * scale);
                                 var newTextSize = ImGui.CalcTextSize(text);
                                 var textPosition = box.Center.ToVector2Num() - newTextSize / 2;
                                 var rectPosition = new Vector2(textPosition.X, box.Top + 1);
                                 drawList.AddRectFilled(rectPosition, rectPosition + new Vector2(newTextSize.X, box.Height - 2), backgroundColor.ToImgui());
                                 drawList.AddText(textPosition, textColor.ToImgui(), text);
-                                ImGui.SetWindowFontScale(1);
+                                ImGui.PopFont();
                             }
 
                             if (item.UniqueNameCandidates.Any())
