@@ -345,6 +345,10 @@ public class CustomItem
         {
             ItemType = ItemTypes.Ducat;
         }
+        else if (BaseName.EndsWith(" Enshrouding Crystal"))
+        {
+            ItemType = ItemTypes.EnshroudingCrystal;
+        }
         else if (ClassName == "StackableCurrency" &&
                  !BaseName.StartsWith("Crescent Splinter") &&
                  !BaseName.StartsWith("Simulacrum") &&
