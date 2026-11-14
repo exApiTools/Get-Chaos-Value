@@ -255,6 +255,7 @@ public partial class Main
         ProcessTradeWindow();
         ProcessDivineFontRewards();
         DrawVillageUniqueWindow();
+        DrawSkillGemCorruptWindow();
         ShowSanctumOfferPrices();
         ProcessUltimatumPanel();
         ProcessHoveredItem();
@@ -1051,6 +1052,117 @@ public partial class Main
             }
 
             Settings.LeagueSpecificSettings.ShowVillageUniqueDisenchantValueWindow.Value = show;
+        }
+    }
+
+    private string _gemFilter = "";
+    private float _minGemDivinePrice = 0.5f;
+    private int _minGemListings = 10;
+
+    private void DrawSkillGemCorruptWindow()
+    {
+        if (Settings.LeagueSpecificSettings.ShowSkillGemCorruptWindow)
+        {
+            var show = true;
+            if (ImGui.Begin("Skill Gem Corruption Prices", ref show))
+            {
+                ImGui.SliderFloat("Minimum corrupted sale value", ref _minGemDivinePrice, 0, 100);
+                ImGui.SliderInt("Minimum corrupted listings", ref _minGemListings, 0, 100);
+                ImGui.InputTextWithHint("##filter", "Filter", ref _gemFilter, 200);
+                if (ImGui.BeginTable("Skill Gem Corruption Prices", 6, ImGuiTableFlags.Borders | ImGuiTableFlags.Sortable | ImGuiTableFlags.SizingFixedFit))
+                {
+                    ImGui.TableSetupColumn("Name");
+                    ImGui.TableSetupColumn("Price (uncorrupted)");
+                    ImGui.TableSetupColumn("Price (corrupted)");
+                    ImGui.TableSetupColumn("Price (corrupted failed)");
+                    ImGui.TableSetupColumn("Profit Ratio", ImGuiTableColumnFlags.DefaultSort | ImGuiTableColumnFlags.PreferSortDescending);
+                    ImGui.TableSetupColumn("Listings");
+                    ImGui.TableHeadersRow();
+
+                    // uncorrupted = highest level gem with no corruption and 20 quality
+                    // corrupted = highest level gem with corruption and 23 quality
+                    // corrupted failed = same gem level and quality as uncorrupted, but with corruption
+                    var gemGroups = (CollectedData.SkillGems.Lines ?? [])
+                        .Where(x => string.IsNullOrEmpty(_gemFilter) || x.Name.Contains(_gemFilter, StringComparison.InvariantCultureIgnoreCase))
+                        .GroupBy(x => x.Name)
+                        .Where(x => x.Any(y => y.Corrupted && (y.DivineValue ?? 0) >= _minGemDivinePrice))
+                        .ToDictionary(x => x.Key, x => x.ToList());
+                    var gems = gemGroups.Select(gemGroup =>
+                        {
+                            var uncorruptedGem = gemGroup.Value
+                                .Where(x => !x.Corrupted)
+                                .OrderByDescending(x => x.GemLevel)
+                                .ThenByDescending(x => x.GemQuality)
+                                .FirstOrDefault();
+                            var corruptedGem = gemGroup.Value
+                                .Where(x => x.Corrupted)
+                                .OrderByDescending(x => x.GemLevel)
+                                .ThenByDescending(x => x.GemQuality)
+                                .FirstOrDefault();
+                            var corruptedFailedGem = gemGroup.Value
+                                .Where(x => x.Corrupted)
+                                .FirstOrDefault(x => x.GemLevel == uncorruptedGem?.GemLevel && x.GemQuality == uncorruptedGem?.GemQuality);
+                            var uncorruptedPrice = uncorruptedGem?.DivineValue ?? 0;
+                            var corruptedPrice = corruptedGem?.DivineValue ?? 0;
+                            return (
+                                Name: gemGroup.Key,
+                                UncorruptedPrice: uncorruptedPrice,
+                                CorruptedPrice: corruptedPrice,
+                                CorruptedFailedPrice: corruptedFailedGem?.DivineValue ?? 0,
+                                Listings: corruptedGem?.ListingCount ?? 0,
+                                Ratio: uncorruptedPrice > 0 ? corruptedPrice / uncorruptedPrice : 0.0);
+                        })
+                        .Where(x => x.Listings >= _minGemListings)
+                        .ToList();
+                    var sortSpecs = ImGui.TableGetSortSpecs();
+                    if (sortSpecs.SpecsCount > 0)
+                    {
+                        object SortSelector((string Name, double UncorruptedPrice, double CorruptedPrice, double CorruptedFailedPrice, int Listings, double Ratio) x) =>
+                            sortSpecs.Specs.ColumnIndex switch
+                            {
+                                0 => x.Name,
+                                1 => x.UncorruptedPrice,
+                                2 => x.CorruptedPrice,
+                                3 => x.CorruptedFailedPrice,
+                                4 => x.Ratio,
+                                5 => x.Listings,
+                                _ => 0,
+                            };
+
+                        if (sortSpecs.Specs.SortDirection == ImGuiSortDirection.Ascending)
+                        {
+                            gems = gems.OrderBy(SortSelector).ToList();
+                        }
+                        else if (sortSpecs.Specs.SortDirection == ImGuiSortDirection.Descending)
+                        {
+                            gems = gems.OrderByDescending(SortSelector).ToList();
+                        }
+                    }
+
+                    foreach (var gem in gems)
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted(gem.Name);
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{gem.UncorruptedPrice:0.##}");
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{gem.CorruptedPrice:0.##}");
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{gem.CorruptedFailedPrice:0.##}");
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{gem.Ratio:0.##}");
+                        ImGui.TableNextColumn();
+                        ImGui.TextUnformatted($"{gem.Listings}");
+                    }
+
+                    ImGui.EndTable();
+                }
+
+                ImGui.End();
+            }
+
+            Settings.LeagueSpecificSettings.ShowSkillGemCorruptWindow.Value = show;
         }
     }
 

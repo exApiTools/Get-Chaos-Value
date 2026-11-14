@@ -83,6 +83,7 @@ public class LeagueSpecificSettings
     public ToggleNode ShowPurchaseWindowPrices { get; set; } = new(true);
     public ToggleNode ShowSanctumRewardPrices { get; set; } = new(true);
     public ToggleNode ShowVillageUniqueDisenchantValueWindow { get; set; } = new(false);
+    public ToggleNode ShowSkillGemCorruptWindow { get; set; } = new(false);
 
     public ToggleNode ShowExpeditionVendorOverlay { get; set; } = new(false);
     public ToggleNode ShowUltimatumOverlay { get; set; } = new(true);
