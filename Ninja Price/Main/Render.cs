@@ -1123,6 +1123,7 @@ public partial class Main
     private void ProcessItemsOnGround()
     {
         if (!Settings.GroundItemSettings.PriceItemsOnGround && !Settings.UniqueIdentificationSettings.ShowRealUniqueNameOnGround && !Settings.GroundItemSettings.PriceHeistRewards) return;
+        if (GameController.IngameState.IngameUi.FullscreenPanels.Any(x => x.IsVisible)) return;
         //this window allows us to change the size of the text we draw to the background list
         //yeah, it's weird
         ImGui.Begin("lmao",
@@ -1216,8 +1217,10 @@ public partial class Main
                                 ImGui.PushFont(null, ImGui.GetStyle().FontSizeBase * scale);
                                 var newTextSize = ImGui.CalcTextSize(text);
                                 var textPosition = box.Center.ToVector2Num() - newTextSize / 2;
-                                var rectPosition = new Vector2(textPosition.X, box.Top + 1);
-                                drawList.AddRectFilled(rectPosition, rectPosition + new Vector2(newTextSize.X, box.Height - 2), backgroundColor.ToImgui());
+                                var (backgroundLeft, backgroundRight) = Settings.UniqueIdentificationSettings.BackgroundCoversWholeLabel
+                                    ? (box.Left + 1, box.Right - 1)
+                                    : (textPosition.X, textPosition.X + newTextSize.X);
+                                drawList.AddRectFilled(new Vector2(backgroundLeft, box.Top + 1), new Vector2(backgroundRight, box.Bottom - 1), backgroundColor.ToImgui());
                                 drawList.AddText(textPosition, textColor.ToImgui(), text);
                                 ImGui.PopFont();
                             }
