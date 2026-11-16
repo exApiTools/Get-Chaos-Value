@@ -459,6 +459,7 @@ public partial class Main
                 break;
             case ItemTypes.Map:
             case ItemTypes.Invitation:
+            case ItemTypes.Viscera:
             case ItemTypes.SkillGem:
             case ItemTypes.ClusterJewel:
             case ItemTypes.InscribedUltimatum:

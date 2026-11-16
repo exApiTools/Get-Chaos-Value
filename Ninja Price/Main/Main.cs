@@ -16,6 +16,9 @@ public partial class Main : BaseSettingsPlugin<Settings.Settings>
 {
     private string NinjaDirectory;
     private CollectiveApiData CollectedData;
+
+    public bool IsKnownViscera(string baseName) =>
+        !string.IsNullOrEmpty(baseName) && CollectedData?.Viscera?.LinesByName.ContainsKey(baseName) == true;
     private const string CustomUniqueArtMappingPath = "uniqueArtMapping.json";
     private const string DefaultUniqueArtMappingPath = "uniqueArtMapping.default.json";
     internal const string DefaultWav = "default.wav";

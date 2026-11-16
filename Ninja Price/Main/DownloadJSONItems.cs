@@ -46,6 +46,7 @@ public partial class Main
     private const string ClusterJewelsUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=ClusterJewel";
     private const string BeastUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Beast";
     private const string VialUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Vial";
+    private const string VisceraUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Viscera";
     private const string BaseTypeUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=BaseType";
 
     private class LeagueMetadata
@@ -100,6 +101,7 @@ public partial class Main
                 await LoadData<Vials.RootObject>("Vials.json", VialUrl, league, tryWebFirst, t => newData.Vials = t);
                 await LoadData<Incubators.RootObject>("Incubators.json", IncubatorsUrl, league, tryWebFirst, t => newData.Incubators = t);
                 await LoadData<Wombgifts.RootObject>("Wombgifts.json", WombgiftsUrl, league, tryWebFirst, t => newData.Wombgifts = t);
+                await LoadData<Viscera.RootObject>("Viscera.json", VisceraUrl, league, tryWebFirst, t => newData.Viscera = t);
                 await LoadData<SkillGems.RootObject>("SkillGems.json", SkillGemsUrl, league, tryWebFirst, t => newData.SkillGems = t);
                 await LoadData<ClusterJewelNinjaData>("ClusterJewels.json", ClusterJewelsUrl, league, tryWebFirst, t => newData.ClusterJewels = t);
                 await LoadData<Beasts.RootObject>("Beasts.json", BeastUrl, league, tryWebFirst, t => newData.Beasts = t);

@@ -59,6 +59,7 @@ public class CustomItem
     public HashSet<string> FoulbornMods;
     public readonly string GrantedPassiveName;
     public readonly int WombgiftLevel;
+    public string VisceraVariant;
 
     public readonly uint EntityId;
     public MapData MapInfo { get; set; } =  new MapData();
@@ -301,6 +302,8 @@ public class CustomItem
             IsHovered = Core.GameController.Game.IngameState.UIHover.AsObject<NormalInventoryItem>().Address == Element?.Address;
 
             ComputeType(itemEntity);
+            if (ItemType == ItemTypes.Viscera && itemEntity.TryGetComponent<Mods>(out var visceraMods))
+                VisceraVariant = API.PoeNinja.Viscera.NormalizeVariant(visceraMods.ImplicitMods.Select(x => x.Translation));
         }
         catch (Exception exception)
         {
@@ -314,7 +317,13 @@ public class CustomItem
     {
         // sort items into types to use correct json data later from poe.ninja
         // This might need tweaking since if this catches anything other than currency.
-        if (Path.StartsWith("Metadata/Items/Currency/Runegraft", StringComparison.Ordinal))
+        if (Path.Contains("/Viscera/", StringComparison.OrdinalIgnoreCase) ||
+            ClassName.Contains("Viscera", StringComparison.OrdinalIgnoreCase) ||
+            Core.IsKnownViscera(BaseName))
+        {
+            ItemType = ItemTypes.Viscera;
+        }
+        else if (Path.StartsWith("Metadata/Items/Currency/Runegraft", StringComparison.Ordinal))
         {
             ItemType = ItemTypes.KalguuranRune;
         }

@@ -418,6 +418,15 @@ public partial class Main
                             item.PriceData.DetailsId = wombgiftSearch.DetailsId;
                         }
                         break;
+                    case ItemTypes.Viscera:
+                        var visceraSearch = CollectedData.Viscera.Find(item.BaseName, item.VisceraVariant);
+                        if (visceraSearch != null)
+                        {
+                            item.PriceData.MinChaosValue = visceraSearch.ChaosValue ?? 0;
+                            SetPriceChangeData(item.PriceData, visceraSearch.Sparkline?.TotalChange, visceraSearch.Sparkline?.Data);
+                            item.PriceData.DetailsId = visceraSearch.DetailsId;
+                        }
+                        break;
                     case ItemTypes.Invitation:
                         var invitationSearch = CollectedData.Invitations.Lines.Find(x => x.Name == item.BaseName);
                         if (invitationSearch != null)
