@@ -161,6 +161,9 @@ public class UniqueIdentificationSettings
     public ToggleNode OnlyShowRealUniqueNameForValuableUniques { get; set; } = new(false);
     public ToggleNode ShowWarningTextForUnknownUniques { get; set; } = new(true);
     public RangeNode<float> UniqueLabelSize { get; set; } = new(0.8f, 0.1f, 1);
+
+    [Menu(null, "Draw the name background over the whole item label instead of only behind the text")]
+    public ToggleNode BackgroundCoversWholeLabel { get; set; } = new(false);
     public ColorNode UniqueItemNameTextColor { get; set; } = new(Color.Black);
     public ColorNode UniqueItemNameBackgroundColor { get; set; } = new(new Color(175, 96, 37));
     public ColorNode ValuableUniqueItemNameTextColor { get; set; } = new(new Color(175, 96, 37));
