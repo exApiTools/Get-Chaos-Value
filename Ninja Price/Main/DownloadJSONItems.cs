@@ -47,6 +47,7 @@ public partial class Main
     private const string BeastUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Beast";
     private const string VialUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Vial";
     private const string BaseTypeUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=BaseType";
+    private const string ViscerasUrl = "https://poe.ninja/poe1/api/economy/stash/current/item/overview?league={0}&type=Viscera";
 
     private class LeagueMetadata
     {
@@ -115,6 +116,7 @@ public partial class Main
                 await LoadData<BlightRavagedMaps.RootObject>("BlightRavagedMaps.json", BlightRavagedMapsUrl, league, tryWebFirst, t => newData.BlightRavagedMaps = t);
                 await LoadData<ValdoMaps.RootObject>("ValdoMaps.json", ValdoMapsUrl, league, tryWebFirst, t => newData.ValdoMaps = t);
                 await LoadData<BaseTypes.RootObject>("BaseTypes.json", BaseTypeUrl, league, tryWebFirst, t => newData.BaseType = t);
+                await LoadData<Visceras.RootObject>("Visceras.json", ViscerasUrl, league, tryWebFirst, t => newData.Visceras = t);
 
                 new FileInfo(metadataPath).Directory?.Create();
                 await File.WriteAllTextAsync(metadataPath, JsonConvert.SerializeObject(new LeagueMetadata { LastLoadTime = DateTime.UtcNow }));

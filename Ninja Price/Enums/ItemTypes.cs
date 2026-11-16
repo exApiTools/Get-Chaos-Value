@@ -38,4 +38,5 @@ public enum ItemTypes
     BaseType,
     Ducat,
     Thread,
+    Viscera,
 }

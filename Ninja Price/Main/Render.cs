@@ -430,6 +430,7 @@ public partial class Main
             case ItemTypes.UniqueJewel:
             case ItemTypes.UniqueMap:
             case ItemTypes.UniqueWeapon:
+            case ItemTypes.Viscera:
                 if (HoveredItem.UniqueNameCandidates.Any())
                 {
                     AddText(HoveredItem.UniqueNameCandidates.Count == 1

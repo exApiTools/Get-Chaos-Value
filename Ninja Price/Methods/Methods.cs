@@ -6,8 +6,11 @@ using Ninja_Price.API.PoeNinja;
 using Ninja_Price.Enums;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ExileCore;
 using ExileCore.PoEMemory;
 using ExileCore.PoEMemory.FilesInMemory;
@@ -93,6 +96,99 @@ public partial class Main
     private static bool NinjaNameEquals(string ninjaName, string gameName) =>
         ninjaName != null && gameName != null &&
         string.Equals(ninjaName.Replace('\x2019', '\x27'), gameName.Replace('\x2019', '\x27'), StringComparison.Ordinal);
+
+    private static readonly string[] VisceraNamePrefixes = ["Lesser ", "Greater ", "Nightmarish "];
+    private static readonly Regex ModRangePattern = new(@"\(\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*\)", RegexOptions.Compiled);
+    private static readonly Regex ModNumberPattern = new(@"\d+(?:\.\d+)?", RegexOptions.Compiled);
+    private static readonly Regex ModWhitespacePattern = new(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex ModBracketedAliasPattern = new(@"\[(?:[^\]]*\|)?([^\]]+)\]", RegexOptions.Compiled);
+    private static readonly ConcurrentDictionary<string, string> CanonicalVisceraNames = [];
+    private static string CanonicalVisceraName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return string.Empty;
+        return CanonicalVisceraNames.GetOrAdd(name, n =>
+        {
+            var result = n.Replace('\x2019', '\x27');
+            foreach (var prefix in VisceraNamePrefixes)
+            {
+                if (result.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    return result[prefix.Length..];
+                }
+            }
+
+            return result;
+        });
+    }
+
+    private static string NormalizeModText(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        var result = ModBracketedAliasPattern.Replace(text.Replace('\x2019', '\x27'), m => m.Groups[1].Value);
+        result = ModRangePattern.Replace(result, "#");
+        result = ModNumberPattern.Replace(result, "#");
+        return ModWhitespacePattern.Replace(result, " ").Trim();
+    }
+
+    private static List<(double Low, double High)> ParseModRanges(string text)
+    {
+        var ranges = new List<(double Low, double High)>();
+        if (string.IsNullOrEmpty(text)) return ranges;
+        foreach (Match match in ModRangePattern.Matches(text))
+        {
+            var low = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+            var high = double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+            ranges.Add((Math.Min(low, high), Math.Max(low, high)));
+        }
+
+        return ranges;
+    }
+
+    private static List<double> ParseModValues(string text)
+    {
+        var values = new List<double>();
+        if (string.IsNullOrEmpty(text)) return values;
+        foreach (Match match in ModNumberPattern.Matches(text))
+        {
+            var v = double.Parse(match.Value, CultureInfo.InvariantCulture);
+            values.Add(v);
+        }
+
+        return values;
+    }
+
+    private static bool MatchesVisceraImplicitModifiers(List<(string Text, List<double> Values)> itemImplicits, List<Visceras.ImplicitModifier> feedImplicits, bool enforceValues)
+    {
+        if (feedImplicits == null || feedImplicits.Count == 0) return itemImplicits.Count == 0;
+        if (feedImplicits.Count != itemImplicits.Count) return false;
+        foreach (var feedMod in feedImplicits)
+        {
+            var canon = NormalizeModText(feedMod.Text);
+            var itemMod = itemImplicits.FirstOrDefault(x => x.Text == canon);
+            if (itemMod.Text == null) return false;
+            if (!enforceValues) continue;
+            var ranges = ParseModRanges(feedMod.Text);
+            if (ranges.Count > 0)
+            {
+                if (ranges.Count != itemMod.Values.Count) return false;
+                for (var i = 0; i < ranges.Count; i++)
+                {
+                    if (itemMod.Values[i] < ranges[i].Low || itemMod.Values[i] > ranges[i].High) return false;
+                }
+            }
+            else
+            {
+                if (itemMod.Values.Count > 0)
+                {
+                    var feedNumbers = ModNumberPattern.Matches(feedMod.Text)
+                        .Select(m => double.Parse(m.Value, CultureInfo.InvariantCulture)).ToHashSet();
+                    if (feedNumbers.Count > 0 && !itemMod.Values.All(v => feedNumbers.Contains(v))) return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
     private void GetHoveredItem()
     {
@@ -328,6 +424,50 @@ public partial class Main
                         }
 
                         break;
+                    case ItemTypes.Viscera:
+                    {
+                        var canonBaseName = CanonicalVisceraName(item.BaseName);
+                        var visceraCandidates = (CollectedData.Visceras.Lines ?? [])
+                            .Where(x => CanonicalVisceraName(x.Name) == canonBaseName)
+                            .ToList();
+                        if (visceraCandidates.Count == 0)
+                        {
+                            break;
+                        }
+
+                        var itemImplicits = item.ImplicitModsData
+                            .Select(x => (Text: NormalizeModText(x.Translation), ParseModValues(x.Translation)))
+                            .ToList();
+                        var visceraMatches = visceraCandidates
+                            .Where(x => MatchesVisceraImplicitModifiers(itemImplicits, x.ImplicitModifiers, enforceValues: true))
+                            .ToList();
+                        if (visceraMatches.Count == 0)
+                        {
+                            visceraMatches = visceraCandidates
+                                .Where(x => MatchesVisceraImplicitModifiers(itemImplicits, x.ImplicitModifiers, enforceValues: false))
+                                .ToList();
+                        }
+
+                        if (visceraMatches.Count == 0)
+                        {
+                            visceraMatches = visceraCandidates;
+                        }
+
+                        if (visceraMatches.Count == 1)
+                        {
+                            item.PriceData.MinChaosValue = visceraMatches[0].ChaosValue ?? 0;
+                            SetPriceChangeData(item.PriceData, visceraMatches[0].Sparkline?.TotalChange, visceraMatches[0].Sparkline?.Data);
+                            item.PriceData.DetailsId = visceraMatches[0].DetailsId;
+                        }
+                        else if (visceraMatches.Count > 1)
+                        {
+                            item.PriceData.MinChaosValue = visceraMatches.Min(x => x.ChaosValue) ?? 0;
+                            item.PriceData.MaxChaosValue = visceraMatches.Max(x => x.ChaosValue) ?? 0;
+                            item.PriceData.DetailsId = string.Join("\n--", visceraMatches.Select(x => x.DetailsId));
+                        }
+
+                        break;
+                    }
                     case ItemTypes.SkillGem:
                         var displayText = !string.IsNullOrEmpty(item.GemName) ? item.GemName : item.BaseName;
                         var fittingGems = CollectedData.SkillGems.Lines

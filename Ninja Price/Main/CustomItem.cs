@@ -59,6 +59,7 @@ public class CustomItem
     public HashSet<string> FoulbornMods;
     public readonly string GrantedPassiveName;
     public readonly int WombgiftLevel;
+    public readonly List<(string Translation, List<int> Values)> ImplicitModsData = [];
 
     public readonly uint EntityId;
     public MapData MapInfo { get; set; } =  new MapData();
@@ -198,6 +199,8 @@ public class CustomItem
 
                 FoulbornMods = mods.ExplicitMods.Where(x => x.RawName.StartsWith("MutatedUnique", StringComparison.Ordinal)).Select(x => x.Translation).ToHashSet();
 
+                ImplicitModsData.AddRange(mods.ImplicitMods.Select(x => (x.Translation, x.Values)));
+
                 if (UniqueName == "Forbidden Flesh" ||
                     UniqueName == "Forbidden Flame")
                 {
@@ -326,6 +329,10 @@ public class CustomItem
         else if (Path.StartsWith("Metadata/Items/Threads/", StringComparison.Ordinal))
         {
             ItemType = ItemTypes.Thread;
+        }
+        else if (Path.StartsWith("Metadata/Items/Viscera/", StringComparison.Ordinal))
+        {
+            ItemType = ItemTypes.Viscera;
         }
         else if (BaseName == "Imprinted Bestiary Orb")
         {
