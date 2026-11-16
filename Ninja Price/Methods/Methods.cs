@@ -318,6 +318,16 @@ public partial class Main
 
                         break;
                         }
+                    case ItemTypes.Thread:
+                        var threadSearch = CollectedData.Threads.LinesByName.GetValueOrDefault(item.BaseName);
+                        if (threadSearch != default)
+                        {
+                            item.PriceData.MinChaosValue = item.CurrencyInfo.StackSize * threadSearch.ChaosEquivalent;
+                            SetPriceChangeData(item.PriceData, threadSearch.Line.sparkline.totalChange, threadSearch.Line.sparkline.data);
+                            item.PriceData.DetailsId = threadSearch.Item.detailsId;
+                        }
+
+                        break;
                     case ItemTypes.SkillGem:
                         var displayText = !string.IsNullOrEmpty(item.GemName) ? item.GemName : item.BaseName;
                         var fittingGems = CollectedData.SkillGems.Lines

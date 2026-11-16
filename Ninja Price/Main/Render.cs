@@ -396,6 +396,7 @@ public partial class Main
             case ItemTypes.Currency:
             case ItemTypes.Essence:
             case ItemTypes.Fragment:
+            case ItemTypes.Thread:
             case ItemTypes.Scarab:
             case ItemTypes.Resonator:
             case ItemTypes.Fossil:

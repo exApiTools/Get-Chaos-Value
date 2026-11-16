@@ -323,6 +323,10 @@ public class CustomItem
         {
             ItemType = ItemTypes.AllflameEmber;
         }
+        else if (Path.StartsWith("Metadata/Items/Threads/", StringComparison.Ordinal))
+        {
+            ItemType = ItemTypes.Thread;
+        }
         else if (BaseName == "Imprinted Bestiary Orb")
         {
             ItemType = ItemTypes.Beast;
