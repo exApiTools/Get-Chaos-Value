@@ -109,6 +109,7 @@ public class CustomItem
         ClassName = "";
         BaseName = "";
         UniqueNameCandidates = [];
+        FoulbornMods = [];
     }
 
     public CustomItem(Entity itemEntity, Element element)
