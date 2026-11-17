@@ -51,12 +51,13 @@ public class CustomItem
     public string GemName;
     public readonly ItemRarity Rarity;
     public readonly int Sockets;
-    public readonly List<string> UniqueNameCandidates;
+    // init here so a throw in the entity ctor (swallowed by its catch) can't leave these null - ground render then threw between ImGui Begin/End
+    public readonly List<string> UniqueNameCandidates = [];
     public ItemTypes ItemType;
     public ClusterJewelData ClusterJewelData;
     public readonly List<string> EnchantedStats;
     public readonly string CapturedMonsterName;
-    public HashSet<string> FoulbornMods;
+    public HashSet<string> FoulbornMods = [];
     public readonly string GrantedPassiveName;
     public readonly int WombgiftLevel;
     public readonly List<(string Translation, List<int> Values)> ImplicitModsData = [];

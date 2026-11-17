@@ -1242,6 +1242,19 @@ public partial class Main
         //yeah, it's weird
         ImGui.Begin("lmao",
             ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav);
+        // finally so a throw while drawing can't skip End() - that left imgui asserting Missing End() on "lmao"
+        try
+        {
+            DrawGroundItems();
+        }
+        finally
+        {
+            ImGui.End();
+        }
+    }
+
+    private void DrawGroundItems()
+    {
         var drawList = ImGui.GetBackgroundDrawList();
         var tooltipRect = HoveredItem?.Element.AsObject<HoverItemIcon>()?.Tooltip?.GetClientRect() ?? new RectangleF(0, 0, 0, 0);
         var leftPanelRect = GameController.IngameState.IngameUi.OpenLeftPanel.Address != 0
@@ -1395,8 +1408,6 @@ public partial class Main
             }
                 
         }
-        
-        ImGui.End();
     }
 
     private void ProcessUltimatumPanel()
