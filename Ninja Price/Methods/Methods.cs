@@ -534,8 +534,8 @@ public partial class Main
                     case ItemTypes.ClusterJewel:
                         var passivesText = $"{item.ClusterJewelData.PassiveCount} passives";
                         var fittingJewels = CollectedData.ClusterJewels.Lines.Where(x =>
-                            x.Name == item.ClusterJewelData.Name &&
-                            x.Variant == passivesText &&
+                            string.Equals(x.Name?.Trim(), item.ClusterJewelData.Name, StringComparison.OrdinalIgnoreCase) &&
+                            string.Equals(x.Variant?.Trim(), passivesText, StringComparison.OrdinalIgnoreCase) &&
                             x.LevelRequired <= item.ItemLevel).ToList();
                         if (fittingJewels.Any())
                         {
