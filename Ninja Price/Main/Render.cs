@@ -273,9 +273,12 @@ public partial class Main
                 Settings.PriceOverlaySettings.DoNotDrawWhileAnItemIsHovered && HoveredItem != null ||
                 !layout.Enabled) return;
 
+            RectangleF? stashViewport = tabType == InventoryType.DivinationStash
+                ? StashPanel.VisibleStash?.GetChildAtIndex(0)?.GetClientRect()
+                : null;
             foreach (var customItem in ItemsToDrawList.Where(customItem => customItem.ItemType != ItemTypes.None))
             {
-                PriceBoxOverItem(customItem, null, null, null, layout);
+                PriceBoxOverItem(customItem, stashViewport, null, null, layout);
             }
         }
         else if (
