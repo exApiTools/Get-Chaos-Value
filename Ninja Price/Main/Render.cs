@@ -273,12 +273,18 @@ public partial class Main
                 Settings.PriceOverlaySettings.DoNotDrawWhileAnItemIsHovered && HoveredItem != null ||
                 !layout.Enabled) return;
 
-            RectangleF? stashViewport = tabType == InventoryType.DivinationStash
+            var isDivinationTab = tabType == InventoryType.DivinationStash;
+            RectangleF? stashViewport = isDivinationTab
                 ? StashPanel.VisibleStash?.GetChildAtIndex(0)?.GetClientRect()
                 : null;
             foreach (var customItem in ItemsToDrawList.Where(customItem => customItem.ItemType != ItemTypes.None))
             {
-                PriceBoxOverItem(customItem, stashViewport, null, null, layout);
+                // Each div card sits in a square cell that's wider than the card, so put its price on
+                // the card picture, which is the cell's first child.
+                var itemBox = isDivinationTab && customItem.Element.GetChildAtIndex(0) is { IsVisible: true } card
+                    ? card.GetClientRect()
+                    : (RectangleF?)null;
+                PriceBoxOverItem(customItem, stashViewport, null, null, layout, itemBox);
             }
         }
         else if (
@@ -748,7 +754,7 @@ public partial class Main
         return (Settings.VisualPriceSettings.FontColor, Settings.VisualPriceSettings.BackgroundColor);
     }
 
-    private void PriceBoxOverItem(CustomItem item, RectangleF? containerBox, Color? textColor = null, Color? backgroundColor = null, StashPriceOverlayLayout layout = null)
+    private void PriceBoxOverItem(CustomItem item, RectangleF? containerBox, Color? textColor = null, Color? backgroundColor = null, StashPriceOverlayLayout layout = null, RectangleF? itemBox = null)
     {
         var itemValue = item.PriceData.MinChaosValue;
 
@@ -756,7 +762,7 @@ public partial class Main
 
         layout ??= new StashPriceOverlayLayout();
 
-        var box = item.Element.GetClientRect();
+        var box = itemBox ?? item.Element.GetClientRect();
         var h = Math.Abs(Settings.PriceOverlaySettings.BoxHeight.Value);
 
         const float gap = 2f;
