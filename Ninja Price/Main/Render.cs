@@ -778,7 +778,7 @@ public partial class Main
         var drawBox = new RectangleF(box.X, barTopY, box.Width, h);
 
         (containerBox ?? default).Contains(ref drawBox, out var contains);
-        if (containerBox != null && !contains || drawBox.Intersects(HoveredItem?.Element?.Tooltip?.GetClientRectCache ?? default)) return;
+        if (containerBox != null && !contains || (HoveredItemTooltipRect?.Intersects(drawBox) ?? false)) return;
         var overlayColors = GetOverlayColors(item.PriceData.MinChaosValue);
         Graphics.DrawBox(drawBox, backgroundColor ?? overlayColors.BackgroundColor);
         var textPosition = new Vector2(drawBox.Center.X, drawBox.Center.Y - ImGui.GetTextLineHeight() / 2);

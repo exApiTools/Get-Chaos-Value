@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using ExileCore;
 using ExileCore.PoEMemory;
 using ExileCore.PoEMemory.FilesInMemory;
@@ -217,12 +218,43 @@ public partial class Main
                 }
             }
 
-            HoveredItemTooltipRect = HoveredItem?.Element?.Tooltip?.GetClientRectCache;
+            HoveredItemTooltipRect = GetHoveredTooltipRect(uiHover) ?? HoveredItem?.Element?.Tooltip?.GetClientRectCache;
         }
         catch (Exception ex)
         {
             DebugWindow.LogError($"Failed to get the hovered item: {ex}");
         }
+    }
+
+    /// <summary>
+    /// The rectangle of the tooltip the game is showing for whatever is under the mouse. Unlike
+    /// HoveredItem, this also works for things the plugin skips, such as items in the currency tab
+    /// that report ToolTipType.ItemInChat.
+    /// </summary>
+    private SharpDX.RectangleF? GetHoveredTooltipRect(Element uiHover)
+    {
+        // While Alt is held, the game keeps showing the advanced tooltip of the item it showed when
+        // Alt went down, wherever the cursor goes, while the hover follows the cursor. So keep using
+        // that tooltip until Alt is let go.
+        var altHeld = Input.IsKeyDown(Keys.Menu);
+        var tooltip = altHeld && _tooltipShownWhileAltHeld is { Address: not 0, IsVisible: true } heldTooltip
+            ? heldTooltip
+            : FindShownTooltip(uiHover);
+        _tooltipShownWhileAltHeld = altHeld ? tooltip : null;
+        if (tooltip == null) return null;
+        var rect = tooltip.GetClientRect();
+        return rect.Width > 0 && rect.Height > 0 ? rect : null;
+    }
+
+    private Element _tooltipShownWhileAltHeld;
+
+    private Element FindShownTooltip(Element uiHover)
+    {
+        // While Alt is held for the advanced tooltip, UIHover reads 0, but UIHoverTooltip still
+        // points at the element whose tooltip is showing.
+        var hovered = uiHover is { Address: not 0, IsValid: true } ? uiHover : GameController.IngameState.UIHoverTooltip;
+        var tooltip = hovered is { Address: not 0, IsValid: true } ? hovered.Tooltip : null;
+        return tooltip is { Address: not 0, IsVisible: true } ? tooltip : null;
     }
 
     private void GetValue(IEnumerable<CustomItem> items)
