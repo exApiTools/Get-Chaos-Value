@@ -217,12 +217,25 @@ public partial class Main
                 }
             }
 
-            HoveredItemTooltipRect = HoveredItem?.Element?.Tooltip?.GetClientRectCache;
+            HoveredItemTooltipRect = GetHoveredTooltipRect(uiHover) ?? HoveredItem?.Element?.Tooltip?.GetClientRectCache;
         }
         catch (Exception ex)
         {
             DebugWindow.LogError($"Failed to get the hovered item: {ex}");
         }
+    }
+
+    /// <summary>
+    /// The rectangle of the tooltip the game is showing for whatever is under the mouse. Unlike
+    /// HoveredItem, this also works for things the plugin skips, such as items in the currency tab
+    /// that report ToolTipType.ItemInChat.
+    /// </summary>
+    private static SharpDX.RectangleF? GetHoveredTooltipRect(Element uiHover)
+    {
+        var tooltip = uiHover is { Address: not 0, IsValid: true } ? uiHover.Tooltip : null;
+        if (tooltip is not { Address: not 0, IsVisible: true }) return null;
+        var rect = tooltip.GetClientRect();
+        return rect.Width > 0 && rect.Height > 0 ? rect : null;
     }
 
     private void GetValue(IEnumerable<CustomItem> items)
