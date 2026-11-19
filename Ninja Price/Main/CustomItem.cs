@@ -6,6 +6,7 @@ using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Enums;
 using Ninja_Price.Enums;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using ExileCore.PoEMemory.Models;
@@ -18,6 +19,67 @@ public class CustomItem
 {
     //because inlining is weird
     private static readonly GameStat ClusterJewelPassiveCountStat = Enum.Parse<GameStat>(nameof(GameStat.LocalJewelExpansionPassiveNodeCount));
+    private static readonly GameStat ClusterJewelPassiveIndexStat = Enum.Parse<GameStat>(nameof(GameStat.LocalJewelExpansionPassiveNodeIndex));
+    // Pre-seeded from PassiveTreeExpansionSkills.dat (1-based LocalJewelExpansionPassiveNodeIndex -> poe.ninja ClusterJewel name)
+    // so Cluster Jewels price immediately in stash/inventory without requiring a mouse hover first.
+    private static readonly ConcurrentDictionary<int, string> ClusterIndexToNameCache = new(new Dictionary<int, string>
+    {
+        [1] = "Axe Attacks deal 12% increased Damage with Hits and Ailments, Sword Attacks deal 12% increased Damage with Hits and Ailments",
+        [2] = "Staff Attacks deal 12% increased Damage with Hits and Ailments, Mace or Sceptre Attacks deal 12% increased Damage with Hits and Ailments",
+        [3] = "Claw Attacks deal 12% increased Damage with Hits and Ailments, Dagger Attacks deal 12% increased Damage with Hits and Ailments",
+        [4] = "12% increased Damage with Bows, 12% increased Damage Over Time with Bow Skills",
+        [5] = "Wand Attacks deal 12% increased Damage with Hits and Ailments",
+        [6] = "12% increased Damage with Two Handed Weapons",
+        [7] = "12% increased Attack Damage while Dual Wielding",
+        [8] = "12% increased Attack Damage while holding a Shield",
+        [9] = "10% increased Attack Damage",
+        [10] = "10% increased Spell Damage",
+        [11] = "10% increased Elemental Damage",
+        [12] = "12% increased Physical Damage",
+        [13] = "12% increased Fire Damage",
+        [14] = "12% increased Lightning Damage",
+        [15] = "12% increased Cold Damage",
+        [16] = "12% increased Chaos Damage",
+        [17] = "Minions deal 10% increased Damage",
+        [18] = "12% increased Burning Damage",
+        [19] = "12% increased Chaos Damage over Time",
+        [20] = "12% increased Physical Damage over Time",
+        [21] = "12% increased Cold Damage over Time",
+        [22] = "10% increased Damage over Time",
+        [23] = "10% increased Effect of Non-Damaging Ailments",
+        [24] = "3% increased effect of Non-Curse Auras from your Skills",
+        [25] = "2% increased Effect of your Curses",
+        [26] = "10% increased Damage while affected by a Herald",
+        [27] = "Minions deal 10% increased Damage while you are affected by a Herald",
+        [28] = "Exerted Attacks deal 20% increased Damage",
+        [29] = "15% increased Critical Strike Chance",
+        [30] = "Minions have 12% increased maximum Life",
+        [31] = "10% increased Area Damage",
+        [32] = "10% increased Projectile Damage",
+        [33] = "12% increased Trap Damage, 12% increased Mine Damage",
+        [34] = "12% increased Totem Damage",
+        [35] = "12% increased Brand Damage",
+        [36] = "Channelling Skills deal 12% increased Damage",
+        [37] = "6% increased Flask Effect Duration",
+        [38] = "10% increased Life Recovery from Flasks, 10% increased Mana Recovery from Flasks",
+        [39] = "4% increased maximum Life",
+        [40] = "6% increased maximum Energy Shield",
+        [41] = "6% increased maximum Mana",
+        [42] = "15% increased Armour",
+        [43] = "15% increased Evasion Rating",
+        [44] = "+2% Chance to Block Attack Damage",
+        [45] = "2% Chance to Block Spell Damage",
+        [46] = "+15% to Fire Resistance",
+        [47] = "+15% to Cold Resistance",
+        [48] = "+15% to Lightning Resistance",
+        [49] = "+12% to Chaos Resistance",
+        [50] = "+4% chance to Suppress Spell Damage",
+        [51] = "+10 to Strength",
+        [52] = "+10 to Dexterity",
+        [53] = "+10 to Intelligence",
+        [54] = "6% increased Mana Reservation Efficiency of Skills",
+        [55] = "2% increased Effect of your Curses",
+    });
     private static readonly GameStat ForbiddenFlameNotableStat = Enum.Parse<GameStat>(nameof(GameStat.UniqueJewelGrantsNotableHashPart1));
     private static readonly GameStat ForbiddenFleshNotableStat = Enum.Parse<GameStat>(nameof(GameStat.UniqueJewelGrantsNotableHashPart2));
 
@@ -470,9 +532,41 @@ public class CustomItem
                      "Small Cluster Jewel")
         {
             ItemType = ItemTypes.ClusterJewel;
-            var passiveCount = itemEntity?.GetComponent<LocalStats>()?.StatDictionary.GetValueOrDefault(ClusterJewelPassiveCountStat) ?? 0;
+            var localStatsDict = itemEntity?.GetComponent<LocalStats>()?.StatDictionary;
+            var passiveCount = localStatsDict?.GetValueOrDefault(ClusterJewelPassiveCountStat) ?? 0;
+            var passiveIndex = localStatsDict?.GetValueOrDefault(ClusterJewelPassiveIndexStat) ?? 0;
+            var enchantedStats = itemEntity?.GetComponent<Mods>()?.EnchantedStats;
+            if (passiveCount == 0 && enchantedStats != null)
+            {
+                var addsLine = enchantedStats.FirstOrDefault(x => x.StartsWith("Adds ", StringComparison.Ordinal) && x.Contains("Passive Skill"));
+                var parts = addsLine?.Split(' ');
+                if (parts?.Length >= 2 && int.TryParse(parts[1], out var parsedCount))
+                    passiveCount = parsedCount;
+            }
             const string namePrefix = "Added Small Passive Skills grant: ";
-            var name = itemEntity?.GetComponent<Mods>()?.EnchantedStats.FirstOrDefault(x => x.StartsWith(namePrefix))?.Replace(namePrefix, null).Replace("\n", ", ");
+            var enchantLines = enchantedStats?
+                .Where(x => x.StartsWith(namePrefix, StringComparison.OrdinalIgnoreCase))
+                .Select(x => x.Replace(namePrefix, "", StringComparison.OrdinalIgnoreCase)
+                    .Replace("\r\n", ", ")
+                    .Replace("\n", ", ")
+                    .Replace("\r", "")
+                    .Trim())
+                .Where(x => !string.IsNullOrEmpty(x))
+                .ToList();
+            var name = enchantLines is { Count: > 0 }
+                ? string.Join(", ", enchantLines)
+                : null;
+
+            if (string.IsNullOrEmpty(name) && passiveIndex > 0)
+                ClusterIndexToNameCache.TryGetValue(passiveIndex, out name);
+
+            if (string.IsNullOrEmpty(name) && Element?.Tooltip != null)
+            {
+                name = ExtractClusterEnchantFromTooltip(Element.Tooltip, namePrefix);
+                if (!string.IsNullOrEmpty(name) && passiveIndex > 0)
+                    ClusterIndexToNameCache[passiveIndex] = name;
+            }
+
             ClusterJewelData = new ClusterJewelData(name, passiveCount);
         }
         else if (Rarity != ItemRarity.Unique && !IsMirrored && !IsCorrupted)
@@ -546,6 +640,49 @@ public class CustomItem
         }
 
         return stats;
+    }
+
+    private static string ExtractClusterEnchantFromTooltip(Element tooltip, string prefix)
+    {
+        if (tooltip == null) return null;
+        var queue = new Queue<Element>();
+        queue.Enqueue(tooltip);
+        int visited = 0;
+        while (queue.Count > 0 && visited < 200)
+        {
+            var el = queue.Dequeue();
+            visited++;
+            if (el == null) continue;
+            var text = el.TextNoTags ?? el.Text;
+            if (!string.IsNullOrEmpty(text))
+            {
+                int idx = text.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+                if (idx >= 0)
+                {
+                    var lines = text[idx..]
+                        .Replace("\r\n", "\n")
+                        .Replace("\r", "\n")
+                        .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(l =>
+                        {
+                            var s = l.Replace(prefix, "", StringComparison.OrdinalIgnoreCase).Trim();
+                            int paren = s.IndexOf(" (enchant)", StringComparison.OrdinalIgnoreCase);
+                            if (paren >= 0) s = s[..paren].Trim();
+                            return s;
+                        })
+                        .Where(l => !string.IsNullOrEmpty(l));
+                    var joined = string.Join(", ", lines);
+                    if (!string.IsNullOrEmpty(joined))
+                        return joined;
+                }
+            }
+            if (el.Children != null)
+            {
+                foreach (var child in el.Children)
+                    queue.Enqueue(child);
+            }
+        }
+        return null;
     }
 
     public override string ToString()
