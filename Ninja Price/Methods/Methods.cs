@@ -230,9 +230,12 @@ public partial class Main
     /// HoveredItem, this also works for things the plugin skips, such as items in the currency tab
     /// that report ToolTipType.ItemInChat.
     /// </summary>
-    private static SharpDX.RectangleF? GetHoveredTooltipRect(Element uiHover)
+    private SharpDX.RectangleF? GetHoveredTooltipRect(Element uiHover)
     {
-        var tooltip = uiHover is { Address: not 0, IsValid: true } ? uiHover.Tooltip : null;
+        // While Alt is held for the advanced tooltip, UIHover reads 0, but UIHoverTooltip still
+        // points at the element whose tooltip is showing.
+        var hovered = uiHover is { Address: not 0, IsValid: true } ? uiHover : GameController.IngameState.UIHoverTooltip;
+        var tooltip = hovered is { Address: not 0, IsValid: true } ? hovered.Tooltip : null;
         if (tooltip is not { Address: not 0, IsVisible: true }) return null;
         var rect = tooltip.GetClientRect();
         return rect.Width > 0 && rect.Height > 0 ? rect : null;
