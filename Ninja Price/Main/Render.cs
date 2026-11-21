@@ -1350,6 +1350,13 @@ public partial class Main
 
                             void DrawOnItemLabel(float scale, string text, Color backgroundColor, Color textColor)
                             {
+                                // A label whose rect reads empty or as garbage (zero height while the game changes it) gives a
+                                // negative or non-finite scale, and ImGui aborts the whole HUD on a negative font size.
+                                if (!(scale > 0) || !float.IsFinite(scale))
+                                {
+                                    return;
+                                }
+
                                 ImGui.PushFont(null, ImGui.GetStyle().FontSizeBase * scale);
                                 var newTextSize = ImGui.CalcTextSize(text);
                                 var textPosition = box.Center.ToVector2Num() - newTextSize / 2;
