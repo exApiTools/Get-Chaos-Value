@@ -97,18 +97,64 @@ public partial class Main
     {
         var labelsOnGround = GameController.IngameState.IngameUi.ItemsOnGroundLabelsVisible;
         var result = new List<ItemOnGround>();
+        var essencesByName = CollectedData?.Essences?.LinesByName;
+
         foreach (var labelOnGround in labelsOnGround)
         {
             var item = labelOnGround.ItemOnGround;
-            if (item != null &&
-                item.TryGetComponent<HeistRewardDisplay>(out var heistReward) &&
+            if (item == null) continue;
+
+            if (item.TryGetComponent<HeistRewardDisplay>(out var heistReward) &&
                 heistReward.RewardItem is { IsValid: true } heistItemEntity)
             {
-                result.Add(new ItemOnGround(new CustomItem(heistItemEntity, labelOnGround.Label), GroundItemProcessingType.HeistReward, null));
+                var heistCustomItem = new CustomItem(heistItemEntity, labelOnGround.Label);
+                GetValue(heistCustomItem);
+                result.Add(new ItemOnGround(heistCustomItem, GroundItemProcessingType.HeistReward, null));
+            }
+            else if (Settings.GroundItemSettings.PriceEssenceMonoliths &&
+                     !Settings.ValuationDisablingSettings.IsValuationDisabled(ItemTypes.Essence) &&
+                     essencesByName != null &&
+                     item.TryGetComponent<Monolith>(out var monolith) &&
+                     !monolith.IsOpened &&
+                     labelOnGround.Label is { IsValid: true, IsVisible: true } label)
+            {
+                Element essencePanel = null;
+                var matchedLines = new List<(Element Element, double ChaosValue)>();
+
+                foreach (var childPanel in label.Children)
+                {
+                    if (!childPanel.IsVisible) continue;
+                    foreach (var lineElement in childPanel.Children)
+                    {
+                        var text = (lineElement.TextNoTags ?? lineElement.Text)?.Trim().Replace('\x2019', '\x27');
+                        if (string.IsNullOrEmpty(text)) continue;
+
+                        var essenceSearch = essencesByName.GetValueOrDefault(text);
+                        if (essenceSearch != default)
+                        {
+                            essencePanel ??= childPanel;
+                            matchedLines.Add((lineElement, essenceSearch.ChaosEquivalent));
+                        }
+                    }
+                }
+
+                if (matchedLines.Count > 0)
+                {
+                    var totalChaosValue = matchedLines.Sum(x => x.ChaosValue);
+                    var customItem = new CustomItem(item, essencePanel ?? label)
+                    {
+                        ItemType = ItemTypes.Essence,
+                        BaseName = "Essence Monolith",
+                        PriceData =
+                        {
+                            MinChaosValue = totalChaosValue,
+                            MaxChaosValue = totalChaosValue,
+                        }
+                    };
+                    result.Add(new ItemOnGround(customItem, GroundItemProcessingType.EssenceMonolith, null, matchedLines));
+                }
             }
         }
-
-        GetValue(result.Select(x => x.Item));
 
         return result;
     }
@@ -1272,7 +1318,7 @@ public partial class Main
         var rightPanelRect = GameController.IngameState.IngameUi.OpenRightPanel.Address != 0
                                  ? GameController.IngameState.IngameUi.OpenRightPanel.GetClientRectCache
                                  : RectangleF.Empty;
-        foreach (var (item, processingType, clientRect) in _groundItems.Value)
+        foreach (var (item, processingType, clientRect, essenceLines) in _groundItems.Value)
         {
             var box = clientRect ?? item.Element.GetClientRect();
             switch (processingType)
@@ -1421,6 +1467,55 @@ public partial class Main
 
                     break;
                 }
+                case GroundItemProcessingType.EssenceMonolith:
+                {
+                    var passesThreshold = Settings.GroundItemSettings.OnlyPriceItemsAboveThreshold
+                        ? item.PriceData.MinChaosValue >= Settings.GroundItemSettings.ValueThreshold
+                        : item.PriceData.MinChaosValue > 0;
+
+                    if (Settings.GroundItemSettings.PriceEssenceMonoliths &&
+                        passesThreshold &&
+                        item.Element is { IsValid: true, IsVisible: true } &&
+                        !tooltipRect.Intersects(box) &&
+                        !leftPanelRect.Intersects(box) &&
+                        !rightPanelRect.Intersects(box))
+                    {
+                        var isValuable = item.PriceData.MaxChaosValue >= Settings.VisualPriceSettings.ValuableColorThreshold.Value;
+                        var totalText = $"Total: {item.PriceData.MinChaosValue.FormatNumber(2)}";
+                        using (Graphics.SetTextScale(Settings.GroundItemSettings.GroundPriceTextScale))
+                        {
+                            var textSize = Graphics.MeasureText(totalText);
+                            var textPos = new Vector2(box.Right - textSize.X, box.Top);
+                            Graphics.DrawBox(textPos, textPos + textSize, Settings.GroundItemSettings.GroundPriceBackgroundColor);
+                            Graphics.DrawText(totalText, textPos, isValuable ? Settings.VisualPriceSettings.ValuableColor : Settings.VisualPriceSettings.FontColor);
+                        }
+
+                        if (Settings.GroundItemSettings.ShowIndividualEssencePrices && essenceLines != null)
+                        {
+                            using (Graphics.SetTextScale(Settings.GroundItemSettings.GroundPriceTextScale))
+                            {
+                                foreach (var (lineElement, chaosValue) in essenceLines)
+                                {
+                                    var linePassesThreshold = Settings.GroundItemSettings.OnlyPriceItemsAboveThreshold
+                                        ? chaosValue >= Settings.GroundItemSettings.ValueThreshold
+                                        : chaosValue > 0;
+                                    if (!linePassesThreshold || lineElement is not { IsValid: true, IsVisible: true }) continue;
+                                    var lineRect = lineElement.GetClientRect();
+                                    if (lineRect.Height <= 0) continue;
+
+                                    var isLineValuable = chaosValue >= Settings.VisualPriceSettings.ValuableColorThreshold.Value;
+                                    var lineText = chaosValue.FormatNumber(2);
+                                    var lineTextSize = Graphics.MeasureText(lineText);
+                                    var linePos = new Vector2(box.Right - lineTextSize.X, lineRect.Top);
+                                    Graphics.DrawBox(linePos, linePos + lineTextSize, Settings.GroundItemSettings.GroundPriceBackgroundColor);
+                                    Graphics.DrawText(lineText, linePos, isLineValuable ? Settings.VisualPriceSettings.ValuableColor : Settings.VisualPriceSettings.FontColor);
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+                }
             }
                 
         }
@@ -1544,4 +1639,4 @@ public partial class Main
     }
 }
 
-internal record ItemOnGround(CustomItem Item, GroundItemProcessingType Type, RectangleF? ClientRect);
+internal record ItemOnGround(CustomItem Item, GroundItemProcessingType Type, RectangleF? ClientRect, IReadOnlyList<(Element Element, double ChaosValue)> EssenceLines = null);

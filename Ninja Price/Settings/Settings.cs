@@ -141,6 +141,8 @@ public class HoveredItemSparklineSettings
 public class GroundItemSettings
 {
     public ToggleNode PriceHeistRewards { get; set; } = new(true);
+    public ToggleNode PriceEssenceMonoliths { get; set; } = new(true);
+    public ToggleNode ShowIndividualEssencePrices { get; set; } = new(false);
     public ToggleNode PriceItemsOnGround { get; set; } = new(true);
     public ToggleNode OnlyPriceUniquesOnGround { get; set; } = new(false);
     public ToggleNode OnlyPriceItemsAboveThreshold { get; set; } = new(false);

@@ -4,4 +4,5 @@ public enum GroundItemProcessingType
 {
     WorldItem,
     HeistReward,
+    EssenceMonolith,
 }
